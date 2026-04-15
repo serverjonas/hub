@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Meme Upload{% endblock %}
+
+{% block content %}
+
+<h1>📤 Meme hochladen</h1>
+
+{% if message %}
+    <p>{{ message }}</p>
+{% endif %}
+
+{% if user %}
+    <p>👋 Angemeldet als <b>{{ user['name'] }}</b></p>
+
+    <div class="grid">
+        <div class="card">
+            <form action="{{ url_for('memes.upload') }}" method="post" enctype="multipart/form-data">
+                <label for="file">Bild auswählen (PNG/JPG/GIF):</label>
+                <input type="file" name="file" id="file" required><br><br>
+
+                <label for="title">Titel (optional):</label>
+                <input type="text" name="title" id="title"><br><br>
+
+                <button type="submit">Hochladen</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FIXED UPLOAD BUTTON -->
+    <a href="https://serverjonas.de/memes/" 
+    style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #ff4081;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        transition: transform 0.2s;
+    "
+    onmouseover="this.style.transform='scale(1.1)'"
+    onmouseout="this.style.transform='scale(1)'"
+    >
+    ⬆️ Zurück zum Viewer
+    </a>
+{% else %}
+    <p>Du musst eingeloggt sein, um ein Meme hochzuladen.  
+    <a href="/login"><button>🔐 Login</button></a></p>
+{% endif %}
+
+{% endblock %}

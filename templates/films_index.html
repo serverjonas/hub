@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Media · serverjonas{% endblock %}
+{% block content %}
+<h1>🎬 Media</h1>
+<p>Deine persönliche Mediathek</p>
+
+<div class="grid">
+    <div class="card" onclick="location.href='{{ url_for('films.films') }}'">
+        <span>🎥</span>
+        <h3>Filme</h3>
+        <p style="font-size:0.85em; opacity:0.7;">Einzelne Filme ansehen</p>
+    </div>
+    <div class="card" onclick="location.href='{{ url_for('films.series') }}'">
+        <span>📺</span>
+        <h3>Serien</h3>
+        <p style="font-size:0.85em; opacity:0.7;">Staffeln & Episoden</p>
+    </div>
+    <div class="card" onclick="location.href='{{ url_for('films.upload') }}'">
+        <span>⬆️</span>
+        <h3>Upload</h3>
+        <p style="font-size:0.85em; opacity:0.7;">Film oder Episode hochladen</p>
+    </div>
+</div>
+{% endblock %}

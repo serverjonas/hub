@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Gesperrt – serverjonas network</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e2e8f0;
+            font-family: 'Syne', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(251,113,133,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(251,113,133,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 560px;
+            padding: 48px 40px;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.88);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(251,113,133,0.08);
+            animation: fadeUp 0.4s ease-out both;
+            position: relative;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 5rem;
+            font-weight: 700;
+            margin: 0;
+            color: #fb7185;
+            text-shadow: 0 2px 12px rgba(251,113,133,0.35);
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            margin: 16px 0 0 0;
+            display: block;
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.5; }
+        }
+
+        .tag {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            background: rgba(251,113,133,0.1);
+            color: #fb7185;
+            border: 1px solid rgba(251,113,133,0.2);
+            border-radius: 4px;
+            padding: 2px 8px;
+            margin: 16px 0 4px 0;
+            letter-spacing: 0.05em;
+        }
+
+        .title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 12px 0 8px 0;
+            color: #e2e8f0;
+            letter-spacing: 0.02em;
+        }
+
+        p {
+            font-size: 1rem;
+            margin: 0 0 24px 0;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .reason-box {
+            background: rgba(251,113,133,0.07);
+            border: 1px solid rgba(251,113,133,0.15);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin: 0 0 32px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #fda4af;
+            text-align: left;
+            word-break: break-word;
+        }
+
+        .reason-box .label {
+            font-size: 0.65rem;
+            color: #fb7185;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .buttons a {
+            display: inline-block;
+            padding: 12px 28px;
+            background: #38bdf8;
+            color: #0f172a;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.2s ease-in-out;
+            min-width: 180px;
+            font-family: 'Syne', sans-serif;
+        }
+
+        .buttons a:hover {
+            background: #0ea5e9;
+            transform: scale(1.04);
+            box-shadow: 0 4px 16px rgba(56,189,248,0.3);
+        }
+
+        .hint {
+            margin-top: 28px;
+            font-size: 0.8rem;
+            opacity: 0.4;
+            font-family: 'JetBrains Mono', monospace;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="code">BAN</p>
+        <span class="icon">🚫</span>
+        <div class="tag">ACCOUNT GESPERRT</div>
+        <p class="title">Du wurdest vom serverjonas network ausgeschlossen.</p>
+        <p>Dein Account wurde von einem Moderator oder Administrator gesperrt.</p>
+
+        <div class="reason-box">
+            <span class="label">Grund</span>
+            {{ reason }}
+        </div>
+
+        <div class="hint">
+            serverjonas network // access.denied
+        </div>
+    </div>
+</body>
+</html>

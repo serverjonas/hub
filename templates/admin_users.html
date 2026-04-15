@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Adminpanel{% endblock %}
+
+{% block content %}
+<h1>Adminpanel – Users</h1>
+
+{% if users %}
+<table border="1" cellpadding="6" cellspacing="0" style="width:100%;">
+    <thead>
+        <tr>
+            {% for col in users[0].keys() %}
+            <th>{{ col }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            {% for val in user %}
+            <td>{{ val }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Keine User in der Datenbank.</p>
+{% endif %}
+{% endblock %}

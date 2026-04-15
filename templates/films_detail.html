@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}{{ film.title }} · serverjonas{% endblock %}
+{% block head %}
+<style>
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    font-size: 0.9em;
+}
+.back-link:hover { color: white; }
+.player-wrap {
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto 30px auto;
+    background: #000;
+    border-radius: 14px;
+    overflow: hidden;
+}
+.player-wrap video {
+    width: 100%;
+    display: block;
+    border-radius: 14px;
+}
+.film-info {
+    max-width: 860px;
+    margin: 0 auto;
+}
+.film-info h2 { margin: 0 0 8px 0; }
+.film-meta { font-size: 0.85em; opacity: 0.6; margin-bottom: 20px; }
+.status-box {
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    max-width: 860px;
+    margin: 0 auto 30px auto;
+}
+.status-box .icon { font-size: 3em; margin-bottom: 10px; }
+.next-ep {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-decoration: none;
+    color: white;
+    margin-top: 20px;
+}
+.next-ep:hover { background: rgba(255,255,255,0.15); }
+.next-ep .label { font-size: 0.75em; opacity: 0.55; }
+.next-ep .title { font-size: 0.95em; font-weight: bold; margin-top: 2px; }
+.actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 9px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn:hover { background: rgba(255,255,255,0.2); }
+.btn-danger { border-color: rgba(220,53,69,0.4); }
+.btn-danger:hover { background: rgba(220,53,69,0.25); }
+.series-badge {
+    display: inline-block;
+    background: rgba(99,179,237,0.2);
+    color: #63b3ed;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 0.8em;
+    margin-bottom: 10px;
+}
+</style>
+{% endblock %}
+{% block content %}
+
+{% if film.series %}
+    <a href="{{ url_for('films.series_detail', series_name=film.series) }}" class="back-link">← {{ film.series }}</a>
+{% else %}
+    <a href="{{ url_for('films.films') }}" class="back-link">← Filme</a>
+{% endif %}
+
+{% if film.status == "ready" %}
+<div class="player-wrap">
+    <video controls autoplay preload="metadata">
+        <source src="{{ url_for('films.watch', film_id=film.film_id) }}" type="video/mp4">
+        Dein Browser unterstützt kein HTML5-Video.
+    </video>
+</div>
+
+{% elif film.status == "converting" %}
+<div class="status-box" id="status-box">
+    <div class="icon">⚙️</div>
+    <p>Wird konvertiert... bitte warten.</p>
+    <p style="font-size:0.8em; opacity:0.5;">Die Seite aktualisiert sich automatisch.</p>
+</div>
+<script>
+setInterval(async () => {
+    const r = await fetch("{{ url_for('films.film_status', film_id=film.film_id) }}");
+    const d = await r.json();
+    if (d.status === "ready") location.reload();
+}, 3000);
+</script>
+
+{% elif film.status == "queued" %}
+<div class="status-box" id="status-box">
+    <div class="icon">⏳</div>
+    <p>In der Warteschlange...</p>
+</div>
+<script>
+setInterval(async () => {
+    const r = await fetch("{{ url_for('films.film_status', film_id=film.film_id) }}");
+    const d = await r.json();
+    if (d.status !== "queued") location.reload();
+}, 3000);
+</script>
+
+{% else %}
+<div class="status-box">
+    <div class="icon">❌</div>
+    <p>Konvertierung fehlgeschlagen.</p>
+    {% if film.error %}
+    <pre style="font-size:0.75em; opacity:0.6; text-align:left; overflow-x:auto;">{{ film.error }}</pre>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="film-info">
+    {% if film.series %}
+    <div class="series-badge">📺 {{ film.series }} · S{{ film.season }}E{{ film.episode }}</div>
+    {% endif %}
+    <h2>{{ film.title }}</h2>
+    <div class="film-meta">Hochgeladen am {{ film.uploaded_at | strftime }}</div>
+
+    {% if next_episode %}
+    <a class="next-ep" href="{{ url_for('films.film_detail', film_id=next_episode.film_id) }}">
+        <span style="font-size:1.8em;">▶️</span>
+        <div>
+            <div class="label">Nächste Episode · S{{ next_episode.season }}E{{ next_episode.episode }}</div>
+            <div class="title">{{ next_episode.title }}</div>
+        </div>
+    </a>
+    {% endif %}
+
+    <div class="actions">
+        <form method="POST" action="{{ url_for('films.delete_film', film_id=film.film_id) }}"
+              onsubmit="return confirm('Film wirklich löschen?')">
+            <button type="submit" class="btn btn-danger">🗑️ Löschen</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<link rel="icon" href="https://serverjonas.de/logo.png?v=5">
+<meta charset="UTF-8">
+<title>serverjonas HUB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    margin: 0;
+    font-family: system-ui, monospace;
+    color: white;
+    min-height: 100vh;
+
+    /* Gradient anpassen */
+    background: linear-gradient(
+        225deg,       /* Richtung: von oben rechts nach unten links */
+        #0d0e12 0%,   /* oben links / Ecke mit Logo */
+        #0f2027 50%, 
+        #203a43 80%, 
+        #2c5364 100%  /* unten rechts */
+    );
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px;
+}
+h1 {
+    text-align: center;
+    font-size: 3em;
+    margin-bottom: 10px;
+    position: relative;  /* unbedingt nötig für z-index */
+    z-index: 2000;       /* höher als das Logo */
+}
+p {
+    text-align: center;
+    opacity: 0.8;
+}
+.grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+.card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.card:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-5px);
+}
+.card span {
+    font-size: 2em;
+}
+.footer {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 0.9em;
+    opacity: 0.6;
+}
+#logo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    max-width: 200px; /* nach Bedarf anpassen */
+    width: 100%;
+    height: auto;
+    z-index: 0; /* damit es über anderen Elementen liegt */
+}
+/* Handy Hochformat */
+@media (max-width: 768px) and (orientation: portrait) {
+    #logo {
+        width: 100px; /* kleiner im Hochformat */
+    }
+}
+
+/* Handy Querformat (Tablet/Handy Quer) */
+@media (max-width: 768px) and (orientation: landscape) {
+    #logo {
+        width: 200px; /* volle Breite wie auf PC */
+    }
+}
+</style>
+</head>
+<body>
+<img id="logo" src="logo.png" alt="Logo">
+<div class="container">
+    <h1>🚀 serverjonas</h1>
+    <p>Zentraler Zugriff auf alle Services</p>
+
+    <div class="grid">
+        <div class="card" onclick="location.href='https://nextcloud.serverjonas.de'">
+            <span>☁️</span>
+            <h3>Nextcloud</h3>
+        </div>
+
+        <div class="card" onclick="location.href='https://games.serverjonas.de'">
+            <span>🎮</span>
+            <h3>Games</h3>
+        </div>
+
+        <div class="card" onclick="location.href='https://serverjonas.de/history.txt'">
+            <span>🖥️</span>
+            <h3>Der Grundstein dieses Systems (mit all seinen Macken)</h3>
+        </div>
+
+        <div class="card" onclick="location.href='https://serverjonas.de/apple.txt'">
+            <span>📊</span>
+            <h3>Warum Apple auf diesem Server gebannt ist</h3>
+        </div>
+    </div>
+
+    <div class="footer">
+        powered by Linux · serverjonas · no iSchrott
+    </div>
+</div>
+
+</body>
+</html>

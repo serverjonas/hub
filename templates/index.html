@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}serverjonas HUB{% endblock %}
+
+{% block content %}
+
+<h1>🚀 serverjonas</h1>
+
+{% if user %}
+    <p>👋 Angemeldet als <b>{{ user }}</b></p>
+{% else %}
+    <p>
+        <a href="/login">
+            <button>🔐 Login</button>
+        </a>
+    </p>
+{% endif %}
+
+<p>Zentraler Zugriff auf alle Services</p>
+
+<div class="grid">
+    <div class="card" onclick="location.href='https://nextcloud.serverjonas.de'">
+        <span>☁️</span>
+        <h3>Nextcloud</h3>
+    </div>
+
+    <div class="card" onclick="location.href='https://serverjonas.de/memes'">
+        <span>😂</span>
+        <h3>Memes</h3>
+    </div>
+
+    <div class="card" onclick="location.href='https://serverjonas.de/films'">
+        <span>🎬</span>
+        <h3>Media</h3>
+    </div>
+
+    <div class="card" onclick="location.href='https://serverjonas.de/friends'">
+      <span>👥</span>
+      <h3>Freunde</h3>
+    </div>
+
+</div>
+
+
+{% endblock %}

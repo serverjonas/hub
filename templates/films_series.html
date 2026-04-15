@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Serien · serverjonas{% endblock %}
+{% block head %}
+<style>
+.series-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+.series-card {
+    background: rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 24px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.series-card:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-4px);
+}
+.series-card .icon { font-size: 2.5em; margin-bottom: 12px; }
+.series-card h3 { margin: 0 0 8px 0; }
+.series-card .meta { font-size: 0.82em; opacity: 0.6; }
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn:hover { background: rgba(255,255,255,0.2); }
+.empty { text-align: center; opacity: 0.5; margin-top: 60px; font-size: 1.1em; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="topbar">
+    <h1 style="margin:0; font-size:2em;">📺 Serien</h1>
+    <a href="{{ url_for('films.upload') }}" class="btn">⬆️ Episode hochladen</a>
+</div>
+<p>Alle deine Serien</p>
+
+{% if series %}
+<div class="series-grid">
+    {% for series_name, data in series.items() %}
+    {% set total_eps = data.seasons.values() | map('length') | sum %}
+    {% set total_seasons = data.seasons | length %}
+    <div class="series-card" onclick="location.href='{{ url_for('films.series_detail', series_name=series_name) }}'">
+        <div class="icon">📺</div>
+        <h3>{{ series_name }}</h3>
+        <div class="meta">
+            {{ total_seasons }} Staffel{% if total_seasons != 1 %}n{% endif %} ·
+            {{ total_eps }} Episode{% if total_eps != 1 %}n{% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty">
+    <p>📭 Noch keine Serien vorhanden.</p>
+    <p style="font-size:0.9em;">Beim Upload einfach "Serie" wählen und Serienname angeben.</p>
+    <a href="{{ url_for('films.upload') }}" class="btn">Jetzt hochladen</a>
+</div>
+{% endif %}
+{% endblock %}

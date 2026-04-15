@@ -1,0 +1,3132 @@
+=== ./toolbox.py ===
+# toolbox.py
+import sqlite3
+import time
+from flask import request
+
+DB_PATH = "/var/www/serverjonas-hub/users.db"
+
+def get_name(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT user_name
+        FROM users
+        WHERE user_id = ?
+    """, (user_id,))
+
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
+        return None  # User existiert nicht
+
+    return row[0]  # username
+
+
+def get_current_user():
+    session_id = request.cookies.get("session_id")
+    if not session_id:
+        return None
+
+    now = int(time.time())
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT users.user_id, users.user_name
+        FROM sessions
+        JOIN users ON sessions.user_id = users.user_id
+        WHERE sessions.session_id = ?
+          AND sessions.expires_at > ?
+    """, (session_id, now))
+
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
+        return None
+
+    # Rückgabe als Dictionary: sowohl ID als auch Name
+    return {"id": row[0], "name": row[1]}
+
+def get_friends(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT u.user_id FROM users u
+        JOIN friendships f ON (
+            (f.user_id = ? AND f.friend_id = u.user_id) OR
+            (f.friend_id = ? AND f.user_id = u.user_id)
+        )
+        WHERE f.status = 'accepted'
+    """, (user_id, user_id))
+    rows = cur.fetchall()
+    conn.close()
+    return [row[0] for row in rows]
+=== ./modules/rights/app.py ===
+from flask import Blueprint, render_template, abort
+
+bp = Blueprint("rights", __name__, template_folder="templates")
+
+DOCUMENTS = {
+    "datenschutz": {
+        "title": "Datenschutzerklärung",
+        "icon": "🔒",
+        "subtitle": "Informationspflichten gemäß Art. 13, 14 DSGVO",
+    },
+    "nutzungsbedingungen": {
+        "title": "Nutzungsbedingungen",
+        "icon": "📋",
+        "subtitle": "Allgemeine Nutzungsbedingungen (ANB)",
+    },
+}
+
+@bp.route("/")
+def index():
+    return render_template("rights/index.html", documents=DOCUMENTS)
+
+@bp.route("/<doc_name>")
+def document(doc_name):
+    if doc_name not in DOCUMENTS:
+        abort(404)
+    doc = DOCUMENTS[doc_name]
+    return render_template(f"rights/{doc_name}.html", doc=doc, documents=DOCUMENTS)
+=== ./modules/friends/app.py ===
+from flask import Blueprint, render_template, request, redirect, url_for
+import sqlite3
+from toolbox import get_current_user
+
+DB_PATH = "/var/www/serverjonas-hub/users.db"
+
+bp = Blueprint("friends", __name__, template_folder="../../templates/friends")
+
+
+def get_friends(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT u.user_id, u.user_name FROM users u
+        JOIN friendships f ON (
+            (f.user_id = ? AND f.friend_id = u.user_id) OR
+            (f.friend_id = ? AND f.user_id = u.user_id)
+        )
+        WHERE f.status = 'accepted'
+        ORDER BY u.user_name ASC
+    """, (user_id, user_id))
+    result = cur.fetchall()
+    conn.close()
+    return result
+
+
+def get_pending_incoming(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT u.user_id, u.user_name FROM users u
+        JOIN friendships f ON f.user_id = u.user_id
+        WHERE f.friend_id = ? AND f.status = 'pending'
+    """, (user_id,))
+    result = cur.fetchall()
+    conn.close()
+    return result
+
+
+def get_pending_outgoing(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT u.user_id, u.user_name FROM users u
+        JOIN friendships f ON f.friend_id = u.user_id
+        WHERE f.user_id = ? AND f.status = 'pending'
+    """, (user_id,))
+    result = cur.fetchall()
+    conn.close()
+    return result
+
+
+def send_request(from_id, to_username):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("SELECT user_id FROM users WHERE user_name = ?", (to_username,))
+    to = cur.fetchone()
+    if not to:
+        conn.close()
+        return "❌ Benutzer nicht gefunden"
+
+    to_id = to[0]
+
+    if from_id == to_id:
+        conn.close()
+        return "❌ Du kannst dir nicht selbst eine Anfrage schicken"
+
+    cur.execute("""
+        SELECT 1 FROM friendships
+        WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)
+    """, (from_id, to_id, to_id, from_id))
+
+    if cur.fetchone():
+        conn.close()
+        return "❌ Anfrage existiert bereits oder ihr seid schon befreundet"
+
+    cur.execute(
+        "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, 'pending')",
+        (from_id, to_id)
+    )
+    conn.commit()
+    conn.close()
+    return "✅ Freundschaftsanfrage gesendet"
+
+
+def accept_request(to_id, from_id):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE friendships SET status = 'accepted'
+        WHERE user_id = ? AND friend_id = ? AND status = 'pending'
+    """, (from_id, to_id))
+    conn.commit()
+    conn.close()
+
+
+def decline_or_remove(user_id, other_id):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        DELETE FROM friendships
+        WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)
+    """, (user_id, other_id, other_id, user_id))
+    conn.commit()
+    conn.close()
+
+
+@bp.route("/", methods=["GET", "POST"])
+def index():
+    user_array = get_current_user()
+    if not user_array:
+        return render_template("not_logged_in.html")
+
+    user_id = user_array["id"]
+    user_name = user_array["name"]
+    message = None
+
+    if request.method == "POST":
+        action = request.form.get("action")
+
+        if action == "send":
+            to_username = request.form.get("to_username", "").strip()
+            message = send_request(user_id, to_username)
+
+        elif action == "accept":
+            from_id = int(request.form.get("from_id"))
+            accept_request(user_id, from_id)
+
+        elif action == "decline":
+            other_id = int(request.form.get("other_id"))
+            decline_or_remove(user_id, other_id)
+
+        elif action == "remove":
+            other_id = int(request.form.get("other_id"))
+            decline_or_remove(user_id, other_id)
+
+    friends = get_friends(user_id)
+    incoming = get_pending_incoming(user_id)
+    outgoing = get_pending_outgoing(user_id)
+
+    return render_template(
+        "friends/index.html",
+        user=user_name,
+        friends=friends,
+        incoming=incoming,
+        outgoing=outgoing,
+        message=message
+    )
+=== ./modules/adminpanel/app.py ===
+from flask import Blueprint, render_template
+import sqlite3
+import time
+
+DB_PATH = "/var/www/serverjonas-hub/users.db"
+
+bp = Blueprint("adminpanel", __name__)
+
+
+def get_all_users():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM users")
+    users = cur.fetchall()
+
+    conn.close()
+    return users
+
+
+@bp.route("/")
+def admin_index():
+    users = get_all_users()
+    return render_template(
+        "admin_users.html",
+        users=users
+    )
+=== ./modules/memes/app.py ===
+from flask import Blueprint, render_template, request, redirect, make_response, abort
+from PIL import Image
+import sqlite3, secrets, time, os, random
+from toolbox import get_current_user, get_name
+
+
+MEMES_DIR = "/var/www/serverjonas-hub/static/memes"
+USER_DB_PATH = "/var/www/serverjonas-hub/users.db"
+MEMES_DB_PATH = os.path.join(MEMES_DIR, "memes.db")
+
+bp = Blueprint("memes", __name__)
+
+def get_random_meme():
+    conn = sqlite3.connect(MEMES_DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT meme_id, user_id, filename, title, created_at FROM memes")
+    memes = cur.fetchall()
+    conn.close()
+
+    now = int(time.time())
+    weights = [1 + (now - meme[4])/3600 for meme in memes]  # z.B. Gewicht = Stunden seit Upload
+    selected = random.choices(memes, weights=weights, k=1)[0]
+
+    return {
+        "meme_id": selected[0],
+        "user_id": selected[1],
+        "filename": selected[2],
+        "title": selected[3],
+        "created_at": selected[4]
+    }
+
+def insert_meme(user_id, filename, title=None):
+    """Fügt einen neuen Meme-Eintrag in die Datenbank ein."""
+    created_at = int(time.time())
+
+    conn = sqlite3.connect(MEMES_DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO memes (user_id, filename, title, created_at)
+        VALUES (?, ?, ?, ?)
+    """, (user_id, filename, title, created_at))
+
+    conn.commit()
+    conn.close()
+
+    return True  # optional, nur zur Bestätigung
+
+@bp.route("/", methods=["GET"])
+def memepage():
+    """Zeigt ein zufälliges Meme im Viewer."""
+    user = get_current_user()
+
+    if user is None:
+        abort(401)
+
+    meme = get_random_meme()  # Funktion aus vorherigem Schritt
+
+    if meme is None:
+        # Kein Meme vorhanden → Rückgabe einer Nachricht oder Template
+        return "<p>Keine Memes verfügbar. Lade zuerst welche hoch!</p>"
+
+    # Meme gefunden → Template rendern
+    return render_template("meme_view.html", meme=meme, user=user)
+
+
+@bp.route("/upload", methods=["GET", "POST"])
+def upload():
+    user = get_current_user()
+    if not user:
+        abort(401)
+
+    message = None
+
+    if request.method == "POST":
+        file = request.files.get("file")
+        if not file:
+            message = "Keine Datei hochgeladen"
+        else:
+            timestamp = int(time.time())
+            filename = f"{user['id']}-{timestamp}.png"
+            files_dir = os.path.join(MEMES_DIR, "files")
+            os.makedirs(files_dir, exist_ok=True)
+            filepath = os.path.join(files_dir, filename)
+
+            try:
+                img = Image.open(file)
+                img.save(filepath, format="PNG")
+                title = request.form.get("title")
+                insert_meme(user['id'], filename, title=title)
+                message = "Meme erfolgreich gespeichert."
+            except Exception as e:
+                message = "Fehler beim Speichern des Bildes: " + str(e)
+
+    return render_template("memes_upload.html", message=message, user = user["name"])
+=== ./modules/login/templates/index.html ===
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+
+<h1>Anmelden</h1>
+
+<form method="post" action="/login">
+
+    <label>
+        Benutzername:
+        <input type="text" name="username" required>
+    </label>
+
+    <br><br>
+
+    <label>
+        Passwort:
+        <input type="password" name="password" required>
+    </label>
+
+    <br><br>
+
+    <button type="submit">Login</button>
+
+</form>
+
+</body>
+</html>
+=== ./modules/login/templates/login.html ===
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+
+<h1>Anmelden</h1>
+
+<form method="post" action="/login">
+
+    <label>
+        Benutzername:
+        <input type="text" name="username" required>
+    </label>
+
+    <br><br>
+
+    <label>
+        Passwort:
+        <input type="password" name="password" required>
+    </label>
+
+    <br><br>
+
+    <button type="submit">Login</button>
+
+</form>
+
+</body>
+</html>
+=== ./modules/login/app.py ===
+from flask import Blueprint, render_template, request, redirect, make_response
+import sqlite3, time, secrets
+from werkzeug.security import check_password_hash
+
+DB_PATH = "/var/www/serverjonas-hub/users.db"
+
+bp = Blueprint("login", __name__)
+
+def get_user(username):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT user_id, password_hash FROM users WHERE user_name = ?",
+        (username,)
+    )
+    row = cur.fetchone()
+    conn.close()
+    return row
+
+
+def create_session(user_id):
+    session_id = secrets.token_urlsafe(32)
+    now = int(time.time())
+    expires = now + 60 * 60 * 24 * 30  # 30d
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO sessions (session_id, user_id, created_at, expires_at)
+        VALUES (?, ?, ?, ?)
+    """, (session_id, user_id, now, expires))
+    conn.commit()
+    conn.close()
+
+    return session_id
+
+
+@bp.route("/", methods=["GET", "POST"])
+def login():
+    message = None
+
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = get_user(username)
+
+        if not user:
+            message = "Benutzer existiert nicht ❌"
+        else:
+            user_id, pw_hash = user
+            if not check_password_hash(pw_hash, password):
+                message = "Falsches Passwort ❌"
+            else:
+                session_id = create_session(user_id)
+                resp = make_response(redirect("/"))
+                resp.set_cookie(
+                    "session_id",
+                    session_id,
+                    httponly=True,
+                    samesite="Lax",
+                    max_age=60 * 60 * 24 * 30  # ← 30d
+                )
+                return resp
+
+    return render_template("login.html", message=message)
+=== ./modules/register/app.py ===
+from flask import Blueprint, render_template, request
+import json
+import os
+import sqlite3
+import re
+
+
+ACCOUNTS_FILE = "/var/www/serverjonas-hub/accounts.json"
+SERVER_KEY = "server"
+DB_PATH = "/var/www/serverjonas-hub/users.db"
+
+import re
+
+def valid_password(password):
+    checks = []
+
+    # Länge
+    if len(password) < 8:
+        checks.append("❌ Mindestens 8 Zeichen – das ist keine PIN für dein Fahrradschloss")
+
+    # Großbuchstabe
+    if not re.search(r"[A-Z]", password):
+        checks.append("❌ Mindestens ein Großbuchstabe – SCHREI wenigstens einmal")
+
+    # Sonderzeichen
+    if not re.search(r"[!@#$%*=+\-?_]", password):
+        checks.append("❌ Mindestens ein Sonderzeichen (!@#$%*=+-?_) – sei kreativ, du schaffst das")
+
+    # Aufeinanderfolgende Zahlen
+    if re.search(r"(?:0(?=1)|1(?=2)|2(?=3)|3(?=4)|4(?=5)|5(?=6)|6(?=7)|7(?=8)|8(?=9)){3}", password):
+        checks.append("❌ Keine 4 aufeinanderfolgenden Zahlen (1234 etc.) – das war 1998 schon schlecht")
+
+    # Wiederholende Zeichen (z.B. aaaa, 1111)
+    if re.search(r"(.)\1{2,}", password):
+        checks.append("❌ Keine 3+ gleichen Zeichen hintereinander (aaa, 111...) – Strg+C Strg+V ist keine Strategie")
+
+    # Keine Leerzeichen
+    if re.search(r"\s", password):
+        checks.append("❌ Keine Leerzeichen – ein Passwort ist kein Gedicht")
+
+    # Nur Zahlen
+    if password.isdigit():
+        checks.append("❌ Nicht nur Zahlen – du bist Mensch, beweise es")
+
+    # Häufige Passwörter
+    banned = ["passwort", "password", "qwertz", "qwerty", "abc123", "123456", "hallo", "admin", "login", "welcome"]
+    if password.lower() in banned:
+        checks.append("❌ Dieses Passwort steht auf jeder Hacker-Liste – bitte mehr Fantasie")
+
+    # Jahreszahlen (1900–2099)
+    if re.search(r"(19|20)\d{2}", password):
+        checks.append("❌ Kein Geburtsjahr oder Datum – dein Hacker weiß wann du geboren bist")
+
+    # Keine Tastatur-Sequenzen
+    keyboard_seqs = ["qwert", "qwertz", "asdf", "yxcv", "zxcv"]
+    if any(seq in password.lower() for seq in keyboard_seqs):
+        checks.append("❌ Keine Tastaturmuster – deine Finger sind keine Passwort-Strategie")
+
+    # Mindestens 2 Zahlen
+    if len(re.findall(r"\d", password)) < 2:
+        checks.append("❌ Mindestens 2 Zahlen – eine reicht nicht, wir sind nicht bei 'Wer wird Millionär'")
+
+    # Mindestens 2 Großbuchstaben
+    if len(re.findall(r"[A-Z]", password)) < 2:
+        checks.append("❌ Mindestens 2 Großbuchstaben – einmal SCHREIEN reicht nicht")
+
+    if checks:
+        return False, checks
+    return True, None
+
+#
+def valid_str(the_str):
+    return re.fullmatch(r"[a-zA-Z0-9_\-\+\?\!\@\#\$\%\*\=]{3,32}", the_str) is not None
+
+def exist_account(username: str) -> bool:
+    """
+    Prüft, ob ein Benutzername bereits in der Datenbank existiert.
+    Gibt True zurück, wenn der Benutzer existiert, sonst False.
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    
+    cur.execute("SELECT 1 FROM users WHERE user_name = ? LIMIT 1", (username,))
+    result = cur.fetchone()
+    
+    conn.close()
+    
+    return result is not None
+
+def add_account(username, password):
+    if os.path.isfile(ACCOUNTS_FILE):
+        with open(ACCOUNTS_FILE) as f:
+            data = json.load(f)
+    else:
+        data = []
+
+    data.append({"name": username, "password": password})
+
+    with open(ACCOUNTS_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+
+bp = Blueprint("register", __name__, template_folder="../../templates")
+
+@bp.route("/", methods=["GET", "POST"])
+def register():
+    message = None
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        server_key = request.form.get("server_key")
+
+        valid, pw_message = valid_password(password)
+
+
+        if not SERVER_KEY or server_key != SERVER_KEY:
+            message = "❌ Ungültiger Server-Key"
+        elif exist_account(username):
+            message = "❌ Accountname bereits belegt"
+        elif not valid_str(username):
+            message = "❌ Ungültiger Benutzername. Erlaubt sind 3–32 Zeichen: a-z A-Z 0-9 _ - + ? ! @ # $ % * ="
+        elif not valid_str(password):
+            message = "❌ Ungültiges Password. Erlaubt sind 3–32 Zeichen: a-z A-Z 0-9 _ - + ? ! @ # $ % * ="
+        elif not valid:
+            message = pw_message
+        else:
+            try:
+                add_account(username, password)
+                message = "✅ Account erfolgreich erstellt"
+            except Exception as e:
+                message = f"❌ Fehler: {e}"
+
+    return render_template("register.html", message=message)
+=== ./modules/films/app.py ===
+from flask import Blueprint, render_template, request, redirect, url_for, abort, Response, stream_with_context, jsonify, abort
+from toolbox import get_current_user
+import os, json, time, subprocess, threading, uuid, shutil
+import tempfile
+tempfile.tempdir = "/var/www/serverjonas-hub/films/data/tmp"
+FILMS_DATA_DIR = "/var/www/serverjonas-hub/films/data"
+
+bp = Blueprint("films", __name__, template_folder="templates")
+
+# Nach bp = Blueprint(...) einfügen:
+from datetime import datetime
+
+@bp.app_template_filter('strftime')
+def strftime_filter(value):
+    return datetime.fromtimestamp(int(value)).strftime('%d.%m.%Y %H:%M')
+# ── Hilfsfunktionen ────────────────────────────────────────────────────────────
+
+def user_dir(username: str) -> str:
+    return os.path.join(FILMS_DATA_DIR, username, "films")
+
+def film_dir(username: str, film_id: str) -> str:
+    return os.path.join(user_dir(username), film_id)
+
+def meta_path(username: str, film_id: str) -> str:
+    return os.path.join(film_dir(username, film_id), "meta.json")
+
+def read_meta(username: str, film_id: str) -> dict | None:
+    p = meta_path(username, film_id)
+    if not os.path.isfile(p):
+        return None
+    with open(p) as f:
+        return json.load(f)
+
+def write_meta(username: str, film_id: str, data: dict):
+    with open(meta_path(username, film_id), "w") as f:
+        json.dump(data, f, indent=2)
+
+def list_films(username: str) -> list:
+    base = user_dir(username)
+    if not os.path.isdir(base):
+        return []
+    films = []
+    for fid in os.listdir(base):
+        meta = read_meta(username, fid)
+        if meta:
+            films.append(meta)
+    films.sort(key=lambda m: m.get("uploaded_at", 0), reverse=True)
+    return films
+
+
+# ── FFmpeg-Konvertierung (Background-Thread) ───────────────────────────────────
+
+def convert_film(username: str, film_id: str, original_path: str):
+    """Konvertiert zu 1080p MP4, aktualisiert meta.json, löscht Original."""
+    fdir = film_dir(username, film_id)
+    output_path = os.path.join(fdir, "film.mp4")
+
+    meta = read_meta(username, film_id)
+    meta["status"] = "converting"
+    write_meta(username, film_id, meta)
+
+    cmd = [
+        "ffmpeg", "-y", "-i", original_path,
+        "-vf", "scale='min(1920,iw)':'min(1080,ih)':force_original_aspect_ratio=decrease",
+        "-c:v", "libx264", "-crf", "23", "-preset", "ultrafast",
+        "-c:a", "aac", "-b:a", "128k",
+        "-movflags", "+faststart",
+        output_path
+    ]
+
+    try:
+        subprocess.run(cmd, check=True, capture_output=True)
+        meta["status"] = "ready"
+        meta["filename"] = "film.mp4"
+        if os.path.isfile(original_path):
+            os.remove(original_path)
+    except subprocess.CalledProcessError as e:
+        meta["status"] = "error"
+        meta["error"] = e.stderr.decode(errors="replace")[-500:]
+
+    write_meta(username, film_id, meta)
+
+
+# ── Routen ─────────────────────────────────────────────────────────────────────
+@bp.route("/", methods=["GET"])
+def index():
+    user = get_current_user()
+    if not user:
+        abort(401)
+    films = list_films(user["name"])
+    return render_template("films_index.html")
+
+
+@bp.route("/films", methods=["GET"])
+def films():
+    user = get_current_user()
+    if not user:
+        abort(401)
+    films = list_films(user["name"])
+    return render_template("films_films.html", user=user["name"], films=films)
+
+@bp.route("/series", methods=["GET"])
+def series():
+    user = get_current_user()
+    if not user:
+        abort(401)
+    films = list_films(user["name"])
+    return render_template("films_series.html")
+
+
+@bp.route("/upload", methods=["GET", "POST"])
+def upload():
+    user = get_current_user()
+    if not user:
+        abort(401)
+
+    message = None
+    message_type = "info"
+
+    if request.method == "POST":
+        file = request.files.get("file")
+        title = request.form.get("title", "").strip() or "Unbekannter Film"
+
+        if not file or file.filename == "":
+            message = "Keine Datei ausgewählt."
+            message_type = "error"
+        else:
+            film_id = str(uuid.uuid4())[:8]
+            fdir = film_dir(user["name"], film_id)
+            os.makedirs(fdir, exist_ok=True)
+
+            ext = os.path.splitext(file.filename)[1].lower() or ".mp4"
+            original_filename = f"original{ext}"
+            original_path = os.path.join(fdir, original_filename)
+            file.save(original_path)
+
+            meta = {
+                "film_id": film_id,
+                "title": title,
+                "username": user["name"],
+                "uploaded_at": int(time.time()),
+                "status": "queued",
+                "filename": None,
+                "original": original_filename,
+            }
+            write_meta(user["name"], film_id, meta)
+
+            t = threading.Thread(
+                target=convert_film,
+                args=(user["name"], film_id, original_path),
+                daemon=True
+            )
+            t.start()
+
+            return redirect(url_for("films.film_detail", film_id=film_id))
+
+    return render_template("films_upload.html", user=user["name"], message=message, message_type=message_type)
+
+
+@bp.route("/film/<film_id>")
+def film_detail(film_id):
+    user = get_current_user()
+    if not user:
+        abort(401)
+    meta = read_meta(user["name"], film_id)
+    if not meta:
+        abort(404)
+    return render_template("films_detail.html", user=user["name"], film=meta)
+
+
+@bp.route("/film/<film_id>/watch")
+def watch(film_id):
+    """MP4-Stream mit Range-Support für HTML5-Player."""
+    user = get_current_user()
+    if not user:
+        abort(401)
+
+    meta = read_meta(user["name"], film_id)
+    if not meta or meta.get("status") != "ready":
+        abort(404)
+
+    fpath = os.path.join(film_dir(user["name"], film_id), meta["filename"])
+    if not os.path.isfile(fpath):
+        abort(404)
+
+    file_size = os.path.getsize(fpath)
+    range_header = request.headers.get("Range")
+
+    if range_header:
+        byte_range = range_header.replace("bytes=", "").split("-")
+        start = int(byte_range[0])
+        end = int(byte_range[1]) if byte_range[1] else file_size - 1
+        length = end - start + 1
+
+        def generate_range():
+            with open(fpath, "rb") as f:
+                f.seek(start)
+                remaining = length
+                while remaining > 0:
+                    chunk = f.read(min(65536, remaining))
+                    if not chunk:
+                        break
+                    remaining -= len(chunk)
+                    yield chunk
+
+        resp = Response(stream_with_context(generate_range()), 206, mimetype="video/mp4")
+        resp.headers["Content-Range"] = f"bytes {start}-{end}/{file_size}"
+        resp.headers["Accept-Ranges"] = "bytes"
+        resp.headers["Content-Length"] = str(length)
+        return resp
+
+    def generate_full():
+        with open(fpath, "rb") as f:
+            while True:
+                chunk = f.read(65536)
+                if not chunk:
+                    break
+                yield chunk
+
+    resp = Response(stream_with_context(generate_full()), 200, mimetype="video/mp4")
+    resp.headers["Content-Length"] = str(file_size)
+    resp.headers["Accept-Ranges"] = "bytes"
+    return resp
+
+
+@bp.route("/film/<film_id>/status")
+def film_status(film_id):
+    """Polling-Endpoint: gibt aktuellen Konvertierungsstatus zurück."""
+    user = get_current_user()
+    if not user:
+        abort(401)
+    meta = read_meta(user["name"], film_id)
+    if not meta:
+        abort(404)
+    return jsonify({"status": meta.get("status"), "film_id": film_id})
+
+
+@bp.route("/film/<film_id>/delete", methods=["POST"])
+def delete_film(film_id):
+    user = get_current_user()
+    if not user:
+        abort(401)
+    fdir = film_dir(user["name"], film_id)
+    if os.path.isdir(fdir):
+        shutil.rmtree(fdir)
+    return redirect(url_for("films.films"))
+=== ./modules/Musikauswahlsystem/app.py ===
+from flask import Blueprint, request, redirect, url_for, session
+import json, os, time
+
+bp = Blueprint("musikauswahl", __name__)
+
+# ---------------- Passwörter ----------------
+ADD_PASSWORD = "party_pw"       # Passwort für Add-Seite
+SETTINGS_PASSWORD = "settings_pw"  # Passwort für Settings
+
+# ---------------- Dateien ----------------
+CONFIG_FILE = os.path.join(os.path.dirname(__file__), "settings.json")
+SONGS_FILE = os.path.join(os.path.dirname(__file__), "songs.json")
+
+default_config = {"max_entries": 50, "delay_seconds": 0, "allow_duplicates": True}
+
+def load_json(path, default):
+    if not os.path.exists(path):
+        save_json(path, default)
+        return default
+    with open(path, "r") as f:
+        return json.load(f)
+
+def save_json(path, data):
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4)
+
+config = load_json(CONFIG_FILE, default_config)
+songs = load_json(SONGS_FILE, [])
+last_entry_time = 0
+
+# ---------------- Layout ----------------
+def layout(content, message=""):
+    return f"""
+    <html>
+    <head>
+        <meta charset='utf-8'>
+        <title>Musikliste</title>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                margin: 40px;
+                background: var(--bg);
+                color: var(--fg);
+                transition: 0.3s;
+            }}
+            :root {{
+                --bg: #111;
+                --fg: #eee;
+                --card: #1c1c1c;
+                --input: #222;
+                --accent: #4da3ff;
+            }}
+            .card {{
+                background: var(--card);
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 0 8px #0008;
+                max-width: 450px;
+                margin-bottom: 20px;
+            }}
+            input {{
+                width: 100%;
+                padding: 8px;
+                border-radius: 8px;
+                border: none;
+                margin-top: 4px;
+                background: var(--input);
+                color: var(--fg);
+                transition: 0.3s;
+            }}
+            button {{
+                padding: 10px 16px;
+                background: var(--accent);
+                border: none;
+                color: white;
+                border-radius: 8px;
+                cursor: pointer;
+                margin-top: 10px;
+            }}
+            a {{
+                color: var(--accent);
+            }}
+            .song {{
+                margin-bottom: 10px;
+                padding: 10px;
+                background: #1a1a1a;
+                border-radius: 6px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }}
+            .del {{
+                background: #d33;
+                padding: 6px 10px;
+                border-radius: 6px;
+                color: white;
+                text-decoration: none;
+            }}
+            .msg {{
+                margin-bottom: 15px;
+                padding: 10px;
+                background: #b33;
+                border-radius: 6px;
+            }}
+            #toggleMode {{
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #333;
+                padding: 8px 14px;
+                border-radius: 8px;
+                cursor: pointer;
+                color: #ddd;
+            }}
+        </style>
+    </head>
+    <body>
+        <div id="toggleMode" onclick="toggleDark()">Dark/Light</div>
+        {f"<div class='msg'>{message}</div>" if message else ""}
+        {content}
+        <script>
+            function toggleDark() {{
+                const r = document.querySelector(':root');
+                if (r.style.getPropertyValue('--bg') === '#111') {{
+                    r.style.setProperty('--bg', '#fafafa');
+                    r.style.setProperty('--fg', '#111');
+                    r.style.setProperty('--card', '#ffffff');
+                    r.style.setProperty('--input', '#eee');
+                }} else {{
+                    r.style.setProperty('--bg', '#111');
+                    r.style.setProperty('--fg', '#eee');
+                    r.style.setProperty('--card', '#1c1c1c');
+                    r.style.setProperty('--input', '#222');
+                }}
+            }}
+        </script>
+    </body>
+    </html>
+    """
+
+# ---------------- Globaler Zugriffsschutz Add ----------------
+@bp.before_request
+def require_add_pw():
+    allowed_routes = ["musikauswahl.login_add", "musikauswahl.login_settings", "static"]
+    if request.endpoint not in allowed_routes:
+        if not session.get("logged_in_add"):
+            return redirect(url_for("musikauswahl.login_add"))
+
+# ---------------- LOGIN Add ----------------
+@bp.route("/login", methods=["GET","POST"])
+def login_add():
+    if request.method == "POST":
+        pw = request.form.get("pw","")
+        if pw == ADD_PASSWORD:
+            session["logged_in_add"] = True
+            return redirect(url_for("musikauswahl.add_song"))
+        return layout("", "Falsches Passwort!")
+    return layout("""
+        <div class='card'>
+            <h2>Party Passwort</h2>
+            <form method='post'>
+                Passwort: <input type='password' name='pw'>
+                <button>OK</button>
+            </form>
+        </div>
+    """)
+
+# ---------------- SONG HINZUFÜGEN ----------------
+@bp.route("/add", methods=["GET","POST"])
+def add_song():
+    global last_entry_time
+    message = ""
+    if request.method == "POST":
+        now = time.time()
+        if now - last_entry_time < config["delay_seconds"]:
+            message = f"Bitte {int(config['delay_seconds'] - (now - last_entry_time))} Sekunden warten."
+        else:
+            artist = request.form.get("artist","").strip()
+            title = request.form.get("title","").strip()
+            if artist and title:
+                if len(songs) >= config["max_entries"]:
+                    message = "Limit erreicht!"
+                elif not config["allow_duplicates"] and any(s["artist"]==artist and s["title"]==title for s in songs):
+                    message = "Schon vorhanden!"
+                else:
+                    songs.append({"artist": artist, "title": title})
+                    save_json(SONGS_FILE, songs)
+                    last_entry_time = now
+                    message = f"Gespeichert: {artist} – {title}"
+
+    content = f"""
+    <div class='card'>
+        <h2>Song hinzufügen</h2>
+        <div style="display:flex; align-items:flex-start; gap:20px;">
+            <form method='post' style="flex:1;">
+                Künstler:<br>
+                <input name="artist" autocomplete="off"><br><br>
+                
+                Titel:<br>
+                <input name="title" autocomplete="off"><br><br>
+                <button type='submit'>Speichern</button>
+            </form>
+        </div>
+        <br>
+        <a href='{url_for('musikauswahl.list_songs')}'>Zur Liste</a><br>
+        <a href='{url_for('musikauswahl.login_settings')}'>Entwickleroptionen</a>
+    </div>
+    """
+    return layout(content, message)
+
+# ---------------- SONG LISTE ----------------
+@bp.route("/list")
+def list_songs():
+    items = ""
+    for i,s in enumerate(songs):
+        items += f"<div class='song'>{s['artist']} – {s['title']} <a class='del' href='{url_for('musikauswahl.delete_song', id=i)}'>✖</a></div>"
+    if not items:
+        items = "<p>Noch keine Songs gespeichert.</p>"
+    content = f"<div class='card'><h2>Songliste</h2>{items}<br><a href='{url_for('musikauswahl.add_song')}'>Zurück</a></div>"
+    return layout(content)
+
+# ---------------- DELETE ----------------
+@bp.route("/delete/<int:id>")
+def delete_song(id):
+    if 0 <= id < len(songs):
+        songs.pop(id)
+        save_json(SONGS_FILE, songs)
+    return redirect(url_for("musikauswahl.list_songs"))
+
+# ---------------- LOGIN SETTINGS ----------------
+@bp.route("/settings_login", methods=["GET","POST"])
+def login_settings():
+    if request.method == "POST":
+        pw = request.form.get("pw","")
+        if pw == SETTINGS_PASSWORD:
+            session["logged_in_settings"] = True
+            return redirect(url_for("musikauswahl.settings"))
+        return layout("", "Falsches Settings-Passwort!")
+    return layout("""
+        <div class='card'>
+            <h2>Settings Passwort</h2>
+            <form method='post'>
+                Passwort: <input type='password' name='pw'>
+                <button>OK</button>
+            </form>
+        </div>
+    """)
+
+# ---------------- SETTINGS ----------------
+@bp.route("/settings", methods=["GET","POST"])
+def settings():
+    if not session.get("logged_in_settings"):
+        return redirect(url_for("musikauswahl.login_settings"))
+    message = ""
+    if request.method == "POST":
+        config["max_entries"] = int(request.form.get("max_entries"))
+        config["delay_seconds"] = int(request.form.get("delay_seconds"))
+        config["allow_duplicates"] = "allow_duplicates" in request.form
+        save_json(CONFIG_FILE, config)
+        message = "Einstellungen gespeichert!"
+    checked = "checked" if config.get("allow_duplicates") else ""
+    content = f"""
+        <div class='card'>
+            <h2>Entwickleroptionen</h2>
+            <form method='post'>
+                Maximale Einträge:<br>
+                <input name='max_entries' value='{config.get("max_entries",50)}'><br><br>
+                Delay zwischen Einträgen:<br>
+                <input name='delay_seconds' value='{config.get("delay_seconds",0)}'><br><br>
+                <label><input type='checkbox' name='allow_duplicates' {checked}> Duplikate erlauben</label><br><br>
+                <button>Speichern</button>
+            </form>
+            <br><a href='{url_for('musikauswahl.add_song')}'>Zurück</a>
+        </div>
+    """
+    return layout(content, message)
+
+# ---------------- ROOT ----------------
+@bp.route("/")
+def index():
+    return redirect(url_for("musikauswahl.add_song"))
+=== ./modules/status/app.py ===
+from flask import Blueprint, jsonify
+
+bp = Blueprint("status", __name__)
+
+@bp.route("/")
+def status_home():
+    return jsonify({
+        "status": "online",
+        "server": "serverjonas",
+        "linux": "better"
+    })
+=== ./create_user_root.py ===
+from time import sleep
+import json
+import os
+import subprocess
+
+BASE_DIR = os.path.dirname(__file__)
+accounts_file = os.path.join(BASE_DIR, "accounts.json")
+creater_file = os.path.join(BASE_DIR, "create_user.py")
+
+def load_data(data):
+    for line in data:
+        if line.get("name") is not None and line.get("password") is not None:
+            print(line.get("name"), line.get("password"))
+            subprocess.run(["python3", creater_file, line.get("name"), line.get("password")])
+
+while True:
+    if os.path.isfile(accounts_file):
+        with open(accounts_file) as f:
+            data = json.load(f)
+        load_data(data)
+
+    new_data = []
+    # JSON-Datei überschreiben mit nur den Accounts, die nicht erstellt wurden
+    with open(accounts_file, "w") as f:
+        json.dump(new_data, f)
+    sleep(2)
+=== ./index.html ===
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<link rel="icon" href="https://serverjonas.de/logo.png?v=5">
+<meta charset="UTF-8">
+<title>serverjonas HUB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    margin: 0;
+    font-family: system-ui, monospace;
+    color: white;
+    min-height: 100vh;
+
+    /* Gradient anpassen */
+    background: linear-gradient(
+        225deg,       /* Richtung: von oben rechts nach unten links */
+        #0d0e12 0%,   /* oben links / Ecke mit Logo */
+        #0f2027 50%, 
+        #203a43 80%, 
+        #2c5364 100%  /* unten rechts */
+    );
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px;
+}
+h1 {
+    text-align: center;
+    font-size: 3em;
+    margin-bottom: 10px;
+    position: relative;  /* unbedingt nötig für z-index */
+    z-index: 2000;       /* höher als das Logo */
+}
+p {
+    text-align: center;
+    opacity: 0.8;
+}
+.grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+.card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.card:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-5px);
+}
+.card span {
+    font-size: 2em;
+}
+.footer {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 0.9em;
+    opacity: 0.6;
+}
+#logo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    max-width: 200px; /* nach Bedarf anpassen */
+    width: 100%;
+    height: auto;
+    z-index: 0; /* damit es über anderen Elementen liegt */
+}
+/* Handy Hochformat */
+@media (max-width: 768px) and (orientation: portrait) {
+    #logo {
+        width: 100px; /* kleiner im Hochformat */
+    }
+}
+
+/* Handy Querformat (Tablet/Handy Quer) */
+@media (max-width: 768px) and (orientation: landscape) {
+    #logo {
+        width: 200px; /* volle Breite wie auf PC */
+    }
+}
+</style>
+</head>
+<body>
+<img id="logo" src="logo.png" alt="Logo">
+<div class="container">
+    <h1>🚀 serverjonas</h1>
+    <p>Zentraler Zugriff auf alle Services</p>
+
+    <div class="grid">
+        <div class="card" onclick="location.href='https://nextcloud.serverjonas.de'">
+            <span>☁️</span>
+            <h3>Nextcloud</h3>
+        </div>
+
+        <div class="card" onclick="location.href='https://games.serverjonas.de'">
+            <span>🎮</span>
+            <h3>Games</h3>
+        </div>
+
+        <div class="card" onclick="location.href='https://serverjonas.de/history.txt'">
+            <span>🖥️</span>
+            <h3>Der Grundstein dieses Systems (mit all seinen Macken)</h3>
+        </div>
+
+        <div class="card" onclick="location.href='https://serverjonas.de/apple.txt'">
+            <span>📊</span>
+            <h3>Warum Apple auf diesem Server gebannt ist</h3>
+        </div>
+    </div>
+
+    <div class="footer">
+        powered by Linux · serverjonas · no iSchrott
+    </div>
+</div>
+
+</body>
+</html>
+=== ./templates/rights/impressum.html ===
+{% extends "base.html" %}
+{% block title %}Impressum – serverjonas{% endblock %}
+{% block content %}
+
+<h1>{{ doc.icon }} {{ doc.title }}</h1>
+<p>{{ doc.subtitle }}</p>
+
+<div style="margin-top:40px; text-align:left; line-height:1.9; opacity:0.85;">
+
+  <h2 style="margin-top:30px;">§ 1 Angaben gemäß § 5 Telemediengesetz (TMG)</h2>
+  <p>
+    Der Betreiber des unter der Domain <strong>serverjonas.de</strong> sowie sämtlicher zugehöriger Subdomains erreichbaren Dienstes ist eine natürliche Person im Sinne des deutschen Zivilrechts. Da der Betreiber zum Zeitpunkt der Veröffentlichung dieses Impressums das 18. Lebensjahr noch nicht vollendet hat, wird das Impressum gemäß § 1629 BGB durch den oder die gesetzlichen Vertreter wahrgenommen.
+  </p>
+  <p style="margin-top:12px;">
+    <strong>Vertreten durch:</strong><br>
+    [Vorname Nachname Erziehungsberechtigte/r]<br>
+    [Straße und Hausnummer]<br>
+    [PLZ Ort]<br>
+    Deutschland
+  </p>
+  <p style="margin-top:12px;">
+    <strong>Kontakt:</strong><br>
+    E-Mail: <a href="mailto:kontakt@serverjonas.de" style="color:#7ec8e3;">kontakt@serverjonas.de</a>
+  </p>
+
+  <h2 style="margin-top:30px;">§ 2 Verantwortlichkeit für den Inhalt nach § 55 Abs. 2 RStV</h2>
+  <p>
+    Die inhaltliche Verantwortlichkeit für die auf diesem Dienst veröffentlichten Inhalte liegt, unbeschadet der gesetzlichen Vertretung durch die oben genannten Erziehungsberechtigten, beim Betreiber dieses Dienstes, nachfolgend bezeichnet als „der Administrator". Der Administrator nimmt seine Verantwortung ernst und behält sich das Recht vor, Inhalte jederzeit, ohne Angabe von Gründen und ohne Vorankündigung zu ändern, zu ergänzen oder vollständig zu entfernen.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 3 Haftung für Inhalte</h2>
+  <p>
+    Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen, sofern wir daran denken und nicht gerade etwas Wichtigeres tun.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 4 Haftung für Links</h2>
+  <p>
+    Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar, weil wir kurz überflogen haben und das reichen muss. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar, insbesondere nicht für eine Einzelperson mit Schulpflicht.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 5 Urheberrecht</h2>
+  <p>
+    Die durch den Betreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet. Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet – meistens.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 6 Streitschlichtung</h2>
+  <p>
+    Die Europäische Kommission stellt unter <a href="https://ec.europa.eu/consumers/odr" style="color:#7ec8e3;" target="_blank">https://ec.europa.eu/consumers/odr</a> eine Plattform zur Online-Streitbeilegung (OS) bereit. Zur Teilnahme an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle sind wir nicht verpflichtet und auch nicht bereit, denn es handelt sich um einen privaten Heimserver und nicht um einen Onlineshop. Etwaige Streitigkeiten können gerne per E-Mail mitgeteilt werden; eine Antwort erfolgt nach Ermessen des Administrators.
+  </p>
+
+  <p style="margin-top:40px; font-size:0.75em; opacity:0.5;">
+    Stand: {{ "heute"|default("aktuell") }} · serverjonas.de · Alle Angaben ohne Gewähr, aber mit viel Aufwand formuliert.
+  </p>
+
+</div>
+
+<div style="text-align:center; margin-top:40px;">
+  <a href="/rights"><button>← Zurück zur Übersicht</button></a>
+</div>
+
+{% endblock %}
+=== ./templates/rights/index.html ===
+{% extends "base.html" %}
+{% block title %}Rechtliches – serverjonas{% endblock %}
+{% block content %}
+
+<h1>⚖️ Rechtliches</h1>
+<p>Alle rechtlich relevanten Dokumente zu serverjonas.de</p>
+
+<div class="grid">
+  {% for key, doc in documents.items() %}
+  <div class="card" onclick="location.href='/rights/{{ key }}'">
+    <span>{{ doc.icon }}</span>
+    <h3>{{ doc.title }}</h3>
+    <p style="font-size:0.75em; opacity:0.6; margin-top:8px;">{{ doc.subtitle }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
+=== ./templates/rights/datenschutz.html ===
+{% extends "base.html" %}
+{% block title %}Datenschutzerklärung – serverjonas{% endblock %}
+{% block content %}
+
+<h1>{{ doc.icon }} {{ doc.title }}</h1>
+<p>{{ doc.subtitle }}</p>
+
+<div style="margin-top:40px; text-align:left; line-height:1.9; opacity:0.85;">
+
+  <h2 style="margin-top:30px;">§ 1 Präambel und Geltungsbereich</h2>
+  <p>
+    Der Schutz Ihrer personenbezogenen Daten ist dem Betreiber dieses Dienstes, nachfolgend „der Administrator" genannt, ein aufrichtiges Anliegen. Diese Datenschutzerklärung klärt Sie über Art, Umfang und Zweck der Verarbeitung von personenbezogenen Daten auf der Website <strong>serverjonas.de</strong> sowie aller zugehörigen Subdomains auf. Sie gilt für alle Bereiche des Dienstes, unabhängig davon, ob diese öffentlich zugänglich oder durch Authentifizierungsmechanismen geschützt sind. Durch die Nutzung dieser Website erklären Sie sich mit der nachfolgend beschriebenen Datenverarbeitung einverstanden – oder auch nicht, dann nutzen Sie sie bitte nicht.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 2 Verantwortliche Stelle im Sinne der DSGVO</h2>
+  <p>
+    Verantwortliche Stelle im Sinne der Datenschutz-Grundverordnung (EU) 2016/679, des Bundesdatenschutzgesetzes (BDSG) sowie sonstiger datenschutzrechtlicher Bestimmungen ist der im Impressum genannte gesetzliche Vertreter. Da der tatsächliche Betreiber minderjährig im Sinne des deutschen Bürgerlichen Gesetzbuches ist, obliegt die formale datenschutzrechtliche Verantwortung gemäß § 1629 BGB den erziehungsberechtigten Personen, auch wenn de facto alle Entscheidungen bezüglich der Datenverarbeitung vom Administrator selbst getroffen werden.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 3 Erhebung und Speicherung personenbezogener Daten</h2>
+  <p>
+    Beim Aufruf unserer Website werden durch den auf Ihrem Endgerät zum Einsatz kommenden Browser automatisch Informationen an den Server dieser Website übermittelt. Diese Informationen werden temporär in einem sogenannten Logfile gespeichert. Folgende Informationen werden dabei ohne Ihr Zutun erfasst und bis zur automatisierten Löschung gespeichert:
+  </p>
+  <ul style="margin: 12px 0 12px 30px;">
+    <li>IP-Adresse des anfragenden Rechners</li>
+    <li>Datum und Uhrzeit des Zugriffs</li>
+    <li>Name und URL der abgerufenen Datei</li>
+    <li>Website, von der aus der Zugriff erfolgt (Referrer-URL)</li>
+    <li>Verwendeter Browser und ggf. das Betriebssystem Ihres Rechners</li>
+    <li>Name Ihres Access-Providers, sofern technisch ermittelbar</li>
+  </ul>
+  <p>
+    Die genannten Daten werden durch uns zu folgenden Zwecken verarbeitet: Gewährleistung eines reibungslosen Verbindungsaufbaus der Website, Gewährleistung einer komfortablen Nutzung unserer Website, Auswertung der Systemsicherheit und -stabilität sowie zu weiteren administrativen Zwecken, die sich der Administrator vorbehält, nach eigenem Ermessen zu definieren.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 4 Cookies</h2>
+  <p>
+    Dieser Dienst verwendet ausschließlich technisch notwendige Cookies im Sinne des § 25 Abs. 2 TTDSG. Diese Cookies sind für den ordnungsgemäßen Betrieb des Dienstes unerlässlich und dienen insbesondere der Aufrechterhaltung von Nutzersitzungen nach erfolgter Authentifizierung. Es werden keinerlei Tracking-Cookies, Analyse-Cookies, Werbe-Cookies oder sonstige Cookies eingesetzt, die einer gesonderten Einwilligung bedürften. Ein sogenannter „Cookie-Banner" ist daher, entgegen der weitverbreiteten Praxis übereifrig gestalteter Websitebetreiber, auf diesem Dienst bewusst nicht vorhanden.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 5 Nutzerkonto und Authentifizierung</h2>
+  <p>
+    Der Zugang zu den Diensten von serverjonas.de setzt die Anlage eines Nutzerkontos voraus. Die Einrichtung eines Nutzerkontos erfolgt ausschließlich auf Einladung des Administrators und erfordert die Kenntnis eines individuellen Server-Schlüssels (nachfolgend „Server Key"). Im Rahmen der Kontoanlage und -nutzung werden folgende Daten verarbeitet: Benutzername, verschlüsseltes Passwort (gehasht mittels branchenüblicher Verfahren), Session-Token zur Verwaltung aktiver Sitzungen sowie Zeitstempel relevanter Aktionen. Eine Weitergabe dieser Daten an Dritte erfolgt nicht, es sei denn, der Administrator ist dazu gesetzlich verpflichtet oder hat schlicht vergessen, dies zu verhindern.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 6 Rechte der betroffenen Person</h2>
+  <p>
+    Ihnen stehen bezüglich Ihrer bei uns gespeicherten personenbezogenen Daten folgende Rechte zu: Recht auf Auskunft gemäß Art. 15 DSGVO, Recht auf Berichtigung gemäß Art. 16 DSGVO, Recht auf Löschung gemäß Art. 17 DSGVO, Recht auf Einschränkung der Verarbeitung gemäß Art. 18 DSGVO, Recht auf Datenübertragbarkeit gemäß Art. 20 DSGVO sowie das Recht auf Widerspruch gegen die Verarbeitung gemäß Art. 21 DSGVO. Zur Wahrnehmung Ihrer Rechte wenden Sie sich bitte per E-Mail an die im Impressum angegebene Adresse. Eine Antwort erfolgt innerhalb einer angemessenen Frist, die der Administrator nach billigem Ermessen bestimmt.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 7 Datensicherheit</h2>
+  <p>
+    Der Administrator verwendet innerhalb des Website-Besuchs das verbreitete SSL- bzw. TLS-Verfahren, das in der Regel über HTTPS erkennbar ist. Darüber hinaus trifft der Administrator technische und organisatorische Maßnahmen zum Schutz der verwalteten Daten gegen zufällige oder vorsätzliche Manipulationen, Verlust, Zerstörung oder gegen den Zugriff unberechtigter Personen. Diese Maßnahmen entsprechen dem Stand der Technik, soweit dieser dem Administrator bekannt ist und mit verfügbarer Hardware umsetzbar ist.
+  </p>
+
+  <h2 style="margin-top:30px;">§ 8 Änderungen dieser Datenschutzerklärung</h2>
+  <p>
+    Der Administrator behält sich das Recht vor, diese Datenschutzerklärung jederzeit mit Wirkung für die Zukunft zu ändern. Die jeweils aktuelle Version ist auf dieser Seite abrufbar. Eine gesonderte Benachrichtigung der Nutzer bei Änderungen erfolgt nach Ermessen des Administrators, in der Regel jedoch nicht, weil er vergisst, dass das eine gute Idee wäre.
+  </p>
+
+  <p style="margin-top:40px; font-size:0.75em; opacity:0.5;">
+    Stand: aktuell · serverjonas.de · Diese Erklärung wurde mit größtmöglicher Sorgfalt und unverhältnismäßig viel Aufwand formuliert.
+  </p>
+
+</div>
+
+<div style="text-align:center; margin-top:40px;">
+  <a href="/rights"><button>← Zurück zur Übersicht</button></a>
+</div>
+
+{% endblock %}
+=== ./templates/rights/nutzungsbedingungen.html ===
+{% extends "base.html" %} {% block title %}Nutzungsbedingungen – serverjonas{% endblock %} {% block content %}
+{{ doc.icon }} {{ doc.title }}
+{{ doc.subtitle }}
+
+§ 1 Geltungsbereich und Vertragsparteien
+Die nachfolgenden Allgemeinen Nutzungsbedingungen (ANB) regeln das Rechtsverhältnis zwischen dem Betreiber des Dienstes serverjonas.de, nachfolgend „Anbieter" oder „Administrator" genannt, und den registrierten Nutzern dieses Dienstes, nachfolgend „Nutzer" genannt. Durch die Nutzung des Dienstes erkennt der Nutzer diese Nutzungsbedingungen ausdrücklich und vollumfänglich an. Sollte der Nutzer mit einzelnen Bestimmungen dieser Nutzungsbedingungen nicht einverstanden sein, ist er angehalten, den Dienst nicht zu verwenden – eine Möglichkeit, die jederzeit und ohne Angabe von Gründen wahrgenommen werden kann.
+
+§ 2 Beschreibung des Dienstes
+serverjonas.de ist ein privat betriebener Dienst, der ausgewählten Nutzern den Zugang zu verschiedenen Anwendungen und Services ermöglicht, darunter, aber nicht ausschließlich: Cloudspeicher, Spieleserver, Medienverwaltung sowie weitere Dienste nach Ermessen des Administrators. Der Umfang des Dienstes ist nicht vertraglich zugesichert und kann jederzeit erweitert, eingeschränkt oder vollständig eingestellt werden. Ein Rechtsanspruch auf Verfügbarkeit des Dienstes oder einzelner Funktionen besteht zu keiner Zeit.
+
+§ 3 Zugang und Registrierung
+Der Zugang zum Dienst setzt die Anlage eines Nutzerkontos voraus. Die Registrierung ist ausschließlich mit einem vom Administrator ausgegebenen Server Key möglich. Der Nutzer ist verpflichtet, seine Zugangsdaten vertraulich zu behandeln und nicht an Dritte weiterzugeben. Der Administrator behält sich das Recht vor, Nutzerkonten ohne Angabe von Gründen und ohne Vorankündigung zu sperren oder zu löschen, insbesondere wenn der Nutzer gegen diese Nutzungsbedingungen verstößt oder der Administrator schlicht keinen Bock mehr hat, das Konto zu betreiben.
+
+§ 4 Pflichten des Nutzers
+Der Nutzer verpflichtet sich, den Dienst ausschließlich im Rahmen der geltenden Gesetze zu nutzen. Insbesondere ist es dem Nutzer untersagt: (a) den Dienst für illegale Zwecke zu nutzen, (b) die Infrastruktur des Dienstes zu belasten, zu beschädigen oder zu kompromittieren, (c) Zugangsdaten an Dritte weiterzugeben, (d) automatisierte Anfragen in einem Umfang zu stellen, der den Betrieb des Dienstes beeinträchtigt, (e) Inhalte hochzuladen oder zu verbreiten, die gegen geltendes Recht verstoßen oder die der Administrator aus persönlichen Gründen als unerwünscht betrachtet, (f) den Administrator um 3 Uhr nachts zu kontaktieren, es sei denn, der Server brennt – im metaphorischen Sinne.
+
+§ 5 Verfügbarkeit und Wartung
+Der Administrator bemüht sich nach Kräften, den Dienst dauerhaft und unterbrechungsfrei zu betreiben. Gleichwohl übernimmt der Administrator keine Garantie für eine bestimmte Verfügbarkeit des Dienstes. Wartungsarbeiten, Updates, Stromausfälle, Hardwaredefekte, schulische Verpflichtungen des Administrators oder sonstige höhere Gewalt können zu vorübergehenden oder dauerhaften Einschränkungen führen. Eine Benachrichtigung der Nutzer vor Wartungsarbeiten erfolgt nach Ermessen des Administrators, in der Praxis jedoch meistens nicht.
+
+§ 6 Haftungsbeschränkung
+Der Administrator haftet nicht für Schäden, die durch die Nutzung oder Nichtnutzung des Dienstes entstehen, soweit diese nicht auf grob fahrlässigem oder vorsätzlichem Handeln des Administrators beruhen. Insbesondere übernimmt der Administrator keine Haftung für Datenverluste, entgangene Gewinne, mittelbare Schäden oder Folgeschäden gleich welcher Art. Da es sich um einen privaten Heimserver handelt, der von einer Einzelperson betrieben wird, sind Erwartungen an die Zuverlässigkeit bitte entsprechend zu kalibrieren.
+
+§ 7 Urheberrecht und geistiges Eigentum
+Sämtliche durch den Administrator erstellten Inhalte, Designs und Systeme unterliegen dem Urheberrecht. Eine Vervielfältigung, Verbreitung oder öffentliche Zugänglichmachung bedarf der ausdrücklichen schriftlichen Genehmigung des Administrators. Für Inhalte, die Nutzer auf dem Dienst speichern, verbleibt das Urheberrecht beim jeweiligen Nutzer; der Administrator erhält jedoch ein nicht-exklusives Recht, diese Inhalte im Rahmen des Dienstbetriebs zu speichern und zu verarbeiten, was im Wesentlichen bedeutet, dass die Daten auf dem Server liegen dürfen.
+
+§ 8 Änderungen der Nutzungsbedingungen
+Der Administrator behält sich das Recht vor, diese Nutzungsbedingungen jederzeit zu ändern. Änderungen werden auf dieser Seite veröffentlicht. Die fortgesetzte Nutzung des Dienstes nach einer Änderung gilt als Zustimmung zu den geänderten Nutzungsbedingungen. Da die meisten Nutzer diese Seite ohnehin nie lesen werden, ist dieses Verfahren als hinreichend erachtet.
+
+§ 9 Schlussbestimmungen
+Sollten einzelne Bestimmungen dieser Nutzungsbedingungen unwirksam oder undurchführbar sein oder werden, bleibt davon die Wirksamkeit der übrigen Bestimmungen unberührt. An die Stelle der unwirksamen oder undurchführbaren Bestimmung soll diejenige wirksame und durchführbare Regelung treten, deren Wirkungen der wirtschaftlichen Zielsetzung am nächsten kommen, die die Vertragsparteien mit der unwirksamen bzw. undurchführbaren Bestimmung verfolgt haben, wobei zu beachten ist, dass der Administrator das wirtschaftliche Ziel dieses Dienstes als „irgendwie spaßig" definiert. Es gilt deutsches Recht. Gerichtsstand ist, soweit gesetzlich zulässig, der Wohnort des Administrators.
+
+Stand: aktuell · serverjonas.de · Diese Nutzungsbedingungen wurden mit einem Ausmaß an juristischem Aufwand formuliert, das in keinem vernünftigen Verhältnis zur Größe des Dienstes steht.
+
+← Zurück zur Übersicht
+{% endblock %}
+=== ./templates/admin_users.html ===
+{% extends "base.html" %}
+
+{% block title %}Adminpanel{% endblock %}
+
+{% block content %}
+<h1>Adminpanel – Users</h1>
+
+{% if users %}
+<table border="1" cellpadding="6" cellspacing="0" style="width:100%;">
+    <thead>
+        <tr>
+            {% for col in users[0].keys() %}
+            <th>{{ col }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            {% for val in user %}
+            <td>{{ val }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Keine User in der Datenbank.</p>
+{% endif %}
+{% endblock %}
+=== ./templates/meme_view.html ===
+{% extends "base.html" %}
+
+{% block title %}Meme Viewer{% endblock %}
+
+{% block content %}
+
+<div class="meme-viewer">
+    {% if meme %}
+        <div class="meme-container">
+            <!-- Bild -->
+            <img src="{{ url_for('static', filename='memes/files/' + meme.filename) }}" alt="Meme" class="meme-img">
+
+            <!-- Username rechts unten -->
+            <div class="meme-info">
+                <span class="username">👤 {{ meme.username }}</span>
+            </div>
+
+            <!-- Buttons für Like / Comment -->
+            <div class="meme-actions">
+                <button class="like-btn">👍 Like</button>
+                <button class="comment-btn">💬 Comment</button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="meme-nav">
+            <a href="{{ url_for('memes.memepage') }}" class="nav-btn prev">⬅️</a>
+            <a href="{{ url_for('memes.memepage') }}" class="nav-btn next">➡️</a>
+        </div>
+
+    {% else %}
+        <p>Keine Memes verfügbar.</p>
+    {% endif %}
+</div>
+
+<!-- FIXED UPLOAD BUTTON -->
+<a href="https://serverjonas.de/memes/upload" 
+   style="
+       position: fixed;
+       bottom: 20px;
+       right: 20px;
+       background-color: #ff4081;
+       color: white;
+       padding: 12px 20px;
+       border-radius: 8px;
+       text-decoration: none;
+       font-weight: bold;
+       box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+       transition: transform 0.2s;
+   "
+   onmouseover="this.style.transform='scale(1.1)'"
+   onmouseout="this.style.transform='scale(1)'"
+>
+   ⬆️ Upload
+</a>
+
+<style>
+/* Zentrieren und Vollbild */
+.meme-viewer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.meme-container {
+    position: relative;
+    text-align: center;
+    max-width: 80%;
+}
+
+.meme-img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.meme-info {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.5);
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: bold;
+}
+
+.meme-actions {
+    margin-top: 10px;
+}
+
+.meme-actions button {
+    margin: 0 5px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.meme-nav {
+    margin-top: 20px;
+}
+
+.meme-nav .nav-btn {
+    margin: 0 10px;
+    font-size: 1.5rem;
+    text-decoration: none;
+}
+</style>
+
+{% endblock %}=== ./templates/403.html ===
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>403 – Keine Berechtigung</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e2e8f0;
+            font-family: 'Syne', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Subtle animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 560px;
+            padding: 48px 40px;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.88);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(56,189,248,0.08);
+            animation: fadeUp 0.4s ease-out both;
+            position: relative;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 5rem;
+            font-weight: 700;
+            margin: 0;
+            color: #f87171;
+            text-shadow: 0 2px 12px rgba(248,113,113,0.35);
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            margin: 16px 0 0 0;
+            display: block;
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.5; }
+        }
+
+        .title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 12px 0 8px 0;
+            color: #e2e8f0;
+            letter-spacing: 0.02em;
+        }
+
+        p {
+            font-size: 1rem;
+            margin: 0 0 36px 0;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .tag {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            background: rgba(248,113,113,0.1);
+            color: #f87171;
+            border: 1px solid rgba(248,113,113,0.2);
+            border-radius: 4px;
+            padding: 2px 8px;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .buttons a {
+            display: inline-block;
+            padding: 12px 28px;
+            background: #38bdf8;
+            color: #0f172a;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.2s ease-in-out;
+            min-width: 180px;
+            font-family: 'Syne', sans-serif;
+        }
+
+        .buttons a:hover {
+            background: #0ea5e9;
+            transform: scale(1.04);
+            box-shadow: 0 4px 16px rgba(56,189,248,0.3);
+        }
+
+        .buttons a.secondary {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid rgba(148,163,184,0.2);
+        }
+
+        .buttons a.secondary:hover {
+            background: rgba(148,163,184,0.08);
+            color: #e2e8f0;
+            box-shadow: none;
+        }
+
+        .hint {
+            margin-top: 28px;
+            font-size: 0.8rem;
+            opacity: 0.4;
+            font-family: 'JetBrains Mono', monospace;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="code">403</p>
+        <span class="icon">🔒</span>
+        <div class="tag">ACCESS DENIED</div>
+        <p class="title">Keine Berechtigung</p>
+        <p>Du hast nicht die nötigen Rechte, um auf diese Seite zuzugreifen.</p>
+        <div class="buttons">
+            <a href="/">Zurück zum Hub</a>
+            {% if user %}
+                <a href="#" class="secondary">Angemeldet als {{ user }}</a>
+            {% else %}
+                <a href="/login" class="secondary">Anderer Account?</a>
+            {% endif %}
+        </div>
+        <div class="hint">
+            Falls das ein Fehler ist – wende dich an einen Admin.
+        </div>
+    </div>
+</body>
+</html>
+=== ./templates/base.html ===
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}serverjonas HUB{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+
+    <!-- Globaler Style -->
+    <style>
+    body {
+        margin: 0;
+        font-family: system-ui, monospace;
+        color: white;
+        min-height: 100vh;
+        background: linear-gradient(
+            225deg,
+            #0d0e12 0%,
+            #0f2027 50%,
+            #203a43 80%,
+            #2c5364 100%
+        );
+    }
+    #logo {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        max-width: 200px;
+        width: 100%;
+        height: auto;
+        z-index: 1000;
+    }
+    @media (max-width: 768px) and (orientation: portrait) {
+        #logo { width: 100px; }
+    }
+    @media (max-width: 768px) and (orientation: landscape) {
+        #logo { width: 200px; }
+    }
+    .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 40px;
+    }
+    h1 { text-align: center; font-size: 3em; margin-bottom: 10px; position: relative; z-index: 2000; }
+    p { text-align: center; opacity: 0.8; }
+    .grid {
+        margin-top: 40px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    .card {
+        background: rgba(255,255,255,0.1);
+        border-radius: 16px;
+        padding: 25px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .card:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-5px);
+    }
+    .card span { font-size: 2em; }
+    .footer { text-align: center; margin-top: 50px; font-size: 0.9em; opacity: 0.6; }
+
+    .support-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #0d6efd;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      z-index: 9999;
+    }
+
+    .support-button:hover {
+      background: #084298;
+    }
+
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Globale Navigationsleiste -->
+    <nav style="background: rgba(0,0,0,0.6); padding: 0 20px 20px 20px; display: flex; gap: 15px; position: sticky; top: 10; z-index: 999; align-items: flex-end; height: 100px;">
+        <a href="/" style="color: white; font-weight: bold; text-decoration: none;">🏠 Start</a>
+        <a href="https://nextcloud.serverjonas.de" style="color: white; text-decoration: none;">☁️ Nextcloud</a>
+        <a href="https://games.serverjonas.de" style="color: white; text-decoration: none;">🎮 Games</a>
+        <a href="https://serverjonas.de/memes" style="color: white; text-decoration: none;">😂 Memes</a>
+        <a href="https://serverjonas.de/films" style="color: white; text-decoration: none;">🎬 Kino</a>
+
+    </nav>
+    <!-- Logo global klickbar -->
+    <a href="/">
+        <img id="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    </a>
+
+    <!-- Kundensupport Button global -->
+    <a href="https://support.serverjonas.de" target="_blank" class="support-button">
+      🛠 Kundensupport
+    </a>
+
+    <!-- Hauptcontent -->
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer global -->
+    <div class="footer">
+        powered by Linux · serverjonas · no iSchrott
+    </div>
+</body>
+</html>
+=== ./templates/404.html ===
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>404 – Seite nicht gefunden</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 6rem;
+            margin: 0;
+            color: #38bdf8;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin: 20px 0;
+            color: #94a3b8;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #38bdf8;
+            color: #0f172a;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        a:hover {
+            background: #0ea5e9;
+        }
+
+        .hint {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <p>Diese Seite existiert nicht im serverjonas network.</p>
+
+        {% if user %}
+            <p>Angemeldet als <strong>{{ user }}</strong></p>
+        {% endif %}
+
+        <a href="/">Zurück zum Hub</a>
+
+        <div class="hint">
+            Vielleicht ist das Modul deaktiviert. Vielleicht war es nie da.
+            Vielleicht hast du dich vertippt.
+        </div>
+    </div>
+</body>
+</html>
+=== ./templates/index.html ===
+{% extends "base.html" %}
+
+{% block title %}serverjonas HUB{% endblock %}
+
+{% block content %}
+
+<h1>🚀 serverjonas</h1>
+
+{% if user %}
+    <p>👋 Angemeldet als <b>{{ user }}</b></p>
+{% else %}
+    <p>
+        <a href="/login">
+            <button>🔐 Login</button>
+        </a>
+    </p>
+{% endif %}
+
+<p>Zentraler Zugriff auf alle Services</p>
+
+<div class="grid">
+    <div class="card" onclick="location.href='https://nextcloud.serverjonas.de'">
+        <span>☁️</span>
+        <h3>Nextcloud</h3>
+    </div>
+
+    <div class="card" onclick="location.href='https://games.serverjonas.de'">
+        <span>🎮</span>
+        <h3>Games</h3>
+    </div>
+
+    <div class="card" onclick="location.href='https://serverjonas.de/memes'">
+        <span>😂</span>
+        <h3>Memes</h3>
+    </div>
+
+    <div class="card" onclick="location.href='https://serverjonas.de/films'">
+        <span>🎬</span>
+        <h3>Kino</h3>
+    </div>
+
+</div>
+
+
+
+{% endblock %}
+=== ./templates/films_detail.html ===
+{% extends "base.html" %}
+{% block title %}{{ film.title }} – serverjonas HUB{% endblock %}
+
+{% block head %}
+<style>
+  .film-page { max-width: 860px; margin: 0 auto; }
+  .back-link { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.9em; display: inline-block; margin-bottom: 20px; }
+  .back-link:hover { color: white; }
+  .film-title { font-size: 2em; margin: 0 0 8px 0; }
+  .film-meta  { opacity: 0.55; font-size: 0.85em; margin-bottom: 24px; }
+
+  /* Player */
+  .player-wrap {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .player-wrap video { width: 100%; height: 100%; display: block; }
+
+  /* Status-Karten */
+  .status-card {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: rgba(0,0,0,0.5);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    gap: 16px;
+  }
+  .status-card .icon { font-size: 3.5em; }
+  .status-card p { margin: 0; opacity: 0.7; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Actions */
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    background: rgba(255,255,255,0.12);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: 0.2s;
+    display: inline-block;
+  }
+  .btn:hover { background: rgba(255,255,255,0.22); }
+  .btn-danger { background: rgba(220,53,69,0.25); border-color: rgba(220,53,69,0.5); }
+  .btn-danger:hover { background: rgba(220,53,69,0.5); }
+
+  .meta-box {
+    margin-top: 24px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 0.85em;
+    opacity: 0.7;
+  }
+  .meta-box p { margin: 4px 0; }
+
+  .error-box {
+    background: rgba(220,53,69,0.15);
+    border: 1px solid rgba(220,53,69,0.4);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 0.85em;
+  }
+  .error-box pre { margin: 8px 0 0 0; opacity: 0.7; white-space: pre-wrap; word-break: break-all; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="film-page">
+  <a href="/films/films" class="back-link">← Zurück zur Übersicht</a>
+
+  <h1 class="film-title">{{ film.title }}</h1>
+  <p class="film-meta">
+    Hochgeladen von {{ film.username }}
+    {% if film.uploaded_at %} · {{ film.uploaded_at }}{% endif %}
+    · ID: {{ film.film_id }}
+  </p>
+
+  {# ── Player oder Status-Karte ── #}
+  {% if film.status == "ready" %}
+    <div class="player-wrap">
+      <video controls preload="metadata">
+        <source src="/films/film/{{ film.film_id }}/watch" type="video/mp4">
+        Dein Browser unterstützt kein HTML5-Video.
+      </video>
+    </div>
+
+  {% elif film.status == "converting" %}
+    <div class="status-card" id="status-card">
+      <div class="spinner"></div>
+      <p>⚙️ Wird konvertiert… bitte warten.</p>
+      <p style="font-size:0.8em">Diese Seite aktualisiert sich automatisch.</p>
+    </div>
+
+  {% elif film.status == "queued" %}
+    <div class="status-card" id="status-card">
+      <div class="icon">⏳</div>
+      <p>In der Warteschlange…</p>
+    </div>
+
+  {% elif film.status == "error" %}
+    <div class="error-box">
+      <strong>⚠ Konvertierung fehlgeschlagen</strong>
+      {% if film.error %}<pre>{{ film.error }}</pre>{% endif %}
+    </div>
+  {% endif %}
+
+  {# ── Aktionen ── #}
+  <div class="actions">
+    {% if film.status == "ready" %}
+      <a href="/films/film/{{ film.film_id }}/watch" download="{{ film.title }}.mp4" class="btn">⬇ Herunterladen</a>
+    {% endif %}
+    <form method="POST" action="/films/film/{{ film.film_id }}/delete"
+          onsubmit="return confirm('Film wirklich löschen?')">
+      <button type="submit" class="btn btn-danger">🗑 Löschen</button>
+    </form>
+  </div>
+
+  <div class="meta-box">
+    <p><strong>Status:</strong> {{ film.status }}</p>
+    <p><strong>Datei:</strong> {{ film.filename or film.original }}</p>
+    <p><strong>Film-ID:</strong> {{ film.film_id }}</p>
+  </div>
+</div>
+
+{# Polling solange nicht fertig #}
+{% if film.status in ["queued", "converting"] %}
+<script>
+  (function poll() {
+    setTimeout(function() {
+      fetch("/films/film/{{ film.film_id }}/status")
+        .then(r => r.json())
+        .then(data => {
+          if (data.status === "ready" || data.status === "error") {
+            location.reload();
+          } else {
+            poll();
+          }
+        })
+        .catch(() => poll());
+    }, 3000);
+  })();
+</script>
+{% endif %}
+{% endblock %}
+=== ./templates/films_upload.html ===
+{% extends "base.html" %}
+{% block title %}Film hochladen – serverjonas HUB{% endblock %}
+
+{% block head %}
+<style>
+  .upload-box {
+    max-width: 580px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 36px;
+  }
+
+  label { display: block; margin-bottom: 6px; opacity: 0.8; font-size: 0.9em; }
+
+  input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: white;
+    padding: 10px 14px;
+    font-size: 0.95em;
+    margin-bottom: 20px;
+  }
+
+  .drop-zone {
+    border: 2px dashed rgba(255,255,255,0.25);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: #0d6efd;
+    background: rgba(13,110,253,0.08);
+  }
+  .drop-zone input[type="file"] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .drop-zone .dz-icon { font-size: 2.5em; margin-bottom: 8px; }
+  .drop-zone .dz-text { opacity: 0.6; font-size: 0.9em; }
+  .dz-filename { margin-top: 10px; font-weight: bold; color: #5ba4f5; display: none; font-size: 0.9em; }
+
+  .hint { font-size: 0.8em; opacity: 0.45; margin: 6px 0 20px 0; }
+
+  /* Progress */
+  .progress-wrap { display: none; margin-bottom: 22px; }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 0.85em; margin-bottom: 6px; opacity: 0.8;
+  }
+  .progress-bar-bg {
+    background: rgba(255,255,255,0.1);
+    border-radius: 99px; height: 10px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #0d6efd, #5ba4f5);
+    border-radius: 99px;
+    transition: width 0.15s ease;
+  }
+  .progress-speed { font-size: 0.78em; opacity: 0.5; margin-top: 5px; text-align: right; }
+
+  .btn {
+    background: #0d6efd; color: white; border: none;
+    padding: 11px 26px; border-radius: 8px; font-size: 1em;
+    cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block;
+  }
+  .btn:hover { background: #084298; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2); margin-left: 10px;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+
+  .msg { padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; }
+  .msg.error   { background: rgba(220,53,69,0.25);  border: 1px solid #dc3545; }
+  .msg.success { background: rgba(25,135,84,0.25);  border: 1px solid #198754; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>📤 Film hochladen</h1>
+
+<div class="upload-box">
+  <div id="msg-box" style="display:none" class="msg"></div>
+
+  <label for="title">Filmtitel</label>
+  <input type="text" id="title" placeholder="z.B. Sommerurlaub 2025">
+
+  <label>Videodatei</label>
+  <div class="drop-zone" id="drop-zone">
+    <input type="file" id="file-input" accept="video/*">
+    <div class="dz-icon">🎬</div>
+    <div class="dz-text">Datei hierher ziehen oder klicken zum Auswählen</div>
+  </div>
+  <div class="dz-filename" id="dz-filename"></div>
+  <p class="hint">Alle gängigen Formate. Wird automatisch zu 1080p MP4 konvertiert.</p>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-label">
+      <span id="progress-text">Lade hoch…</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-speed" id="progress-speed"></div>
+  </div>
+
+  <button class="btn" id="upload-btn" onclick="startUpload()">🚀 Hochladen</button>
+  <a href="/films/films" class="btn btn-ghost">Abbrechen</a>
+</div>
+
+<script>
+  const dropZone   = document.getElementById("drop-zone");
+  const fileInput  = document.getElementById("file-input");
+  const dzFilename = document.getElementById("dz-filename");
+
+  dropZone.addEventListener("dragover",  e => { e.preventDefault(); dropZone.classList.add("dragover"); });
+  dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+  dropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+    if (e.dataTransfer.files[0]) {
+      fileInput.files = e.dataTransfer.files;
+      showFilename(e.dataTransfer.files[0].name);
+    }
+  });
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files[0]) showFilename(fileInput.files[0].name);
+  });
+
+  function showFilename(name) {
+    dzFilename.textContent = "✓ " + name;
+    dzFilename.style.display = "block";
+  }
+
+  function showMsg(text, type) {
+    const box = document.getElementById("msg-box");
+    box.textContent = text;
+    box.className = "msg " + type;
+    box.style.display = "block";
+  }
+
+  function formatSpeed(bps) {
+    if (bps < 1024)        return bps.toFixed(0) + " B/s";
+    if (bps < 1048576)     return (bps / 1024).toFixed(1) + " KB/s";
+    return (bps / 1048576).toFixed(1) + " MB/s";
+  }
+
+  function startUpload() {
+    const file  = fileInput.files[0];
+    const title = document.getElementById("title").value.trim() || "Unbekannter Film";
+
+    if (!file) { showMsg("Bitte zuerst eine Datei auswählen.", "error"); return; }
+
+    const btn = document.getElementById("upload-btn");
+    btn.disabled = true;
+    document.getElementById("progress-wrap").style.display = "block";
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("title", title);
+
+    const xhr = new XMLHttpRequest();
+    let startTime = Date.now();
+
+    xhr.upload.addEventListener("progress", e => {
+      if (!e.lengthComputable) return;
+      const pct = Math.round((e.loaded / e.total) * 100);
+
+      document.getElementById("progress-fill").style.width = pct + "%";
+      document.getElementById("progress-pct").textContent  = pct + "%";
+      document.getElementById("progress-text").textContent =
+        pct < 100 ? "Lade hoch…" : "Upload fertig, wird verarbeitet…";
+
+      const elapsed = (Date.now() - startTime) / 1000;
+      if (elapsed > 0.5) {
+        const speed = e.loaded / elapsed;
+        const remaining = (e.total - e.loaded) / speed;
+        document.getElementById("progress-speed").textContent =
+          formatSpeed(speed) + (remaining > 1 ? "  ·  noch ~" + Math.ceil(remaining) + "s" : "");
+      }
+    });
+
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 200 && xhr.status < 400) {
+        window.location.href = xhr.responseURL || "/films";
+      } else {
+        showMsg("Fehler beim Upload (HTTP " + xhr.status + ")", "error");
+        btn.disabled = false;
+      }
+    });
+
+    xhr.addEventListener("error", () => {
+      showMsg("Netzwerkfehler beim Upload.", "error");
+      btn.disabled = false;
+    });
+
+    xhr.open("POST", "/films/upload");
+    xhr.send(formData);
+  }
+</script>
+{% endblock %}
+=== ./templates/memes_upload.html ===
+{% extends "base.html" %}
+
+{% block title %}Meme Upload{% endblock %}
+
+{% block content %}
+
+<h1>📤 Meme hochladen</h1>
+
+{% if message %}
+    <p>{{ message }}</p>
+{% endif %}
+
+{% if user %}
+    <p>👋 Angemeldet als <b>{{ user['name'] }}</b></p>
+
+    <div class="grid">
+        <div class="card">
+            <form action="{{ url_for('memes.upload') }}" method="post" enctype="multipart/form-data">
+                <label for="file">Bild auswählen (PNG/JPG/GIF):</label>
+                <input type="file" name="file" id="file" required><br><br>
+
+                <label for="title">Titel (optional):</label>
+                <input type="text" name="title" id="title"><br><br>
+
+                <button type="submit">Hochladen</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FIXED UPLOAD BUTTON -->
+    <a href="https://serverjonas.de/memes/" 
+    style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #ff4081;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        transition: transform 0.2s;
+    "
+    onmouseover="this.style.transform='scale(1.1)'"
+    onmouseout="this.style.transform='scale(1)'"
+    >
+    ⬆️ Zurück zum Viewer
+    </a>
+{% else %}
+    <p>Du musst eingeloggt sein, um ein Meme hochzuladen.  
+    <a href="/login"><button>🔐 Login</button></a></p>
+{% endif %}
+
+{% endblock %}=== ./templates/films_index.html ===
+{% extends "base.html" %}
+{% block title %}🎬 serverjonas MOVIE{% endblock %}
+
+{% block head %}
+<style>
+  .menu-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 20px;
+  }
+  .menu-title {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+  .btn-big {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 20px 60px;
+    border-radius: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 1.3em;
+    transition: 0.2s;
+    display: inline-block;
+    width: 300px;
+    text-align: center;
+  }
+  .btn-big:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="menu-wrapper">
+  <h1 class="menu-title">🎬 Was möchtest du sehen?</h1>
+  <a href="/films/films" class="btn-big">🎥 Filme</a>
+  <a href="/films/series" class="btn-big">📺 Serien</a>
+</div>
+{% endblock %}=== ./templates/friends/index.html ===
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Freunde</h2>
+
+{% if message %}
+  <p>{{ message }}</p>
+{% endif %}
+
+<form method="POST">
+  <input type="hidden" name="action" value="send">
+  <input type="text" name="to_username" placeholder="Benutzername" required>
+  <button type="submit">Anfrage senden</button>
+</form>
+
+{% if incoming %}
+  <h3>Eingehende Anfragen</h3>
+  {% for id, name in incoming %}
+    <div>
+      <span>{{ name }}</span>
+      <form method="POST" style="display:inline">
+        <input type="hidden" name="action" value="accept">
+        <input type="hidden" name="from_id" value="{{ id }}">
+        <button type="submit">✅ Annehmen</button>
+      </form>
+      <form method="POST" style="display:inline">
+        <input type="hidden" name="action" value="decline">
+        <input type="hidden" name="other_id" value="{{ id }}">
+        <button type="submit">❌ Ablehnen</button>
+      </form>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if outgoing %}
+  <h3>Gesendete Anfragen</h3>
+  {% for id, name in outgoing %}
+    <div>
+      <span>{{ name }}</span>
+      <form method="POST" style="display:inline">
+        <input type="hidden" name="action" value="decline">
+        <input type="hidden" name="other_id" value="{{ id }}">
+        <button type="submit">Zurückziehen</button>
+      </form>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if friends %}
+  <h3>Deine Freunde</h3>
+  {% for id, name in friends %}
+    <div>
+      <span>{{ name }}</span>
+      <form method="POST" style="display:inline">
+        <input type="hidden" name="action" value="remove">
+        <input type="hidden" name="other_id" value="{{ id }}">
+        <button type="submit">Entfernen</button>
+      </form>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% endblock %}
+=== ./templates/register.html ===
+{% extends "base.html" %}
+{% block title %}Registrieren{% endblock %}
+
+{% block content %}
+<h2>🧾 Account erstellen</h2>
+
+{% if message %}
+<p>{{ message }}</p>
+{% endif %}
+
+<form method="post">
+    <input name="username" placeholder="Username" required><br>
+    <input name="password" type="password" placeholder="Passwort" required><br>
+    <input name="server_key" type="password" placeholder="Server-Key" required><br>
+    <button>Account erstellen</button>
+</form>
+{% endblock %}
+=== ./templates/films_films.html ===
+{% extends "base.html" %}
+{% block title %}🎬 Meine Filme – serverjonas HUB{% endblock %}
+
+{% block head %}
+<style>
+  .films-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .btn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: 0.2s;
+    display: inline-block;
+  }
+  .btn:hover { background: rgba(255,255,255,0.25); }
+  .btn-primary { background: #0d6efd; border-color: #0d6efd; }
+  .btn-primary:hover { background: #084298; }
+  .btn-danger { background: rgba(220,53,69,0.3); border-color: rgba(220,53,69,0.6); }
+  .btn-danger:hover { background: rgba(220,53,69,0.6); }
+
+  .films-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .film-card {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+  .film-card:hover { background: rgba(255,255,255,0.13); transform: translateY(-4px); }
+  .film-thumb {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+  }
+  .film-info { padding: 14px; }
+  .film-title { font-weight: bold; margin: 0 0 6px 0; font-size: 1em; }
+  .film-meta { font-size: 0.8em; opacity: 0.6; margin: 0; }
+  .status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.75em;
+    margin-top: 6px;
+  }
+  .status-ready    { background: rgba(25,135,84,0.4);  border: 1px solid #198754; }
+  .status-converting { background: rgba(255,193,7,0.3); border: 1px solid #ffc107; color: #ffc107; }
+  .status-queued   { background: rgba(108,117,125,0.3); border: 1px solid #6c757d; }
+  .status-error    { background: rgba(220,53,69,0.3);  border: 1px solid #dc3545; color: #ff6b7a; }
+
+  .empty-state { text-align: center; padding: 60px 20px; opacity: 0.6; }
+  .empty-state .icon { font-size: 4em; margin-bottom: 16px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="films-header">
+  <h1 style="margin:0; font-size:2em;">🎬 Meine Filme</h1>
+  <a href="/films/upload" class="btn btn-primary">＋ Film hochladen</a>
+</div>
+
+{% if films %}
+  <div class="films-grid">
+    {% for film in films %}
+    <div class="film-card" onclick="location.href='/films/film/{{ film.film_id }}'">
+      <div class="film-thumb">
+        {% if film.status == "ready" %}🎥{% elif film.status == "converting" %}⚙️{% elif film.status == "error" %}❌{% else %}⏳{% endif %}
+      </div>
+      <div class="film-info">
+        <p class="film-title">{{ film.title }}</p>
+        <p class="film-meta">{{ film.uploaded_at }}</p>
+        <span class="status-badge status-{{ film.status }}">
+          {% if film.status == "ready" %}✓ Bereit
+          {% elif film.status == "converting" %}⚙ Wird konvertiert…
+          {% elif film.status == "queued" %}⏳ Warteschlange
+          {% else %}⚠ Fehler{% endif %}
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="icon">🎬</div>
+    <p>Noch keine Filme. Lade deinen ersten hoch!</p>
+    <a href="/films/upload" class="btn btn-primary" style="margin-top:12px;">Film hochladen</a>
+  </div>
+{% endif %}
+{% endblock %}
+=== ./templates/not_logged_in.html ===
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Nicht eingeloggt</title>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 40px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            font-size: 5rem;
+            margin: 0;
+            color: #38bdf8;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin: 20px 0 40px 0;
+            color: #94a3b8;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .buttons a {
+            display: inline-block;
+            padding: 12px 28px;
+            background: #38bdf8;
+            color: #0f172a;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.2s ease-in-out;
+            min-width: 180px;
+        }
+
+        .buttons a:hover {
+            background: #0ea5e9;
+            transform: scale(1.05);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚠️</h1>
+        <p>Du musst angemeldet sein, um auf diese Seite zuzugreifen.</p>
+
+        <div class="buttons">
+            <a href="/">Zurück zum Hub</a>
+            <a href="/login">Login</a>
+        </div>
+    </div>
+</body>
+</html>=== ./templates/login.html ===
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<h1>Anmelden</h1>
+
+{% if message %}
+    <p>{{ message }}</p>
+{% endif %}
+
+<form method="post" action="/login">
+    <label>
+        Benutzername:
+        <input type="text" name="username" required>
+    </label>
+
+    <br><br>
+
+    <label>
+        Passwort:
+        <input type="password" name="password" required>
+    </label>
+
+    <br><br>
+
+    <button type="submit">Login</button>
+
+    &nbsp;&nbsp;
+
+    <a href="/register">
+        <button type="button">Noch keinen Account? Erstellen Sie einen.</button>
+    </a>
+</form>
+{% endblock %}
+=== ./templates/films_series.html ===
+{% extends "base.html" %}
+{% block title %}Noch in Arbeit – serverjonas HUB{% endblock %}
+
+{% block content %}
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; text-align:center; gap:16px;">
+  <div style="font-size:3em;">🚧</div>
+  <h1 style="margin:0;">Noch in Arbeit</h1>
+  <p style="opacity:0.6;">Probier es später erneut.</p>
+  <a href="/films" style="
+    margin-top:10px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 10px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.2s;
+  ">← Zurück zur Übersicht</a>
+</div>
+{% endblock %}=== ./create_user.py ===
+#!/usr/bin/env python3
+import sys
+import sqlite3
+import subprocess
+from werkzeug.security import generate_password_hash
+import os
+import datetime
+import traceback
+# ======================
+# KONFIGURATION
+# ======================
+DB_PATH = "/var/www/serverjonas-hub/users.db"
+NEXTCLOUD_OCC = "/var/www/nextcloud/occ"
+NEXTCLOUD_QUOTA = "50 G" #Limit an speicherplaz
+PHP_BIN = "php"  # meist richtig
+ERROR_LOG = "/var/www/serverjonas-hub/errors.log"
+DEFAULT_ROLE = {
+    "admin": 0,
+    "vip": 0,
+    "mod": 0
+}
+
+# ======================
+# HILFSFUNKTIONEN
+# ======================
+def usage():
+    print("Usage:")
+    print("  create_user.py <username> <password>")
+    sys.exit(1)
+
+def log_error(msg: str, exc: Exception = None):
+    """Schreibt eine Nachricht + optional Exception in errors.log"""
+    with open(ERROR_LOG, "a", encoding="utf-8") as f:
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        f.write(f"[{now}] {msg}\n")
+        if exc:
+            f.write(f"{type(exc).__name__}: {exc}\n")
+            f.write(traceback.format_exc())
+        f.write("\n")
+
+def user_exists(username: str) -> bool:
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM users WHERE user_name = ?", (username,))
+    exists = cur.fetchone() is not None
+    conn.close()
+    return exists
+
+
+def create_db_user(username: str, password: str):
+    password_hash = generate_password_hash(password)
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO users (user_name, password_hash, admin, vip, mod)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        username,
+        password_hash,
+        DEFAULT_ROLE["admin"],
+        DEFAULT_ROLE["vip"],
+        DEFAULT_ROLE["mod"]
+    ))
+
+    conn.commit()
+    conn.close()
+
+def create_nextcloud_user(username: str, password: str):
+    cmd = [
+        PHP_BIN, NEXTCLOUD_OCC,
+        "user:add",
+        "--password-from-env",
+        username
+    ]
+
+    env = dict(os.environ)
+    env["OC_PASS"] = password
+
+    result = subprocess.run(
+        cmd,
+        env=env,
+        capture_output=True,  # <- stdout/stderr abfangen
+        text=True,
+        encoding="utf-8"
+    )
+
+    # Fehler-Check
+    if result.returncode != 0:
+        raise Exception(f"Nextcloud-Error:\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}")
+
+    quota_cmd = [
+        PHP_BIN, NEXTCLOUD_OCC,
+        "user:setting",
+        username,
+        "files",
+        "quota",
+        NEXTCLOUD_QUOTA
+    ]
+
+    subprocess.run(quota_cmd, check=True)
+
+
+
+def create_nextcloud_user_old(username: str, password: str):
+    cmd = [
+        PHP_BIN,
+        NEXTCLOUD_OCC,
+        "user:add",
+        "--password-from-env",
+        "--quota",
+        NEXTCLOUD_QUOTA,
+        username
+    ]
+
+    env = dict(**os.environ)
+    env["OC_PASS"] = password
+
+    subprocess.run(
+        cmd,
+        env=env,
+        check=True
+    )
+
+
+# ======================
+# MAIN
+# ======================
+if len(sys.argv) != 3:
+    usage()
+
+username = sys.argv[1]
+password = sys.argv[2]
+
+if user_exists(username):
+    print(f"❌ User '{username}' existiert bereits")
+    sys.exit(2)
+
+try:
+    print("☁️ Erstelle Nextcloud‑Account …")
+    create_nextcloud_user(username, password)
+    print("✅ Nextcloud‑User erstellt")
+    account = True
+except Exception as e:
+    print("Fehler beim erstellen des nextcloud accounts", e)
+    log_error("Fehler beim Erstellen des Nextcloud-Accounts", e)
+    account = True
+
+#account = True
+
+if account:
+    print("🔐 Hashing password …")
+    create_db_user(username, password)
+    print("✅ User in users.db angelegt")
+    print("🎉 Fertig!")
+
+=== ./app.py ===
+# main app.py
+from flask import Flask, request, redirect, send_from_directory, render_template, abort
+import os
+import json
+import importlib.util
+import sqlite3
+import time
+from toolbox import get_current_user
+from dotenv import load_dotenv
+load_dotenv()
+
+BASE_DIR = os.path.dirname(__file__)
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+MODULE_DIR = os.path.join(BASE_DIR, "modules")
+DB_PATH = "/var/www/serverjonas-hub/users.db"
+
+app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=os.path.join(BASE_DIR, "static"))
+
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024 * 1024  # 50GB
+app.secret_key = os.environ.get("SECRET_KEY")
+
+
+
+def load_modules():
+    config_path = os.path.join(BASE_DIR, "modules.json")
+    if not os.path.isfile(config_path):
+        print("❌ modules.json fehlt")
+        return
+
+    with open(config_path) as f:
+        modules = json.load(f)
+
+    for name, cfg in modules.items():
+        try:
+            module_path = os.path.join(MODULE_DIR, cfg["pfad"], "app.py")
+            spec = importlib.util.spec_from_file_location(f"modules.{name}", module_path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            app.register_blueprint(module.bp, url_prefix=cfg["url"])
+            print(f"✅ Modul geladen: {name} -> {cfg['url']}")
+        except Exception as e:
+            print(f"❌ Modul {name} konnte nicht geladen werden:", e)
+
+load_modules()
+
+@app.errorhandler(404)
+def page_not_found(e):
+    user_array = get_current_user()
+    if user_array == None:
+        user = None
+    else:
+        user = user_array["name"]
+    return render_template("404.html", user=user), 404
+
+@app.errorhandler(403)
+def forbidden(e):
+    user_array = get_current_user()
+    user = user_array["name"] if user_array else None
+    return render_template("403.html", user=user), 403
+
+@app.errorhandler(401)
+def not_logged_in(e):
+    user_array = get_current_user()
+    user = user_array["name"] if user_array else None
+    return render_template("not_logged_in.html", user=user), 401
+
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def hub(path):
+    ua = request.headers.get("User-Agent", "")
+    if "iPhone" in ua or "iPad" in ua or "iPod" in ua:
+        return redirect(f"https://apple.serverjonas.de/{path}", code=302)
+
+    if path == "" or path == "index.html":
+        user_array = get_current_user()
+        if user_array == None:
+            user = None
+        else:
+            user = user_array["name"]
+        return render_template(
+            "index.html",
+            user=user
+        )
+
+    file_path = os.path.join(BASE_DIR, path)
+    if os.path.isfile(file_path):
+        return send_from_directory(BASE_DIR, path)
+
+    return abort(404)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>🎧 Musik</h1>
+
+<form id="uploadForm">
+  <input type="file" name="files" multiple webkitdirectory>
+  <input type="file" name="zip" accept=".zip">
+  <button>Upload</button>
+</form>
+
+<div class="progress"><div id="bar"></div></div>
+
+<ul>
+{% for a in artists %}
+  <li onclick="location.href='/music/artist/{{a}}'">🎤 {{a}}</li>
+{% endfor %}
+</ul>
+
+<style>
+.progress {height:8px;background:#222;margin:10px 0;}
+#bar {height:100%;width:0;background:#0d6efd;}
+li {cursor:pointer;padding:8px;}
+li:hover {background:#333;}
+</style>
+
+<script>
+let form = document.getElementById("uploadForm");
+let bar = document.getElementById("bar");
+
+form.onsubmit = e => {
+  e.preventDefault();
+  let data = new FormData(form);
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST","/music/upload");
+
+  xhr.upload.onprogress = e=>{
+    if(e.lengthComputable){
+      bar.style.width=(e.loaded/e.total*100)+"%";
+    }
+  };
+
+  xhr.onload = ()=>location.reload();
+  xhr.send(data);
+};
+</script>
+
+{% endblock %}

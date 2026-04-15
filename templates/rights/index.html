@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Rechtliches – serverjonas{% endblock %}
+{% block content %}
+
+<h1>⚖️ Rechtliches</h1>
+<p>Alle rechtlich relevanten Dokumente zu serverjonas.de</p>
+
+<div class="grid">
+  {% for key, doc in documents.items() %}
+  <div class="card" onclick="location.href='/rights/{{ key }}'">
+    <span>{{ doc.icon }}</span>
+    <h3>{{ doc.title }}</h3>
+    <p style="font-size:0.75em; opacity:0.6; margin-top:8px;">{{ doc.subtitle }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

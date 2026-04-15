@@ -1,0 +1,154 @@
+Welcome to Ubuntu 24.04.4 LTS (GNU/Linux 6.8.0-106-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Do 19. Mär 09:50:53 UTC 2026
+
+  System load:  0.11                Temperature:             29.8 C
+  Usage of /:   82.0% of 115.78GB   Processes:               177
+  Memory usage: 5%                  Users logged in:         0
+  Swap usage:   0%                  IPv4 address for enp2s0: 192.168.2.76
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Erweiterte Sicherheitswartung (ESM) für Applications ist  nicht aktiviert.
+
+0 Aktualisierungen können sofort angewendet werden.
+
+23 zusätzliche Sicherheitsupdates können mit ESM Apps angewendet werden.
+Erfahren Sie mehr über die Aktivierung des ESM Apps-Dienstes at https://ubuntu.com/esm
+
+
+Activate the web console with: systemctl enable --now cockpit.socket
+
+You have new mail.
+Last login: Thu Mar 19 09:45:09 2026 from 176.7.185.205
+-bash: /root/.cargo/env: No such file or directory
+-bash: /root/.cargo/env: No such file or directory
+root@serverjonas:~# chmod -x  /usr/local/bin/sysmonitor
+root@serverjonas:~# sysmonitor
+-bash: /usr/local/bin/sysmonitor: Permission denied
+root@serverjonas:~# cat /usr/local/bin/sysmonitor
+#!/usr/bin/env bash
+
+# ─────────────────────────────────────────
+#  sysmonitor – system overview
+# ─────────────────────────────────────────
+
+BOLD='\033[1m'
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RESET='\033[0m'
+
+header() {
+  echo -e "${CYAN}${BOLD}══════════════════════════════════════${RESET}"
+  echo -e "${CYAN}${BOLD}  sysmonitor @ $(hostname)${RESET}"
+  echo -e "${CYAN}${BOLD}  $(date '+%Y-%m-%d %H:%M:%S')${RESET}"
+  echo -e "${CYAN}${BOLD}══════════════════════════════════════${RESET}"
+}
+
+section() {
+  echo -e "\n${YELLOW}${BOLD}▸ $1${RESET}"
+}
+
+# ── Speichermedien ──────────────────────
+section "Speichermedien"
+printf "  %-22s %6s %7s %6s %6s  %s\n" "Dateisystem" "Größe" "Benutzt" "Verf." "Verw%" "Eingehängt"
+df -h | awk '/^\/dev\// { seen[$1]++; if(seen[$1]==1) printf "  %-22s %6s %7s %6s %6s  %s\n", $1, $2, $3, $4, $5, $6 }'
+
+# ── CPU ─────────────────────────────────
+section "CPU"
+# Modell
+cpu_model=$(grep -m1 "model name" /proc/cpuinfo | cut -d: -f2 | xargs)
+cpu_cores=$(nproc)
+echo -e "  Modell : $cpu_model"
+echo -e "  Kerne  : $cpu_cores"
+
+# Auslastung (1-Sekunden-Snapshot via /proc/stat)
+read cpu user nice system idle iowait irq softirq steal _ < /proc/stat
+total1=$((user+nice+system+idle+iowait+irq+softirq+steal))
+idle1=$idle
+sleep 0.5
+read cpu user nice system idle iowait irq softirq steal _ < /proc/stat
+total2=$((user+nice+system+idle+iowait+irq+softirq+steal))
+idle2=$idle
+delta_total=$((total2-total1))
+delta_idle=$((idle2-idle1))
+if [ $delta_total -gt 0 ]; then
+  cpu_usage=$(( (delta_total - delta_idle) * 100 / delta_total ))
+else
+  cpu_usage=0
+fi
+echo -e "  Last   : ${cpu_usage}%"
+
+# CPU-Temp (beste Zone suchen)
+if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
+  best_temp=0
+  for zone in /sys/class/thermal/thermal_zone*/temp; do
+    t=$(cat "$zone" 2>/dev/null)
+    [ "$t" -gt "$best_temp" ] 2>/dev/null && best_temp=$t
+  done
+  [ "$best_temp" -gt 0 ] && echo -e "  Temp   : $((best_temp/1000))°C"
+fi
+
+# ── RAM ─────────────────────────────────
+section "RAM"
+awk '
+/^MemTotal:/     { total=$2 }
+/^MemAvailable:/ { avail=$2 }
+/^SwapTotal:/    { stotal=$2 }
+/^SwapFree:/     { sfree=$2 }
+END {
+  used = total - avail
+  printf "  RAM    : %.1f GB benutzt / %.1f GB gesamt\n", used/1024/1024, total/1024/1024
+  if (stotal > 0)
+    printf "  Swap   : %.1f GB benutzt / %.1f GB gesamt\n", (stotal-sfree)/1024/1024, stotal/1024/1024
+}' /proc/meminfo
+
+# ── GPU ─────────────────────────────────
+section "GPU"
+if command -v nvidia-smi &>/dev/null; then
+  nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu \
+    --format=csv,noheader,nounits | while IFS=',' read name util mem_used mem_total temp; do
+    echo -e "  Modell : $(echo $name | xargs)"
+    echo -e "  Last   : $(echo $util | xargs)%"
+    echo -e "  VRAM   : $(echo $mem_used | xargs) MB / $(echo $mem_total | xargs) MB"
+    echo -e "  Temp   : $(echo $temp | xargs)°C"
+  done
+elif command -v radeontop &>/dev/null; then
+  echo -e "  AMD GPU erkannt – starte radeontop für Details"
+else
+  # Fallback: lspci – nur echte Grafikgeräte (VGA / 3D), kein Sensor Hub
+  gpu=$(lspci 2>/dev/null | grep -iE "^[^ ]+ (VGA compatible controller|3D controller|Display controller)")
+  if [ -n "$gpu" ]; then
+    echo "$gpu" | while read -r line; do
+      echo -e "  $line"
+    done
+  else
+    echo -e "  Keine GPU erkannt (kein nvidia-smi / lspci)"
+  fi
+fi
+
+# ── Netzwerk-Interfaces ─────────────────
+section "Netzwerk"
+ip -brief addr show 2>/dev/null | awk '{
+  printf "  %-12s %-10s %s\n", $1, $2, $3
+}'
+
+# ── Uptime ──────────────────────────────
+section "System"
+uptime_str=$(uptime -p 2>/dev/null || uptime)
+echo -e "  Uptime : $uptime_str"
+echo -e "  Kernel : $(uname -r)"
+
+echo -e "\n${CYAN}${BOLD}══════════════════════════════════════${RESET}\n"
+
+root@serverjonas:~# ls -lh /usr/local/bin/sysmonitor
+-rw-r--r-- 1 root root 4,5K Mär 19 09:45 /usr/local/bin/sysmonitor
+root@serverjonas:~# 

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Meme Viewer{% endblock %}
+
+{% block content %}
+
+<div class="meme-viewer">
+    {% if meme %}
+        <div class="meme-container">
+            <!-- Bild -->
+            <img src="{{ url_for('static', filename='memes/files/' + meme.filename) }}" alt="Meme" class="meme-img">
+
+            <!-- Username rechts unten -->
+            <div class="meme-info">
+                <span class="username">👤 {{ meme.username }}</span>
+            </div>
+
+            <!-- Buttons für Like / Comment -->
+            <div class="meme-actions">
+                <button class="like-btn">👍 Like</button>
+                <button class="comment-btn">💬 Comment</button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="meme-nav">
+            <a href="{{ url_for('memes.memepage') }}" class="nav-btn prev">⬅️</a>
+            <a href="{{ url_for('memes.memepage') }}" class="nav-btn next">➡️</a>
+        </div>
+
+    {% else %}
+        <p>Keine Memes verfügbar.</p>
+    {% endif %}
+</div>
+
+<!-- FIXED UPLOAD BUTTON -->
+<a href="https://serverjonas.de/memes/upload" 
+   style="
+       position: fixed;
+       bottom: 20px;
+       right: 20px;
+       background-color: #ff4081;
+       color: white;
+       padding: 12px 20px;
+       border-radius: 8px;
+       text-decoration: none;
+       font-weight: bold;
+       box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+       transition: transform 0.2s;
+   "
+   onmouseover="this.style.transform='scale(1.1)'"
+   onmouseout="this.style.transform='scale(1)'"
+>
+   ⬆️ Upload
+</a>
+
+<style>
+/* Zentrieren und Vollbild */
+.meme-viewer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.meme-container {
+    position: relative;
+    text-align: center;
+    max-width: 80%;
+}
+
+.meme-img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.meme-info {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.5);
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: bold;
+}
+
+.meme-actions {
+    margin-top: 10px;
+}
+
+.meme-actions button {
+    margin: 0 5px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.meme-nav {
+    margin-top: 20px;
+}
+
+.meme-nav .nav-btn {
+    margin: 0 10px;
+    font-size: 1.5rem;
+    text-decoration: none;
+}
+</style>
+
+{% endblock %}
