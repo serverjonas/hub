@@ -181,10 +181,13 @@ def scan(root):
     out = []
     for r, _, f in os.walk(root):
         for i in f:
-            if i.lower().endswith(".mp3"):
-                out.append(os.path.join(r, i))
-    return out
+            full = os.path.join(r, i)
+            print("DEBUG FILE:", full)
 
+            if i.lower().endswith((".mp3", ".m4a", ".flac", ".wav", ".ogg")):
+                out.append(full)
+
+    return out
 
 # -------------------------
 # UPLOAD HANDLER

@@ -9,6 +9,7 @@ __pycache__/
 
 # Data folder komplett ignorieren
 data/
+!data/.gitkeep
 
 # Logs
 *.log
