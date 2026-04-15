@@ -3,8 +3,8 @@ from toolbox import get_current_user
 import os, json, time, subprocess, threading, uuid, shutil, tempfile
 from datetime import datetime
 
-tempfile.tempdir = "/var/www/serverjonas-hub/data/films/tmp"
-FILMS_DATA_DIR = "/var/www/serverjonas-hub/data/films"
+tempfile.tempdir = "/var/www/serverjonas-hub/data/films/data/tmp"
+FILMS_DATA_DIR = "/var/www/serverjonas-hub/data/films/data"
 
 bp = Blueprint("films", __name__, template_folder="templates")
 
