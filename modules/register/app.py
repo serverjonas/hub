@@ -3,11 +3,10 @@ import json
 import os
 import sqlite3
 import re
+from toolbox import create_user, DB_PATH
 
 blacklist = ["tpm", "admin", "deinemutter"]
-ACCOUNTS_FILE = "/var/www/serverjonas-hub/accounts.json"
 SERVER_KEY = "server"
-DB_PATH = "/var/www/serverjonas-hub/users.db"
 
 
 def valid_password(password):
@@ -86,19 +85,6 @@ def exist_account(username: str) -> bool:
     
     return result is not None
 
-def add_account(username, password):
-    if os.path.isfile(ACCOUNTS_FILE):
-        with open(ACCOUNTS_FILE) as f:
-            content = f.read().strip()
-            data = json.loads(content) if content else []
-    else:
-        data = []
-
-    data.append({"name": username, "password": password})
-
-    with open(ACCOUNTS_FILE, "w") as f:
-        json.dump(data, f, indent=2)
-
 bp = Blueprint("register", __name__, template_folder="../../templates")
 
 @bp.route("/", methods=["GET", "POST"])
@@ -125,7 +111,7 @@ def register():
                 message = pw_message
             else:
                 try:
-                    add_account(username, password)
+                    create_user(username, password)
                     message = "✅ Account erfolgreich erstellt"
                 except Exception as e:
                     message = f"❌ Fehler: {e}"
