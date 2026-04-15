@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, make_response, abort
 from PIL import Image
 import sqlite3, secrets, time, os, random
-from toolbox import get_current_user, get_name
+from toolbox import get_current_user, get_name, DB_PATH
 
 
-MEMES_DIR = "/var/www/serverjonas-hub/static/memes"
-USER_DB_PATH = "/var/www/serverjonas-hub/users.db"
+MEMES_DIR = "/var/www/serverjonas-hub/data/memes"
+USER_DB_PATH = DB_PATH
 MEMES_DB_PATH = os.path.join(MEMES_DIR, "memes.db")
 
 bp = Blueprint("memes", __name__)
