@@ -35,7 +35,6 @@ def get_all_users():
             COUNT(CASE WHEN s.expires_at > ? THEN 1 END) AS active_sessions
         FROM users u
         LEFT JOIN sessions s ON u.user_id = s.user_id
-        WHERE u.user_id != 453
         GROUP BY u.user_id
         ORDER BY u.user_id ASC
     """, (now,))
