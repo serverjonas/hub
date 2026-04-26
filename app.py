@@ -96,10 +96,8 @@ def hub(path):
     if "iPhone" in ua or "iPad" in ua or "iPod" in ua:
         return redirect(f"https://apple.serverjonas.de/{path}", code=302)
 
-    if path == "" or path == "index.html":
-        user_array = get_current_user()
-        user = user_array["name"] if user_array else None
-        return render_template("index.html", user=user)
+    if path == "":
+        return redirect("/hub")
 
     # NUR static files erlauben
     ext = os.path.splitext(path)[1].lower()
