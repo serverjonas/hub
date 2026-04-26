@@ -69,7 +69,7 @@ def lookup_musicbrainz(fp, duration):
         r = requests.get(
             "https://api.acoustid.org/v2/lookup",
             params={
-                "client": "YOUR_ACOUSTID_KEY",
+                "client": "iInmsHiFXY",
                 "meta": "recordings",
                 "duration": duration,
                 "fingerprint": fp
