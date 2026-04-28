@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, abort, Response, stream_with_context, jsonify
 from toolbox import get_current_user
+from toolbox import DATA_PATH
 import os, json, time, subprocess, threading, uuid, shutil, tempfile
 from datetime import datetime
 
 tempfile.tempdir = "/var/www/serverjonas-hub/data/films/data/tmp"
-FILMS_DATA_DIR = "/var/www/serverjonas-hub/data/films/data"
+FILMS_DATA_DIR = os.path.join(DATA_PATH, "films", "data")
 
 bp = Blueprint("films", __name__, template_folder="templates")
 

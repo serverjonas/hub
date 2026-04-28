@@ -5,7 +5,10 @@ from flask import request
 from werkzeug.security import generate_password_hash
 import os
 
+
+
 DB_PATH = "/var/www/serverjonas-hub/users.db"
+DATA_PATH = "/var/www/serverjonas-hub/data/"
 
 def init_database():
     # Ordner sicherstellen

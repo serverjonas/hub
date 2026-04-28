@@ -5,7 +5,7 @@ import shutil
 import json
 import subprocess
 import requests
-
+from toolbox import DATA_PATH
 from flask import Blueprint, request, render_template, jsonify, send_file, abort
 from toolbox import get_current_user
 from mutagen.easyid3 import EasyID3
@@ -13,7 +13,8 @@ from mutagen.mp3 import MP3
 
 bp = Blueprint("music", __name__, template_folder="templates")
 
-BASE = "/var/www/serverjonas-hub/data/music"
+
+BASE = os.path.join(DATA_PATH, "music")
 
 # -------------------------
 # PATHS

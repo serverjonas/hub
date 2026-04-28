@@ -2,9 +2,10 @@ from flask import Blueprint, render_template, request, redirect, make_response, 
 from PIL import Image
 import sqlite3, secrets, time, os, random
 from toolbox import get_current_user, get_name, DB_PATH
+from toolbox import DATA_PATH
 
 
-MEMES_DIR = "/var/www/serverjonas-hub/data/memes"
+MEMES_DIR = os.path.join(DATA_PATH, "memes")
 USER_DB_PATH = DB_PATH
 MEMES_DB_PATH = os.path.join(MEMES_DIR, "memes.db")
 
