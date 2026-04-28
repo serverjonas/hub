@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <title>{% block title %}serverjonas HUB{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <!-- Favicon -->
     <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
-
     <!-- Globaler Style -->
     <style>
     body {
@@ -65,7 +63,8 @@
     }
     .card span { font-size: 2em; }
     .footer { text-align: center; margin-top: 50px; font-size: 0.9em; opacity: 0.6; }
-
+    
+    /* Desktop Support Button */
     .support-button {
       position: fixed;
       top: 20px;
@@ -79,28 +78,169 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.25);
       z-index: 9999;
     }
-
     .support-button:hover {
       background: #084298;
     }
 
-    </style>
+    /* Desktop Navigation */
+    .desktop-nav {
+        background: rgba(0,0,0,0.6);
+        padding: 0 20px 20px 20px;
+        display: flex;
+        gap: 15px;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+        align-items: flex-end;
+        height: 100px;
+    }
+    .desktop-nav a {
+        color: white;
+        text-decoration: none;
+    }
 
+    /* Mobile Menu Button (Burger) */
+    .mobile-menu-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 40px;
+        height: 40px;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        z-index: 10001;
+        cursor: pointer;
+        border-radius: 50%;
+        transition: background 0.3s;
+    }
+    .mobile-menu-button:hover {
+        background: rgba(128, 128, 128, 0.5);
+    }
+    .mobile-menu-button span {
+        width: 24px;
+        height: 3px;
+        background: #c0c0c0;
+        border-radius: 2px;
+        transition: 0.3s;
+    }
+
+    /* Mobile Slide-In Menu */
+    .mobile-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background: rgba(20, 20, 30, 0.98);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 10000;
+        display: none;
+        flex-direction: column;
+        padding: 80px 0 20px 0;
+    }
+    .mobile-nav.open {
+        transform: translateX(0);
+    }
+    .mobile-nav a {
+        color: white;
+        text-decoration: none;
+        padding: 18px 30px;
+        font-size: 1.1em;
+        transition: background 0.2s;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .mobile-nav a:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    /* Mobile Overlay (darkens background when menu is open) */
+    .mobile-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        z-index: 9999;
+        display: none;
+    }
+    .mobile-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    /* Mobile Layout Adjustments */
+    @media (max-width: 768px) {
+        .desktop-nav {
+            display: none;
+        }
+        .support-button {
+            display: none;
+        }
+        .mobile-menu-button {
+            display: flex;
+        }
+        .mobile-nav {
+            display: flex;
+        }
+        .mobile-overlay {
+            display: block;
+        }
+        .container {
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2em;
+            margin-top: 20px;
+        }
+        .grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+    }
+    </style>
     {% block head %}{% endblock %}
 </head>
 <body>
-    <!-- Globale Navigationsleiste -->
-    <nav style="background: rgba(0,0,0,0.6); padding: 0 20px 20px 20px; display: flex; gap: 15px; position: sticky; top: 10; z-index: 999; align-items: flex-end; height: 100px;">
-        <a href="https://serverjonas.de/memes" style="color: white; text-decoration: none;">Memes</a>
-        <a href="https://serverjonas.de/films" style="color: white; text-decoration: none;">Media</a>
-        <a href="https://serverjonas.de/friends" style="color: white; text-decoration: none;">Freunde</a>
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav">
+        <a href="https://serverjonas.de/memes">Memes</a>
+        <a href="https://serverjonas.de/films">Media</a>
+        <a href="https://serverjonas.de/friends">Freunde</a>
     </nav>
+
+    <!-- Mobile Menu Button (Burger) -->
+    <div class="mobile-menu-button" id="mobileMenuButton">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Mobile Overlay (closes menu when clicked) -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Mobile Slide-In Menu -->
+    <nav class="mobile-nav" id="mobileNav">
+        <a href="/">Home</a>
+        <a href="https://support.serverjonas.de" target="_blank">Kundensupport</a>
+        <a href="https://serverjonas.de/memes">Memes</a>
+        <a href="https://serverjonas.de/films">Media</a>
+        <a href="https://serverjonas.de/friends">Freunde</a>
+    </nav>
+
     <!-- Logo global klickbar -->
     <a href="/">
         <img id="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
     </a>
 
-    <!-- Kundensupport Button global -->
+    <!-- Desktop Kundensupport Button -->
     <a href="https://support.serverjonas.de" target="_blank" class="support-button">
       🛠 Kundensupport
     </a>
@@ -114,5 +254,28 @@
     <div class="footer">
         powered by Linux · serverjonas · no iSchrott
     </div>
+
+    <!-- Mobile Menu JavaScript -->
+    <script>
+    const menuButton = document.getElementById('mobileMenuButton');
+    const mobileNav = document.getElementById('mobileNav');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+
+    function toggleMenu() {
+        mobileNav.classList.toggle('open');
+        mobileOverlay.classList.toggle('active');
+    }
+
+    menuButton.addEventListener('click', toggleMenu);
+    mobileOverlay.addEventListener('click', toggleMenu);
+
+    // Close menu when window is resized to desktop size
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            mobileNav.classList.remove('open');
+            mobileOverlay.classList.remove('active');
+        }
+    });
+    </script>
 </body>
 </html>
