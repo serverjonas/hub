@@ -1,8 +1,7 @@
 from flask import Blueprint, render_template
 import sqlite3
 import time
-
-DB_PATH = "/var/www/serverjonas-hub/users.db"
+from toolbox import DB_PATH
 
 bp = Blueprint("adminpanel", __name__)
 

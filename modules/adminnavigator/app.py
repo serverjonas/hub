@@ -3,12 +3,13 @@ import sys
 import os
 import sqlite3
 import time
+from toolbox import DB_PATH
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from toolbox import get_current_user, get_infos
 
 bp = Blueprint("admin", __name__, template_folder="templates")
-DB_PATH = "/var/www/serverjonas-hub/users.db"
+
 
 def get_active_bans():
     now = int(time.time())

@@ -1,8 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, make_response
 import sqlite3, time, secrets
 from werkzeug.security import check_password_hash
-
-DB_PATH = "/var/www/serverjonas-hub/users.db"
+from toolbox import DB_PATH
 
 bp = Blueprint("login", __name__)
 

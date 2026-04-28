@@ -3,11 +3,10 @@ import sqlite3
 import time
 import sys
 import os
+from toolbox import DB_PATH
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from toolbox import get_current_user, get_infos
-
-DB_PATH = "/var/www/serverjonas-hub/users.db"
 
 bp = Blueprint("adminban", __name__, template_folder="templates")
 

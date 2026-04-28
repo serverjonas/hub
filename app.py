@@ -5,7 +5,7 @@ import json
 import importlib.util
 import sqlite3
 import time
-from toolbox import get_current_user, is_banned, is_user_active, init_database
+from toolbox import get_current_user, is_banned, is_user_active, init_database, DB_PATH
 from dotenv import load_dotenv
 from urllib.parse import quote
 load_dotenv()
@@ -14,7 +14,6 @@ init_database()
 BASE_DIR = os.path.dirname(__file__)
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 MODULE_DIR = os.path.join(BASE_DIR, "modules")
-DB_PATH = "/var/www/serverjonas-hub/users.db"
 
 app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=os.path.join(BASE_DIR, "static"))
 

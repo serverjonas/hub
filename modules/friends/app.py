@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 import sqlite3
-from toolbox import get_current_user
+from toolbox import get_current_user, DB_PATH
 
-DB_PATH = "/var/www/serverjonas-hub/users.db"
+
 
 bp = Blueprint("friends", __name__, template_folder="../../templates/friends")
 
