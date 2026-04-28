@@ -3,8 +3,75 @@ import sqlite3
 import time
 from flask import request
 from werkzeug.security import generate_password_hash
+import os
 
 DB_PATH = "/var/www/serverjonas-hub/users.db"
+
+def init_database():
+    # Ordner sicherstellen
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    # ---------------- USERS ----------------
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_name TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            admin INTEGER DEFAULT 0,
+            vip INTEGER DEFAULT 0,
+            mod INTEGER DEFAULT 0
+        )
+    """)
+
+    # ---------------- SESSIONS ----------------
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS sessions (
+            session_id TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            expires_at INTEGER NOT NULL,
+            FOREIGN KEY(user_id) REFERENCES users(user_id)
+        )
+    """)
+
+    # ---------------- BAN ----------------
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS ban (
+            user_id INTEGER PRIMARY KEY,
+            reason TEXT,
+            expires_at INTEGER,
+            FOREIGN KEY(user_id) REFERENCES users(user_id)
+        )
+    """)
+
+    # ---------------- ACTIVATION ----------------
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS user_activation (
+            user_id INTEGER PRIMARY KEY,
+            active INTEGER DEFAULT 1,
+            FOREIGN KEY(user_id) REFERENCES users(user_id)
+        )
+    """)
+
+    # ---------------- FRIENDSHIPS ----------------
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS friendships (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            friend_id INTEGER NOT NULL,
+            status TEXT DEFAULT 'pending',
+            created_at INTEGER DEFAULT (strftime('%s','now')),
+            FOREIGN KEY(user_id) REFERENCES users(user_id),
+            FOREIGN KEY(friend_id) REFERENCES users(user_id)
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+    print("[DB] Datenbank erfolgreich initialisiert.")
 
 def create_user(username, password):
     password_hash = generate_password_hash(password)
