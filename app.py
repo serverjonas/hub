@@ -99,6 +99,9 @@ def hub(path):
     if path == "":
         return redirect("/hub")
 
+    if path == "make_me_a_coffee":
+        abort(418)
+
     # NUR static files erlauben
     ext = os.path.splitext(path)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
