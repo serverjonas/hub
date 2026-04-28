@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="de" data-theme="dark">
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Serverjonas{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" />
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <style>
+            :root {
+                --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+                /* Dark Theme (Slightly brighter as requested) */
+                --bg: #0e0e10;
+                --surface: rgba(255, 255, 255, 0.05);
+                --surface-hover: rgba(255, 255, 255, 0.1);
+                --border: rgba(255, 255, 255, 0.08);
+                --text-main: #ffffff;
+                --text-dim: #a0a0a0;
+                --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+                --glass-bg: rgba(14, 14, 16, 0.8);
+            }
+
+            [data-theme="light"] {
+                --bg: #f8fafc;
+                --surface: rgba(0, 0, 0, 0.04);
+                --surface-hover: rgba(0, 0, 0, 0.07);
+                --border: rgba(0, 0, 0, 0.06);
+                --text-main: #0f172a;
+                --text-dim: #64748b;
+                --glass-bg: rgba(255, 255, 255, 0.85);
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background-color: var(--bg);
+                color: var(--text-main);
+                font-family: "Inter", system-ui, -apple-system, sans-serif;
+                line-height: 1.5;
+                -webkit-font-smoothing: antialiased;
+                min-height: 100vh;
+                transition: background-color 0.5s ease;
+            }
+
+            h1, h2, h3, .brand {
+                font-family: "Montserrat", sans-serif;
+            }
+
+            /* Slow Animated Background */
+            .bg-glow {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: -1;
+                pointer-events: none;
+                overflow: hidden;
+            }
+
+            .bg-glow::before {
+                content: "";
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle at 70% 30%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+                            radial-gradient(circle at 30% 70%, rgba(168, 85, 247, 0.12) 0%, transparent 40%);
+                animation: rotate 60s linear infinite; /* Slower animation */
+            }
+
+            @keyframes rotate {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+
+            /* Navigation */
+            nav {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                height: 72px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 40px;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border-bottom: 1px solid var(--border);
+                z-index: 1000;
+            }
+
+            .brand {
+                font-weight: 800;
+                font-size: 20px;
+                letter-spacing: -1px;
+                text-decoration: none;
+                color: var(--text-main);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 24px;
+            }
+
+            .nav-links {
+                display: flex;
+                gap: 24px;
+            }
+
+            .nav-links a {
+                text-decoration: none;
+                color: var(--text-dim);
+                font-size: 14px;
+                font-weight: 500;
+                transition: var(--transition);
+            }
+
+            .nav-links a:hover {
+                color: var(--text-main);
+            }
+
+            /* Theme Toggle & Mobile Menu Button */
+            .icon-btn {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: var(--text-main);
+                transition: var(--transition);
+            }
+
+            .icon-btn:hover {
+                background: var(--surface-hover);
+                transform: scale(1.05);
+            }
+
+            .menu-toggle {
+                display: none;
+            }
+
+            /* Mobile Nav Drawer */
+            .mobile-nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 320px;
+                height: 100vh;
+                background: var(--bg);
+                border-left: 1px solid var(--border);
+                z-index: 2000;
+                padding: 40px 24px;
+                transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .mobile-nav.open {
+                right: 0;
+            }
+
+            .mobile-nav a {
+                text-decoration: none;
+                color: var(--text-main);
+                font-size: 18px;
+                font-weight: 600;
+                padding: 12px 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.4s ease;
+                z-index: 1500;
+            }
+
+            .overlay.active {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            /* Buttons */
+            .btn {
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 14px;
+                cursor: pointer;
+                transition: var(--transition);
+                border: 1px solid var(--border);
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                text-decoration: none;
+                background: var(--surface);
+                color: var(--text-main);
+            }
+
+            .btn:hover {
+                background: var(--surface-hover);
+                transform: translateY(-2px);
+            }
+
+            .btn-primary {
+                background: var(--accent-gradient);
+                color: white;
+                border: none;
+            }
+
+            .btn-primary:hover {
+                box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.5);
+            }
+
+            /* Forms */
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-control {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 12px 16px;
+                color: var(--text-main);
+                font-family: inherit;
+                font-size: 14px;
+                transition: var(--transition);
+                width: 100%;
+            }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #6366f1;
+                background: var(--surface-hover);
+            }
+
+            .message {
+                padding: 12px 20px;
+                border-radius: 12px;
+                margin-bottom: 24px;
+                font-size: 14px;
+            }
+
+            .message-success {
+                background: rgba(34, 197, 94, 0.1);
+                color: #22c55e;
+                border: 1px solid rgba(34, 197, 94, 0.2);
+            }
+
+            .message-error {
+                background: rgba(239, 68, 68, 0.1);
+                color: #ef4444;
+                border: 1px solid rgba(239, 68, 68, 0.2);
+            }
+
+            /* Container */
+            .container {
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 120px 24px 60px;
+            }
+
+            /* Footer */
+            footer {
+                padding: 40px 24px;
+                text-align: center;
+                color: var(--text-dim);
+                font-size: 13px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .motto {
+                font-weight: 600;
+                color: var(--text-main);
+                font-family: "Montserrat", sans-serif;
+            }
+
+            @media (max-width: 768px) {
+                .nav-links { display: none; }
+                .menu-toggle { display: flex; }
+                nav { padding: 0 20px; }
+                .container { padding-top: 100px; }
+            }
+
+            {% block extra_style %}{% endblock %}
+        </style>
+        {% block head %}{% endblock %}
+    </head>
+    <body>
+        <div class="bg-glow"></div>
+        <div class="overlay" id="overlay"></div>
+
+        <nav>
+            <a href="/" class="brand">
+                <i data-lucide="layers" style="width: 24px"></i>
+                Serverjonas
+            </a>
+            <div class="nav-right">
+                <div class="nav-links">
+                    <a href="/memes">Memes</a>
+                    <a href="/films">Media</a>
+                    <a href="/friends">Freunde</a>
+                </div>
+                <button
+                    class="icon-btn"
+                    id="themeToggle"
+                    title="Design wechseln"
+                >
+                    <i data-lucide="sun" id="sunIcon" style="display: none"></i>
+                    <i data-lucide="moon" id="moonIcon"></i>
+                </button>
+                <button class="icon-btn menu-toggle" id="menuToggle">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </nav>
+
+        <nav class="mobile-nav" id="mobileNav">
+            <a href="/memes">Memes</a>
+            <a href="/films">Media</a>
+            <a href="/friends">Freunde</a>
+        </nav>
+
+        <div class="container">{% block content %}{% endblock %}</div>
+
+        <footer>
+            <div>&copy; 2026 Serverjonas &middot; Version 5.0</div>
+        </footer>
+
+        <script>
+            lucide.createIcons();
+
+            // Theme Logic
+            const themeToggle = document.getElementById("themeToggle");
+            const sunIcon = document.getElementById("sunIcon");
+            const moonIcon = document.getElementById("moonIcon");
+            const html = document.documentElement;
+
+            function updateThemeIcons(theme) {
+                if (theme === "light") {
+                    sunIcon.style.display = "block";
+                    moonIcon.style.display = "none";
+                } else {
+                    sunIcon.style.display = "none";
+                    moonIcon.style.display = "block";
+                }
+            }
+
+            const savedTheme = localStorage.getItem("theme") || "dark";
+            html.setAttribute("data-theme", savedTheme);
+            updateThemeIcons(savedTheme);
+
+            themeToggle.addEventListener("click", () => {
+                const currentTheme = html.getAttribute("data-theme");
+                const newTheme = currentTheme === "dark" ? "light" : "dark";
+                html.setAttribute("data-theme", newTheme);
+                localStorage.setItem("theme", newTheme);
+                updateThemeIcons(newTheme);
+                lucide.createIcons();
+            });
+
+            // Mobile Menu Logic
+            const menuToggle = document.getElementById("menuToggle");
+            const mobileNav = document.getElementById("mobileNav");
+            const overlay = document.getElementById("overlay");
+
+            function toggleMenu() {
+                mobileNav.classList.toggle("open");
+                overlay.classList.toggle("active");
+            }
+
+            menuToggle.addEventListener("click", toggleMenu);
+            overlay.addEventListener("click", toggleMenu);
+        </script>
+    </body>
+</html>

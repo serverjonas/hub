@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ series_name }} · Serverjonas{% endblock %}
+{% block head %}
+<style>
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    font-size: 0.9em;
+}
+.back-link:hover { color: white; }
+.season-block {
+    margin-top: 30px;
+}
+.season-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    opacity: 0.9;
+}
+.episode-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.episode-card {
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.episode-card:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateX(4px);
+}
+.ep-num {
+    font-size: 1.4em;
+    font-weight: bold;
+    opacity: 0.4;
+    min-width: 40px;
+    text-align: center;
+}
+.ep-info h4 { margin: 0 0 4px 0; font-size: 0.95em; }
+.ep-info .meta { font-size: 0.78em; opacity: 0.55; }
+.badge {
+    margin-left: auto;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: bold;
+    white-space: nowrap;
+}
+.badge-ready { background: rgba(40,167,69,0.3); color: #6fcf97; }
+.badge-converting { background: rgba(255,193,7,0.3); color: #f2c94c; }
+.badge-queued { background: rgba(108,117,125,0.3); color: #aaa; }
+.badge-error { background: rgba(220,53,69,0.3); color: #eb5757; }
+</style>
+{% endblock %}
+{% block content %}
+<a href="{{ url_for('films.series') }}" class="back-link">← Zurück zu Serien</a>
+
+<h1>📺 {{ series_name }}</h1>
+<p>{{ seasons | length }} Staffel{% if seasons | length != 1 %}n{% endif %}</p>
+
+{% for season_num in seasons | sort %}
+<div class="season-block">
+    <div class="season-title">📂 Staffel {{ season_num }}</div>
+    <div class="episode-list">
+        {% for ep in seasons[season_num] %}
+        <div class="episode-card" onclick="location.href='{{ url_for('films.film_detail', film_id=ep.film_id) }}'">
+            <div class="ep-num">E{{ ep.episode }}</div>
+            <div class="ep-info">
+                <h4>{{ ep.title }}</h4>
+                <div class="meta">{{ ep.uploaded_at | strftime }}</div>
+            </div>
+            {% if ep.status == "ready" %}
+                <span class="badge badge-ready">✅ Bereit</span>
+            {% elif ep.status == "converting" %}
+                <span class="badge badge-converting">⚙️ Konvertiert...</span>
+            {% elif ep.status == "queued" %}
+                <span class="badge badge-queued">⏳ Warteschlange</span>
+            {% else %}
+                <span class="badge badge-error">❌ Fehler</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

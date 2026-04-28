@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Meme Upload &middot; Serverjonas{% endblock %}
+
+{% block extra_style %}
+.upload-container {
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+.upload-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-dim);
+}
+
+.file-dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.file-dropzone:hover {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.05);
+}
+{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+    <div style="margin-bottom: 32px; text-align: center;">
+        <h1 style="font-size: 32px; margin-bottom: 8px;">Meme hochladen</h1>
+        <p style="color: var(--text-dim);">Teile deinen Humor mit der Community.</p>
+    </div>
+
+    <div class="upload-card">
+        {% if message %}
+        <div class="message {% if '❌' in message %}message-error{% else %}message-success{% endif %}" style="margin-bottom: 24px;">
+            {{ message }}
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">Titel (optional)</label>
+                <input type="text" name="title" id="title" class="form-control" placeholder="Ein treffender Titel...">
+            </div>
+
+            <div class="form-group">
+                <label>Bild auswählen</label>
+                <div class="file-dropzone" onclick="document.getElementById('file').click()">
+                    <i data-lucide="image" style="width: 32px; height: 32px; color: var(--text-dim); margin-bottom: 12px;"></i>
+                    <p style="font-size: 14px; color: var(--text-dim);" id="file-label">Klicke zum Auswählen oder Drag & Drop</p>
+                    <input type="file" name="file" id="file" style="display: none;" accept="image/*" onchange="updateFileName(this)" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 12px;">
+                Hochladen
+                <i data-lucide="upload"></i>
+            </button>
+        </form>
+        
+        <div style="margin-top: 24px; text-align: center;">
+            <a href="/memes/" style="color: var(--text-dim); text-decoration: none; font-size: 14px;">
+                <i data-lucide="arrow-left" style="width: 14px; height: 14px; vertical-align: middle;"></i>
+                Zurück zum Feed
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateFileName(input) {
+        const label = document.getElementById('file-label');
+        if (input.files && input.files.length > 0) {
+            label.textContent = input.files[0].name;
+            label.style.color = 'var(--text-main)';
+        }
+    }
+</script>
+{% endblock %}

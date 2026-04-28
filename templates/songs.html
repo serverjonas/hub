@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{artist}} - {{album}}</h1>
+
+<ul>
+{% for t in tracks %}
+  <li onclick="play('{{t}}')">▶ {{t}}</li>
+{% endfor %}
+</ul>
+
+<audio id="player" controls style="width:100%"></audio>
+
+<script>
+function play(track){
+  document.getElementById("player").src =
+    "/music/play/{{artist}}/{{album}}/"+track;
+}
+</script>
+
+<a href="/music/artist/{{artist}}">← zurück</a>
+
+{% endblock %}

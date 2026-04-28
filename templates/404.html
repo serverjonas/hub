@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>404 – Seite nicht gefunden</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 6rem;
+            margin: 0;
+            color: #38bdf8;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin: 20px 0;
+            color: #94a3b8;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #38bdf8;
+            color: #0f172a;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        a:hover {
+            background: #0ea5e9;
+        }
+
+        .hint {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <p>Diese Seite existiert nicht im Serverjonas network.</p>
+
+        {% if user %}
+            <p>Angemeldet als <strong>{{ user }}</strong></p>
+        {% endif %}
+
+        <a href="/">Zurück zum Hub</a>
+
+        <div class="hint">
+            Vielleicht ist das Modul deaktiviert. Vielleicht war es nie da.
+            Vielleicht hast du dich vertippt.
+        </div>
+    </div>
+</body>
+</html>

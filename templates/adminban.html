@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel – Serverjonas network</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e2e8f0;
+            font-family: 'Syne', sans-serif;
+            min-height: 100vh;
+            padding: 40px 24px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 36px;
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #38bdf8;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0 4px 0;
+            color: #f1f5f9;
+        }
+
+        .subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #475569;
+        }
+
+        .tag {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            background: rgba(56,189,248,0.1);
+            color: #38bdf8;
+            border: 1px solid rgba(56,189,248,0.2);
+            border-radius: 4px;
+            padding: 3px 10px;
+            letter-spacing: 0.08em;
+        }
+
+        .card {
+            background: rgba(15,23,42,0.85);
+            border: 1px solid rgba(56,189,248,0.08);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(56,189,248,0.07);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #475569;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 12px 20px;
+            text-align: left;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: #475569;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        td {
+            padding: 14px 20px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        /* Gebannte User hervorheben */
+        tr.banned-row td {
+            background: rgba(251,113,133,0.05);
+        }
+
+        tr.banned-row td:first-child {
+            border-left: 3px solid #fb7185;
+        }
+
+        .username {
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .uid {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #475569;
+        }
+
+        .badge {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-right: 4px;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-admin  { background: rgba(251,113,133,0.15); color: #fb7185; border: 1px solid rgba(251,113,133,0.25); }
+        .badge-vip    { background: rgba(250,204,21,0.12);  color: #fbbf24; border: 1px solid rgba(250,204,21,0.2);  }
+        .badge-mod    { background: rgba(52,211,153,0.12);  color: #34d399; border: 1px solid rgba(52,211,153,0.2);  }
+        .badge-banned { background: rgba(251,113,133,0.15); color: #fb7185; border: 1px solid rgba(251,113,133,0.3); }
+
+        .ban-reason {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #fda4af;
+        }
+
+        .expires {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        /* Ban-Formular */
+        .ban-form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .ban-form input[type="text"] {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            width: 160px;
+        }
+
+        .ban-form input[type="text"]:focus {
+            outline: none;
+            border-color: rgba(251,113,133,0.4);
+        }
+
+        .ban-form input[type="number"] {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            width: 70px;
+        }
+
+        .ban-form input[type="number"]:focus {
+            outline: none;
+            border-color: rgba(251,113,133,0.4);
+        }
+
+        .ban-form label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .btn-ban {
+            background: rgba(251,113,133,0.15);
+            color: #fb7185;
+            border: 1px solid rgba(251,113,133,0.3);
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-ban:hover {
+            background: rgba(251,113,133,0.25);
+            box-shadow: 0 2px 12px rgba(251,113,133,0.2);
+        }
+
+        .btn-unban {
+            background: rgba(52,211,153,0.1);
+            color: #34d399;
+            border: 1px solid rgba(52,211,153,0.25);
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-unban:hover {
+            background: rgba(52,211,153,0.2);
+        }
+
+        .hint {
+            margin-top: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #334155;
+            text-align: center;
+        }
+
+        /* permanent checkbox toggle */
+        .days-field { transition: opacity 0.2s; }
+        .days-field.hidden { opacity: 0; pointer-events: none; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <div>
+            <div class="logo">Serverjonas network</div>
+            <h1>Admin Panel</h1>
+            <div class="subtitle">angemeldet als {{ user }}</div>
+        </div>
+        <span class="tag">RESTRICTED ACCESS</span>
+    </header>
+
+    <div class="card">
+        <div class="card-header">
+            <span>Nutzerverwaltung</span>
+            <span>{{ users|length }} Nutzer</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nutzer</th>
+                    <th>Rollen</th>
+                    <th>Ban-Status</th>
+                    <th>Aktion</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr class="{{ 'banned-row' if u.banned else '' }}">
+                    <td>
+                        <div class="username">{{ u.name }}</div>
+                        <div class="uid">#{{ u.id }}</div>
+                    </td>
+                    <td>
+                        {% if u.admin %}<span class="badge badge-admin">ADMIN</span>{% endif %}
+                        {% if u.vip   %}<span class="badge badge-vip">VIP</span>{% endif %}
+                        {% if u.mod   %}<span class="badge badge-mod">MOD</span>{% endif %}
+                        {% if not u.admin and not u.vip and not u.mod %}
+                            <span style="color:#334155;font-size:0.8rem;">–</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u.banned %}
+                            <span class="badge badge-banned">GEBANNT</span><br>
+                            <span class="ban-reason">{{ u.ban_reason }}</span><br>
+                            {% if u.ban_expires %}
+                                <span class="expires">bis {{ u.ban_expires | int | string }} (unix)</span>
+                            {% else %}
+                                <span class="expires">permanent</span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color:#334155;font-size:0.8rem;">–</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u.banned %}
+                            <form action="/admin/ban/unban" method="POST">
+                                <input type="hidden" name="user_id" value="{{ u.id }}">
+                                <button type="submit" class="btn-unban">Entbannen</button>
+                            </form>
+                        {% else %}
+                            <form action="/admin/ban/ban" method="POST" class="ban-form" id="banform-{{ u.id }}">
+                                <input type="hidden" name="user_id" value="{{ u.id }}">
+                                <input type="text" name="reason" placeholder="Grund..." required>
+                                <span class="days-field" id="days-{{ u.id }}">
+                                    <input type="number" name="days" min="1" value="7" placeholder="Tage">
+                                </span>
+                                <label>
+                                    <input type="checkbox" name="permanent" value="1"
+                                        onchange="toggleDays({{ u.id }}, this.checked)">
+                                    permanent
+                                </label>
+                                <button type="submit" class="btn-ban">Bannen</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="hint">Serverjonas network // admin.panel // {{ users|length }} entries loaded</div>
+</div>
+
+<script>
+function toggleDays(uid, isPermanent) {
+    const field = document.getElementById('days-' + uid);
+    if (isPermanent) {
+        field.classList.add('hidden');
+    } else {
+        field.classList.remove('hidden');
+    }
+}
+</script>
+</body>
+</html>

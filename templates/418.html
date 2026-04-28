@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>418 – I’m a Teapot</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f7f0e3;
+        font-family: 'Comic Neue', cursive;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
+        color: #6b3e26;
+    }
+
+    h1 {
+        font-size: 5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin-bottom: 2rem;
+    }
+
+    a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #d4a373;
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        transition: transform 0.2s, background-color 0.2s;
+    }
+
+    a:hover {
+        transform: scale(1.1);
+        background-color: #b57e5c;
+    }
+
+    .teapot {
+        width: 200px;
+        margin-bottom: 2rem;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px) rotate(-5deg); }
+    }
+</style>
+</head>
+<body>
+
+<h1>418</h1>
+<h2>I’m a Teapot</h2>
+<p>Ups! Dein Request kann hier nicht verarbeitet werden – dieser Server ist eine Teekanne und keine Kaffeemaschine. 🍵<br>
+   Falls du mehr über diesen Spaß-HTTP-Status erfahren willst, schau auf <a href="https://developer.mozilla.org/de/docs/Web/HTTP/Reference/Status/418" target="_blank">MDN HTTP 418</a>oder <a href="https://de.wikipedia.org/wiki/Hyper_Text_Coffee_Pot_Control_Protocol" target="_blank">WIKIPEDIA</a>.</p>
+</body>
+</html>
