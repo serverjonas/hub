@@ -8,6 +8,143 @@ from werkzeug.security import generate_password_hash
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "users.db")
 
+def check_or_create_users_db(db_path=DB_PATH):
+    import os
+    import sqlite3
+
+    schema_sql = [
+        """
+        CREATE TABLE users (
+            user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_name TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            admin INTEGER NOT NULL DEFAULT 0,
+            vip INTEGER NOT NULL DEFAULT 0,
+            mod INTEGER NOT NULL DEFAULT 0
+        );
+        """,
+        """
+        CREATE TABLE sessions (
+            session_id TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            created_at INTEGER NOT NULL,
+            expires_at INTEGER NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        );
+        """,
+        """
+        CREATE TABLE ban (
+            user_id INTEGER NOT NULL,
+            reason TEXT,
+            expires_at INTEGER,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        );
+        """,
+        """
+        CREATE TABLE friendships (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            friend_id INTEGER NOT NULL,
+            status TEXT DEFAULT "pending",
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(user_id),
+            FOREIGN KEY (friend_id) REFERENCES users(user_id)
+        );
+        """,
+        """
+        CREATE TABLE user_activation (
+            user_id INTEGER PRIMARY KEY,
+            active INTEGER DEFAULT 0,
+            created_at INTEGER,
+            activated_at INTEGER,
+            activated_by INTEGER
+        );
+        """
+    ]
+
+    # --- 1. Existiert DB? ---
+    if not os.path.exists(db_path):
+        print("DB nicht vorhanden")
+
+        if input("Neu erstellen? (y/n): ").strip().lower() != "y":
+            print("Abbruch")
+            return "missing"
+
+        print("Erstelle neue Database...")
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+
+        for stmt in schema_sql:
+            cur.execute(stmt)
+
+        conn.commit()
+        conn.close()
+
+        print("Neue DB erstellt")
+        return "created"
+
+    # --- 2. Existiert → prüfen ob kaputt ---
+    try:
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = {t[0] for t in cur.fetchall()}
+
+        required = {"users", "sessions", "ban", "friendships", "user_activation"}
+
+        if not required.issubset(tables):
+            print("DB existiert aber ist kaputt/unvollständig")
+
+            if input("DB löschen & neu erstellen? (y/n): ").strip().lower() != "y":
+                return "corrupt"
+
+            conn.close()
+
+            print("Lösche alte DB...")
+            os.remove(db_path)
+
+            print("Erstelle neue DB...")
+
+            conn = sqlite3.connect(db_path)
+            cur = conn.cursor()
+
+            for stmt in schema_sql:
+                cur.execute(stmt)
+
+            conn.commit()
+            conn.close()
+
+            print("DB repariert & neu erstellt")
+            return "repaired"
+
+        print("DB OK")
+        conn.close()
+        return "ok"
+
+    except Exception as e:
+        print("DB kaputt (SQLite Fehler)")
+        print(e)
+
+        if input("DB löschen & neu erstellen? (y/n): ").strip().lower() != "y":
+            return "broken"
+
+        if os.path.exists(db_path):
+            os.remove(db_path)
+
+        print("Erstelle neue DB...")
+
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+
+        for stmt in schema_sql:
+            cur.execute(stmt)
+
+        conn.commit()
+        conn.close()
+
+        print("DB neu erstellt nach Crash")
+        return "recovered"
 
 def create_user(username, password):
     password_hash = generate_password_hash(password)
