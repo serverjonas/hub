@@ -1,11 +1,13 @@
 from flask import Blueprint, request, redirect, url_for, session
 import json, os, time
+from dotenv import load_dotenv
+load_dotenv()
 
 bp = Blueprint("musikauswahl", __name__)
 
 # ---------------- Passwörter ----------------
-ADD_PASSWORD = "party_pw"       # Passwort für Add-Seite
-SETTINGS_PASSWORD = "settings_pw"  # Passwort für Settings
+ADD_PASSWORD = os.environ.get("MUSIK_PW")      # Passwort für Add-Seite
+SETTINGS_PASSWORD = os.environ.get("MUSIK_SETTINGS_PW")  # Passwort für Settings
 
 # ---------------- Dateien ----------------
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "settings.json")

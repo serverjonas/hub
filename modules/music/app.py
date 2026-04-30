@@ -9,6 +9,9 @@ import requests
 from flask import Blueprint, abort, jsonify, render_template, request, send_file
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
+from dotenv import load_dotenv
+load_dotenv()
+
 
 from toolbox import get_current_user
 
@@ -76,7 +79,7 @@ def lookup_musicbrainz(fp, duration):
         r = requests.get(
             "https://api.acoustid.org/v2/lookup",
             params={
-                "client": "iInmsHiFXY",
+                "client": os.environ.get("musicbrainz_key"),
                 "meta": "recordings",
                 "duration": duration,
                 "fingerprint": fp,
