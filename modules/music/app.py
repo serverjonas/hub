@@ -17,7 +17,7 @@ from toolbox import get_current_user, DATA_PATH
 
 bp = Blueprint("music", __name__, template_folder="templates")
 
-BASE = os.path.join(DATA_PATH "music")
+BASE = os.path.join(DATA_PATH, "music")
 
 # -------------------------
 # PATHS
