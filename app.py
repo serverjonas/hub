@@ -47,7 +47,7 @@ def load_modules():
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             app.register_blueprint(module.bp, url_prefix=cfg["url"])
-            print(f"✅ Modul geladen: {name} -> {cfg['url']}")
+            print(f"Modules Lodet: {name} -> {cfg['url']}")
         except Exception as e:
             print(f"❌ Modul {name} konnte nicht geladen werden:", e)
 
@@ -107,7 +107,7 @@ def hub(path):
 
     if path == "make_me_a_coffee":
         abort(418)
-        
+
     if path == "settings":
         user = get_current_user()
         return render_template("settings.html", user=user["name"] if user else None)
@@ -124,5 +124,13 @@ def hub(path):
     return abort(404)
 
 
-if __name__ == "__main__":
+def RunServerDebug():
     app.run(host="0.0.0.0", port=5000, debug=True)
+
+
+def RunServerRelease():
+    app.run(host="0.0.0.0", port=5000, debug=False)
+
+
+if __name__ == "__main__":
+    RunServerRelease()
