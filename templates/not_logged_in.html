@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block title %}Nicht angemeldet{% endblock %} {%
+block extra_style %} @import
+url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@keyframes slideInFromLeft { from { opacity: 0; transform: translateX(-40px); }
+to { opacity: 1; transform: translateX(0); } } @keyframes slideInFromRight {
+from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform:
+translateX(0); } } @keyframes fadeUp { from { opacity: 0; transform:
+translateY(12px); } to { opacity: 1; transform: translateY(0); } } @keyframes
+pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4;
+transform: scale(0.7); } } .error-wrapper { min-height: 60vh; display: flex;
+align-items: center; justify-content: center; padding: 2rem; } .error-container
+{ font-family: 'Inter', sans-serif; max-width: 420px; width: 100%; padding: 2rem
+2rem 1.75rem; background: rgba(255, 255, 255, 0.07); backdrop-filter:
+blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,
+255, 255, 0.13); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0,
+0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08); text-align: center; animation:
+slideInFromLeft 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; } .error-icon {
+display: inline-flex; align-items: center; gap: 6px; font-size: 11px;
+font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color:
+#fca5a5; background: rgba(239, 68, 68, 0.18); border: 1px solid rgba(239, 68,
+68, 0.28); padding: 5px 12px; border-radius: 999px; margin-bottom: 1.25rem;
+animation: slideInFromRight 0.55s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.error-icon .dot { width: 6px; height: 6px; border-radius: 50%; background:
+#f87171; animation: pulse 1.8s 1s ease-in-out infinite; } .error-title {
+font-size: 1.5rem; font-weight: 600; margin-bottom: 0.75rem; color:
+var(--text-main); animation: fadeUp 0.5s 0.2s ease both; } .error-message {
+color: var(--text-dim); margin-bottom: 2rem; line-height: 1.65; font-size: 14px;
+animation: fadeUp 0.5s 0.3s ease both; } .btn-group { display: flex; gap: 12px;
+justify-content: center; flex-wrap: wrap; animation: fadeUp 0.5s 0.4s ease both;
+} {% endblock %} {% block content %}
+<div class="error-wrapper">
+    <div class="error-container">
+        <div class="error-icon">
+            <span class="dot"></span>
+            Wichtig
+        </div>
+        <h1 class="error-title">Anmeldung erforderlich</h1>
+        <p class="error-message">
+            Du musst angemeldet sein, um auf diese Seite zuzugreifen.
+        </p>
+        <div class="btn-group">
+            <a href="/login" class="btn btn-primary">
+                <i data-lucide="log-in" style="width: 18px"></i>
+                Jetzt anmelden
+            </a>
+            <a href="/" class="btn">
+                <i data-lucide="home" style="width: 18px"></i>
+                Zurück zum Hub
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

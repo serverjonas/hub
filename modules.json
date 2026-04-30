@@ -1,0 +1,67 @@
+	{
+  "login": {
+    "pfad": "login",
+    "url": "/login",
+    "description":"login erstellt cockies"
+  },
+  "register": {
+    "pfad": "register",
+    "url": "/register",
+    "description":"erstellt accounts"
+  },
+  "Musikauswahlsystem": {
+    "pfad": "Musikauswahlsystem",
+    "url": "/musik",
+    "description":"Party organizer für wiedergabelisten"
+  },
+  "memes": {
+    "pfad": "memes",
+    "url": "/memes",
+    "description":"memepage"
+  },
+  "rights": {
+    "pfad": "rights",
+    "url": "/rights",
+    "description":"datenschutzt und cokei erklärung"
+  },
+  "status":{
+    "pfad": "status",
+    "url" : "/status",
+    "description":"serverstatus"
+  },
+  "friends": {
+    "pfad": "friends",
+    "url": "/friends",
+    "description":"freundesliste"
+  },
+  "media": {
+    "pfad": "films",
+    "url": "/films",
+    "description":"mediaserver für filme serien und musik"
+  },
+  "ban":{
+    "pfad":"ban",
+    "url":"/ban",
+    "description":"zeig an das man gebannt wurde"
+ },
+  "banner":{
+    "pfad":"banner",
+    "url":"/admin/ban"
+  },
+  "adminnavigator":{
+    "pfad":"adminnavigator",
+    "url" : "/admin"
+  },
+  "adminuser":{
+    "pfad" : "adminuser",
+    "url":"/admin/users"
+  },
+  "music":{
+    "pfad":"music",
+    "url":"/music"
+  },
+  "hub":{
+    "url":"/hub",
+    "pfad":"hub"
+  }
+}

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Filme &middot; Serverjonas{% endblock %}
+
+{% block extra_style %}
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.film-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
+}
+
+.film-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.film-card:hover {
+    background: var(--surface-hover);
+    transform: translateY(-5px);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.film-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    color: var(--text-dim);
+}
+
+.film-card:hover .film-icon {
+    color: #6366f1;
+}
+
+.film-card h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+}
+
+.badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-ready { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+.badge-converting { background: rgba(234, 179, 8, 0.1); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.2); }
+.badge-queued { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
+.badge-error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+.empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    background: var(--surface);
+    border-radius: 32px;
+    border: 1px dashed var(--border);
+}
+{% endblock %}
+
+{% block content %}
+<div class="topbar">
+    <h1><i data-lucide="film" style="vertical-align: middle; margin-right: 12px;"></i> Filme</h1>
+    <a href="/films/upload" class="btn btn-primary">
+        <i data-lucide="upload"></i>
+        Upload
+    </a>
+</div>
+
+{% if films %}
+<div class="film-grid">
+    {% for film in films %}
+    <div class="film-card" onclick="location.href='/films/film/{{ film.film_id }}'">
+        <div class="film-icon">
+            <i data-lucide="play-circle"></i>
+        </div>
+        <h3>{{ film.title }}</h3>
+        <div class="meta">{{ film.uploaded_at | strftime }}</div>
+        
+        {% if film.status == "ready" %}
+            <span class="badge badge-ready">Bereit</span>
+        {% elif film.status == "converting" %}
+            <span class="badge badge-converting">Konvertiert...</span>
+        {% elif film.status == "queued" %}
+            <span class="badge badge-queued">Warteschlange</span>
+        {% else %}
+            <span class="badge badge-error">Fehler</span>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i data-lucide="clapperboard" style="width: 48px; height: 48px; color: var(--text-dim); margin-bottom: 24px;"></i>
+    <p style="color: var(--text-dim); margin-bottom: 24px;">Noch keine Filme in der Mediathek.</p>
+    <a href="/films/upload" class="btn btn-primary">Ersten Film hochladen</a>
+</div>
+{% endif %}
+{% endblock %}

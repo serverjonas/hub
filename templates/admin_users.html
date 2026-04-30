@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Adminpanel &middot; Users{% endblock %}
+
+{% block extra_style %}
+.admin-table-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+th {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border);
+    color: var(--text-dim);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background: var(--surface-hover);
+}
+
+.badge-admin {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 11px;
+}
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 32px;">
+    <h1>Adminpanel</h1>
+    <p style="color: var(--text-dim);">Benutzerverwaltung und Systemübersicht</p>
+</div>
+
+<div class="admin-table-container">
+    {% if users %}
+    <table>
+        <thead>
+            <tr>
+                {% for col in users[0].keys() %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                {% for val in user %}
+                <td>
+                    {% if val == 1 and loop.index0 > 2 %}
+                        <span class="badge-admin">YES</span>
+                    {% elif val == 0 and loop.index0 > 2 %}
+                        <span style="opacity: 0.3;">NO</span>
+                    {% else %}
+                        {{ val }}
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">Keine User in der Datenbank.</p>
+    {% endif %}
+</div>
+{% endblock %}

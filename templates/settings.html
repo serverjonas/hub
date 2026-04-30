@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Einstellungen &middot; Serverjonas{% endblock %}
+
+{% block extra_style %}
+.settings-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.settings-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 24px;
+}
+
+.settings-section {
+    margin-bottom: 32px;
+}
+
+.settings-section:last-child {
+    margin-bottom: 0;
+}
+
+.settings-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.settings-description {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.option-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    position: relative;
+}
+
+.option-card:hover {
+    border-color: #6366f1;
+    background: var(--surface-hover);
+}
+
+.option-card.active {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.option-card.active::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
+    background: #6366f1;
+    border-radius: 50%;
+}
+
+.option-icon {
+    margin-bottom: 8px;
+    color: var(--text-dim);
+}
+
+.option-card.active .option-icon {
+    color: #6366f1;
+}
+
+.option-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div style="margin-bottom: 32px;">
+        <h1 style="font-size: 32px; margin-bottom: 8px;">Einstellungen</h1>
+        <p style="color: var(--text-dim);">Passe dein Erlebnis auf Serverjonas an.</p>
+    </div>
+
+    <div class="settings-card">
+        <!-- Theme Section -->
+        <div class="settings-section">
+            <h2 class="settings-title">
+                <i data-lucide="palette" style="color: #6366f1;"></i>
+                Erscheinungsbild
+            </h2>
+            <p class="settings-description">Wähle ein Farbschema, das dir gefällt.</p>
+            <div class="options-grid">
+                <div class="option-card" data-option="theme" data-value="light">
+                    <i data-lucide="sun" class="option-icon"></i>
+                    <div class="option-name">Hell</div>
+                </div>
+                <div class="option-card" data-option="theme" data-value="dark">
+                    <i data-lucide="moon" class="option-icon"></i>
+                    <div class="option-name">Dunkel</div>
+                </div>
+                <div class="option-card" data-option="theme" data-value="oled">
+                    <i data-lucide="zap" class="option-icon"></i>
+                    <div class="option-name">OLED</div>
+                </div>
+                <div class="option-card" data-option="theme" data-value="paper">
+                    <i data-lucide="file-text" class="option-icon"></i>
+                    <div class="option-name">Paper</div>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 32px 0;">
+
+        <!-- Design Mode Section -->
+        <div class="settings-section">
+            <h2 class="settings-title">
+                <i data-lucide="layout" style="color: #a855f7;"></i>
+                Design Modus
+            </h2>
+            <p class="settings-description">Wechsle zwischen dem modernen Glas-Look und einem cleanen Stil.</p>
+            <div class="options-grid">
+                <div class="option-card" data-option="style" data-value="vibcodet">
+                    <i data-lucide="sparkles" class="option-icon"></i>
+                    <div class="option-name">Vibcodet</div>
+                </div>
+                <div class="option-card" data-option="style" data-value="clean">
+                    <i data-lucide="square" class="option-icon"></i>
+                    <div class="option-name">Clean</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="/" class="btn">
+            <i data-lucide="check" style="width: 18px;"></i>
+            Fertig
+        </a>
+    </div>
+</div>
+
+<script>
+    function updateActiveStates() {
+        const theme = localStorage.getItem("theme") || "dark";
+        const style = localStorage.getItem("design-style") || "vibcodet";
+
+        document.querySelectorAll('[data-option="theme"]').forEach(el => {
+            el.classList.toggle('active', el.getAttribute('data-value') === theme);
+        });
+        document.querySelectorAll('[data-option="style"]').forEach(el => {
+            el.classList.toggle('active', el.getAttribute('data-value') === style);
+        });
+    }
+
+    document.querySelectorAll('.option-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const type = card.getAttribute('data-option');
+            const value = card.getAttribute('data-value');
+
+            if (type === 'theme') {
+                localStorage.setItem("theme", value);
+                document.documentElement.setAttribute("data-theme", value);
+            } else {
+                localStorage.setItem("design-style", value);
+                document.documentElement.setAttribute("data-style", value);
+            }
+            updateActiveStates();
+            lucide.createIcons();
+        });
+    });
+
+    updateActiveStates();
+</script>
+{% endblock %}

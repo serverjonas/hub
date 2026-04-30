@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{artist}}</h1>
+
+<div class="grid">
+{% for a in albums %}
+  <div class="card" onclick="location.href='/music/artist/{{artist}}/{{a}}'">
+    💿 {{a}}
+  </div>
+{% endfor %}
+</div>
+
+<a href="/music/">← zurück</a>
+
+{% endblock %}

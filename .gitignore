@@ -1,0 +1,28 @@
+# Python
+_pycache_/
+*.pyc
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Data folder komplett ignorieren
+data/
+!data/.gitkeep
+
+# Logs
+*.log
+errors.log
+
+# Env files
+.env
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# backups
+*.bak
+*.save
+*.old

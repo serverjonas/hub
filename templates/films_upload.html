@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Upload &middot; Serverjonas{% endblock %}
+
+{% block extra_style %}
+.upload-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.upload-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-dim);
+}
+
+.radio-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.radio-item {
+    position: relative;
+}
+
+.radio-item input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.radio-item input:checked + .radio-label {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+}
+
+.series-only {
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.file-input-wrapper {
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.file-input-wrapper:hover {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.05);
+}
+{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+    <div style="margin-bottom: 32px; text-align: center;">
+        <h1>Medien hochladen</h1>
+        <p style="color: var(--text-dim);">Füge neue Filme oder Serien zur Mediathek hinzu.</p>
+    </div>
+
+    <div class="upload-card">
+        {% if message %}
+        <div class="message {% if message_type == 'error' %}message-error{% else %}message-success{% endif %}" style="margin-bottom: 24px;">
+            {{ message }}
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="radio-group">
+                <div class="radio-item">
+                    <input type="radio" name="upload_type" value="film" id="type_film" checked>
+                    <label for="type_film" class="radio-label">
+                        <i data-lucide="film"></i> Film
+                    </label>
+                </div>
+                <div class="radio-item">
+                    <input type="radio" name="upload_type" value="series" id="type_series">
+                    <label for="type_series" class="radio-label">
+                        <i data-lucide="tv"></i> Serie
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input type="text" name="title" id="title" class="form-control" placeholder="z.B. Inception" required>
+            </div>
+
+            <div class="series-only" id="series_fields">
+                <div class="form-group">
+                    <label for="series_name">Name der Serie</label>
+                    <input type="text" name="series_name" id="series_name" class="form-control" placeholder="z.B. Breaking Bad">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="season">Staffel</label>
+                        <input type="number" name="season" id="season" class="form-control" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="episode">Episode</label>
+                        <input type="number" name="episode" id="episode" class="form-control" value="1" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Datei auswählen</label>
+                <div class="file-input-wrapper" onclick="document.getElementById('file').click()">
+                    <i data-lucide="cloud-upload" style="width: 32px; height: 32px; color: var(--text-dim); margin-bottom: 12px;"></i>
+                    <p style="font-size: 14px; color: var(--text-dim);" id="file-label">Klicke zum Auswählen oder Drag & Drop</p>
+                    <input type="file" name="file" id="file" style="display: none;" onchange="updateFileName(this)">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 12px;">
+                Upload starten
+                <i data-lucide="upload-cloud"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const radioFilm = document.getElementById('type_film');
+    const radioSeries = document.getElementById('type_series');
+    const seriesFields = document.getElementById('series_fields');
+    const seriesNameInput = document.getElementById('series_name');
+
+    function toggleFields() {
+        if (radioSeries.checked) {
+            seriesFields.style.display = 'block';
+            seriesNameInput.required = true;
+        } else {
+            seriesFields.style.display = 'none';
+            seriesNameInput.required = false;
+        }
+    }
+
+    radioFilm.addEventListener('change', toggleFields);
+    radioSeries.addEventListener('change', toggleFields);
+
+    function updateFileName(input) {
+        const label = document.getElementById('file-label');
+        if (input.files && input.files.length > 0) {
+            label.textContent = input.files[0].name;
+            label.style.color = 'var(--text-main)';
+        }
+    }
+</script>
+{% endblock %}

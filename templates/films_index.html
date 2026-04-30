@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Media &middot; Serverjonas{% endblock %}
+
+{% block extra_style %}
+.media-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.card {
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    background: var(--surface-hover);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.card-icon-box {
+    width: 56px;
+    height: 56px;
+    background: var(--accent-gradient);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    color: white;
+}
+
+.card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.card p {
+    color: var(--text-dim);
+    font-size: 14px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="media-header">
+    <h1>Media Center</h1>
+    <p style="color: var(--text-dim);">Filme, Serien und Musik in höchster Qualität.</p>
+</div>
+
+<div class="grid">
+    <a href="/films/films" class="card">
+        <div class="card-icon-box">
+            <i data-lucide="film"></i>
+        </div>
+        <h3>Filme</h3>
+        <p>Deine Sammlung an Spielfilmen.</p>
+    </a>
+
+    <a href="/films/series" class="card">
+        <div class="card-icon-box">
+            <i data-lucide="tv"></i>
+        </div>
+        <h3>Serien</h3>
+        <p>Staffeln und Episoden deiner Lieblingsshows.</p>
+    </a>
+
+    <a href="/films/upload" class="card">
+        <div class="card-icon-box">
+            <i data-lucide="upload-cloud"></i>
+        </div>
+        <h3>Upload</h3>
+        <p>Neue Medien zur Bibliothek hinzufügen.</p>
+    </a>
+</div>
+{% endblock %}
