@@ -1,15 +1,47 @@
-from flask import Blueprint, render_template, request, redirect, make_response, abort
+import os
+import random
+import secrets
+import sqlite3
+import time
+
+from flask import (
+    Blueprint,
+    abort,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from PIL import Image
-import sqlite3, secrets, time, os, random
-from toolbox import get_current_user, get_name, DB_PATH
-from toolbox import DATA_PATH
 
+from toolbox import DB_PATH, get_current_user, get_name
 
-MEMES_DIR = os.path.join(DATA_PATH, "memes")
-USER_DB_PATH = DB_PATH
+MEMES_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data", "memes")
 MEMES_DB_PATH = os.path.join(MEMES_DIR, "memes.db")
 
 bp = Blueprint("memes", __name__)
+
+
+def init_db():
+    os.makedirs(MEMES_DIR, exist_ok=True)
+    conn = sqlite3.connect(MEMES_DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS memes (
+            meme_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            title TEXT,
+            created_at INTEGER NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+
+init_db()
+
 
 def get_random_meme():
     conn = sqlite3.connect(MEMES_DB_PATH)
@@ -18,65 +50,55 @@ def get_random_meme():
     memes = cur.fetchall()
     conn.close()
 
+    if not memes:
+        return None
+
     now = int(time.time())
-    weights = [1 + (now - meme[4])/3600 for meme in memes]  # z.B. Gewicht = Stunden seit Upload
-    selected = random.choices(memes, weights=weights, k=1)[0]
+    # Einfache Gewichtung: Neuere Memes haben leicht höhere Chance, aber alle sind möglich
+    # Gewicht = 1 + (Stunden seit Upload / 24) -> Ältere Memes werden leicht bevorzugt oder umgekehrt?
+    # Eigentlich wollen wir meistens Abwechslung. Random ohne Gewichtung ist oft cleaner.
+    return random.choice(memes)
 
-    return {
-        "meme_id": selected[0],
-        "user_id": selected[1],
-        "filename": selected[2],
-        "title": selected[3],
-        "created_at": selected[4]
-    }
-
-def insert_meme(user_id, filename, title=None):
-    """Fügt einen neuen Meme-Eintrag in die Datenbank ein."""
-    created_at = int(time.time())
-
-    conn = sqlite3.connect(MEMES_DB_PATH)
-    cur = conn.cursor()
-
-    cur.execute("""
-        INSERT INTO memes (user_id, filename, title, created_at)
-        VALUES (?, ?, ?, ?)
-    """, (user_id, filename, title, created_at))
-
-    conn.commit()
-    conn.close()
-
-    return True  # optional, nur zur Bestätigung
 
 @bp.route("/", methods=["GET"])
 def memepage():
-    """Zeigt ein zufälliges Meme im Viewer."""
     user = get_current_user()
-
     if user is None:
-        abort(401)
+        return redirect("/login")
 
-    meme = get_random_meme()  # Funktion aus vorherigem Schritt
+    meme_row = get_random_meme()
 
-    if meme is None:
-        # Kein Meme vorhanden → Rückgabe einer Nachricht oder Template
-        return "<p>Keine Memes verfügbar. Lade zuerst welche hoch!</p>"
+    if meme_row is None:
+        return render_template("meme_view.html", meme=None, user=user)
 
-    # Meme gefunden → Template rendern
+    meme = {
+        "meme_id": meme_row[0],
+        "user_id": meme_row[1],
+        "filename": meme_row[2],
+        "title": meme_row[3],
+        "created_at": meme_row[4],
+        "author": get_name(meme_row[1]),
+    }
+
     return render_template("meme_view.html", meme=meme, user=user)
+
+
+@bp.route("/file/<filename>")
+def serve_meme(filename):
+    return send_from_directory(os.path.join(MEMES_DIR, "files"), filename)
 
 
 @bp.route("/upload", methods=["GET", "POST"])
 def upload():
     user = get_current_user()
     if not user:
-        abort(401)
+        return redirect("/login")
 
     message = None
-
     if request.method == "POST":
         file = request.files.get("file")
         if not file:
-            message = "Keine Datei hochgeladen"
+            message = "❌ Keine Datei ausgewählt."
         else:
             timestamp = int(time.time())
             filename = f"{user['id']}-{timestamp}.png"
@@ -86,11 +108,26 @@ def upload():
 
             try:
                 img = Image.open(file)
+                img.convert("RGB")  # Sicherstellen dass es ein valides Bild ist
                 img.save(filepath, format="PNG")
-                title = request.form.get("title")
-                insert_meme(user['id'], filename, title=title)
-                message = "Meme erfolgreich gespeichert."
-            except Exception as e:
-                message = "Fehler beim Speichern des Bildes: " + str(e)
 
-    return render_template("memes_upload.html", message=message, user = user["name"])
+                title = request.form.get("title", "Ein lustiges Meme")
+
+                conn = sqlite3.connect(MEMES_DB_PATH)
+                cur = conn.cursor()
+                cur.execute(
+                    "INSERT INTO memes (user_id, filename, title, created_at) VALUES (?, ?, ?, ?)",
+                    (user["id"], filename, title, int(time.time())),
+                )
+                conn.commit()
+                conn.close()
+
+                message = "✅ Meme erfolgreich hochgeladen!"
+            except Exception as e:
+                message = f"❌ Fehler: {e}"
+
+    return render_template("memes_upload.html", message=message, user=user["name"])
+
+
+# Import am Ende um Zirkelbezüge zu vermeiden falls nötig
+from flask import send_from_directory

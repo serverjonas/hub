@@ -1,8 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+import os
 import sqlite3
-from toolbox import get_current_user, DB_PATH
 
+from flask import Blueprint, redirect, render_template, request, url_for
 
+from toolbox import get_current_user
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "users.db")
 
 bp = Blueprint("friends", __name__, template_folder="../../templates/friends")
 
@@ -10,7 +13,8 @@ bp = Blueprint("friends", __name__, template_folder="../../templates/friends")
 def get_friends(user_id):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         SELECT u.user_id, u.user_name FROM users u
         JOIN friendships f ON (
             (f.user_id = ? AND f.friend_id = u.user_id) OR
@@ -18,7 +22,9 @@ def get_friends(user_id):
         )
         WHERE f.status = 'accepted'
         ORDER BY u.user_name ASC
-    """, (user_id, user_id))
+    """,
+        (user_id, user_id),
+    )
     result = cur.fetchall()
     conn.close()
     return result
@@ -27,11 +33,14 @@ def get_friends(user_id):
 def get_pending_incoming(user_id):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         SELECT u.user_id, u.user_name FROM users u
         JOIN friendships f ON f.user_id = u.user_id
         WHERE f.friend_id = ? AND f.status = 'pending'
-    """, (user_id,))
+    """,
+        (user_id,),
+    )
     result = cur.fetchall()
     conn.close()
     return result
@@ -40,11 +49,14 @@ def get_pending_incoming(user_id):
 def get_pending_outgoing(user_id):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         SELECT u.user_id, u.user_name FROM users u
         JOIN friendships f ON f.friend_id = u.user_id
         WHERE f.user_id = ? AND f.status = 'pending'
-    """, (user_id,))
+    """,
+        (user_id,),
+    )
     result = cur.fetchall()
     conn.close()
     return result
@@ -66,10 +78,13 @@ def send_request(from_id, to_username):
         conn.close()
         return "❌ Du kannst dir nicht selbst eine Anfrage schicken"
 
-    cur.execute("""
+    cur.execute(
+        """
         SELECT 1 FROM friendships
         WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)
-    """, (from_id, to_id, to_id, from_id))
+    """,
+        (from_id, to_id, to_id, from_id),
+    )
 
     if cur.fetchone():
         conn.close()
@@ -77,7 +92,7 @@ def send_request(from_id, to_username):
 
     cur.execute(
         "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, 'pending')",
-        (from_id, to_id)
+        (from_id, to_id),
     )
     conn.commit()
     conn.close()
@@ -87,10 +102,13 @@ def send_request(from_id, to_username):
 def accept_request(to_id, from_id):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         UPDATE friendships SET status = 'accepted'
         WHERE user_id = ? AND friend_id = ? AND status = 'pending'
-    """, (from_id, to_id))
+    """,
+        (from_id, to_id),
+    )
     conn.commit()
     conn.close()
 
@@ -98,10 +116,13 @@ def accept_request(to_id, from_id):
 def decline_or_remove(user_id, other_id):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         DELETE FROM friendships
         WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)
-    """, (user_id, other_id, other_id, user_id))
+    """,
+        (user_id, other_id, other_id, user_id),
+    )
     conn.commit()
     conn.close()
 
@@ -145,5 +166,5 @@ def index():
         friends=friends,
         incoming=incoming,
         outgoing=outgoing,
-        message=message
+        message=message,
     )

@@ -1,16 +1,21 @@
-from flask import Blueprint, render_template, request, redirect, make_response
-import sqlite3, time, secrets
+import os
+import secrets
+import sqlite3
+import time
+
+from flask import Blueprint, make_response, redirect, render_template, request
 from werkzeug.security import check_password_hash
-from toolbox import DB_PATH
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "users.db")
 
 bp = Blueprint("login", __name__)
+
 
 def get_user(username):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
-        "SELECT user_id, password_hash FROM users WHERE user_name = ?",
-        (username,)
+        "SELECT user_id, password_hash FROM users WHERE user_name = ?", (username,)
     )
     row = cur.fetchone()
     conn.close()
@@ -24,10 +29,13 @@ def create_session(user_id):
 
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         INSERT INTO sessions (session_id, user_id, created_at, expires_at)
         VALUES (?, ?, ?, ?)
-    """, (session_id, user_id, now, expires))
+    """,
+        (session_id, user_id, now, expires),
+    )
     conn.commit()
     conn.close()
 
@@ -58,7 +66,7 @@ def login():
                     session_id,
                     httponly=True,
                     samesite="Lax",
-                    max_age=60 * 60 * 24 * 30  # ← 30d
+                    max_age=60 * 60 * 24 * 30,  # ← 30d
                 )
                 return resp
 

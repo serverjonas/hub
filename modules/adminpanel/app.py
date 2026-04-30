@@ -1,7 +1,10 @@
-from flask import Blueprint, render_template
+import os
 import sqlite3
 import time
-from toolbox import DB_PATH
+
+from flask import Blueprint, render_template
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "users.db")
 
 bp = Blueprint("adminpanel", __name__)
 
@@ -21,7 +24,4 @@ def get_all_users():
 @bp.route("/")
 def admin_index():
     users = get_all_users()
-    return render_template(
-        "admin_users.html",
-        users=users
-    )
+    return render_template("admin_users.html", users=users)

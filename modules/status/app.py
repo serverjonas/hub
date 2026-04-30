@@ -6,6 +6,6 @@ bp = Blueprint("status", __name__)
 def status_home():
     return jsonify({
         "status": "online",
-        "server": "serverjonas",
+        "server": "Serverjonas",
         "linux": "better"
     })

@@ -1,28 +1,31 @@
+import json
 import os
+import shutil
+import subprocess
 import uuid
 import zipfile
-import shutil
-import json
-import subprocess
+
 import requests
-from toolbox import DATA_PATH
-from flask import Blueprint, request, render_template, jsonify, send_file, abort
-from toolbox import get_current_user
+from flask import Blueprint, abort, jsonify, render_template, request, send_file
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 
+from toolbox import get_current_user
+
 bp = Blueprint("music", __name__, template_folder="templates")
 
+import os
 
-BASE = os.path.join(DATA_PATH, "music")
+BASE = os.path.join(os.path.dirname(__file__), "..", "..", "data", "music")
 
 # -------------------------
 # PATHS
 # -------------------------
 
+
 def user_paths(user_id):
     incoming = os.path.join(BASE, "incoming", str(user_id))
-    library  = os.path.join(BASE, "library", str(user_id))
+    library = os.path.join(BASE, "library", str(user_id))
 
     os.makedirs(incoming, exist_ok=True)
     os.makedirs(library, exist_ok=True)
@@ -33,6 +36,7 @@ def user_paths(user_id):
 # -------------------------
 # HELPERS
 # -------------------------
+
 
 def safe(x):
     return x.replace("/", "_").replace("\\", "_").strip() if x else "Unknown"
@@ -50,6 +54,7 @@ def filename_fallback(name):
 # FINGERPRINT (fpcalc)
 # -------------------------
 
+
 def fingerprint(path):
     try:
         out = subprocess.check_output(["fpcalc", path]).decode()
@@ -65,6 +70,7 @@ def fingerprint(path):
 # MUSICBRAINZ LOOKUP
 # -------------------------
 
+
 def lookup_musicbrainz(fp, duration):
     try:
         r = requests.get(
@@ -73,9 +79,9 @@ def lookup_musicbrainz(fp, duration):
                 "client": "iInmsHiFXY",
                 "meta": "recordings",
                 "duration": duration,
-                "fingerprint": fp
+                "fingerprint": fp,
             },
-            timeout=10
+            timeout=10,
         )
         data = r.json()
 
@@ -83,7 +89,7 @@ def lookup_musicbrainz(fp, duration):
             rec = data["results"][0]["recordings"][0]
 
             artist = rec["artists"][0]["name"]
-            title  = rec["title"]
+            title = rec["title"]
 
             return artist, title
     except:
@@ -96,6 +102,7 @@ def lookup_musicbrainz(fp, duration):
 # METADATA EXTRACTION
 # -------------------------
 
+
 def read_id3(path):
     try:
         audio = EasyID3(path)
@@ -104,9 +111,9 @@ def read_id3(path):
         audio.add_tags()
 
     artist = audio.get("artist", [""])[0]
-    title  = audio.get("title", [""])[0]
-    album  = audio.get("album", ["Unknown Album"])[0]
-    track  = audio.get("tracknumber", ["1"])[0].split("/")[0]
+    title = audio.get("title", [""])[0]
+    album = audio.get("album", ["Unknown Album"])[0]
+    track = audio.get("tracknumber", ["1"])[0].split("/")[0]
 
     return audio, artist, title, album, track
 
@@ -114,6 +121,7 @@ def read_id3(path):
 # -------------------------
 # PROCESS FILE (CORE BRAIN)
 # -------------------------
+
 
 def process_file(path, library):
     filename = os.path.basename(path)
@@ -125,11 +133,22 @@ def process_file(path, library):
 
     if fp:
         try:
-            duration = int(float(subprocess.check_output(
-                ["ffprobe", "-v", "error", "-show_entries",
-                 "format=duration", "-of",
-                 "default=noprint_wrappers=1:nokey=1", path]
-            )))
+            duration = int(
+                float(
+                    subprocess.check_output(
+                        [
+                            "ffprobe",
+                            "-v",
+                            "error",
+                            "-show_entries",
+                            "format=duration",
+                            "-of",
+                            "default=noprint_wrappers=1:nokey=1",
+                            path,
+                        ]
+                    )
+                )
+            )
         except:
             duration = 0
 
@@ -142,12 +161,12 @@ def process_file(path, library):
     if not artist or not title:
         fa, ft = filename_fallback(filename)
         artist = artist or fa
-        title  = title  or ft
+        title = title or ft
 
     # cleanup
     artist = safe(artist)
-    title  = safe(title)
-    album  = safe(album)
+    title = safe(title)
+    album = safe(album)
 
     try:
         track = str(int(track)).zfill(2)
@@ -163,7 +182,7 @@ def process_file(path, library):
 
     # folder structure
     artist_dir = os.path.join(library, artist)
-    album_dir  = os.path.join(artist_dir, album)
+    album_dir = os.path.join(artist_dir, album)
     os.makedirs(album_dir, exist_ok=True)
 
     new_path = os.path.join(album_dir, f"{track} - {title}.mp3")
@@ -178,6 +197,7 @@ def process_file(path, library):
 # SCAN
 # -------------------------
 
+
 def scan(root):
     out = []
     for r, _, f in os.walk(root):
@@ -190,9 +210,11 @@ def scan(root):
 
     return out
 
+
 # -------------------------
 # UPLOAD HANDLER
 # -------------------------
+
 
 def handle_upload(user_id, files, zip_file):
     incoming, library = user_paths(user_id)
@@ -224,6 +246,7 @@ def handle_upload(user_id, files, zip_file):
 # -------------------------
 # ROUTES
 # -------------------------
+
 
 @bp.route("/")
 def home():

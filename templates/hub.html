@@ -1,40 +1,132 @@
 {% extends "base.html" %}
 
-{% block title %}serverjonas HUB{% endblock %}
+{% block title %}Serverjonas &middot; Hub{% endblock %}
+
+{% block extra_style %}
+.hero {
+    text-align: center;
+    margin-bottom: 60px;
+    animation: fadeIn 1s ease-out;
+}
+
+.hero h1 {
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -2px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.card {
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    background: var(--surface-hover);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.3);
+}
+
+.card-icon-box {
+    width: 48px;
+    height: 48px;
+    background: var(--accent-gradient);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.card p {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.user-status {
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+{% endblock %}
 
 {% block content %}
+<div class="hero">
+    <h1>Willkommen bei Serverjonas</h1>
 
-<h1>🚀 serverjonas</h1>
-
-{% if user %}
-    <p>👋 Angemeldet als <b>{{ user }}</b></p>
-{% else %}
-    <p>
-        <a href="/login">
-            <button>🔐 Login</button>
-        </a>
-    </p>
-{% endif %}
-
-<p>Zentraler Zugriff auf alle Services</p>
-
-<div class="grid">
-    <div class="card" onclick="location.href='https://serverjonas.de/memes'">
-        <span>😂</span>
-        <h3>Memes</h3>
+    {% if user %}
+    <div class="user-status">
+        <i data-lucide="user-check" style="width: 16px"></i>
+        Angemeldet als <b>{{ user }}</b>
     </div>
-
-    <div class="card" onclick="location.href='https://serverjonas.de/films'">
-        <span>🎬</span>
-        <h3>Media</h3>
-    </div>
-
-    <div class="card" onclick="location.href='https://serverjonas.de/friends'">
-      <span>👥</span>
-      <h3>Freunde</h3>
-    </div>
-
+    {% else %}
+    <a href="/login" class="btn btn-primary">
+        Einloggen
+        <i data-lucide="log-in"></i>
+    </a>
+    {% endif %}
 </div>
 
+<div class="grid">
+    <a href="/memes" class="card">
+        <div class="card-icon-box">
+            <i data-lucide="image"></i>
+        </div>
+        <h3>Memes</h3>
+        <p>Die beste Sammlung kuratierter Internet-Kultur.</p>
+    </a>
 
+    <a href="/films" class="card">
+        <div class="card-icon-box">
+            <i data-lucide="film"></i>
+        </div>
+        <h3>Media</h3>
+        <p>Filme und Serien in höchster Qualität genießen.</p>
+    </a>
+
+    <a href="/friends" class="card">
+        <div class="card-icon-box">
+            <i data-lucide="users"></i>
+        </div>
+        <h3>Freunde</h3>
+        <p>Vernetze dich mit der Community.</p>
+    </a>
+</div>
 {% endblock %}

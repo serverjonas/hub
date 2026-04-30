@@ -1,114 +1,145 @@
 {% extends "base.html" %}
 
-{% block title %}Meme Viewer{% endblock %}
+{% block title %}Meme Viewer &middot; Serverjonas{% endblock %}
 
-{% block content %}
-
-<div class="meme-viewer">
-    {% if meme %}
-        <div class="meme-container">
-            <!-- Bild -->
-            <img src="{{ url_for('static', filename='memes/files/' + meme.filename) }}" alt="Meme" class="meme-img">
-
-            <!-- Username rechts unten -->
-            <div class="meme-info">
-                <span class="username">👤 {{ meme.username }}</span>
-            </div>
-
-            <!-- Buttons für Like / Comment -->
-            <div class="meme-actions">
-                <button class="like-btn">👍 Like</button>
-                <button class="comment-btn">💬 Comment</button>
-            </div>
-        </div>
-
-        <!-- Navigation -->
-        <div class="meme-nav">
-            <a href="{{ url_for('memes.memepage') }}" class="nav-btn prev">⬅️</a>
-            <a href="{{ url_for('memes.memepage') }}" class="nav-btn next">➡️</a>
-        </div>
-
-    {% else %}
-        <p>Keine Memes verfügbar.</p>
-    {% endif %}
-</div>
-
-<!-- FIXED UPLOAD BUTTON -->
-<a href="https://serverjonas.de/memes/upload" 
-   style="
-       position: fixed;
-       bottom: 20px;
-       right: 20px;
-       background-color: #ff4081;
-       color: white;
-       padding: 12px 20px;
-       border-radius: 8px;
-       text-decoration: none;
-       font-weight: bold;
-       box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-       transition: transform 0.2s;
-   "
-   onmouseover="this.style.transform='scale(1.1)'"
-   onmouseout="this.style.transform='scale(1)'"
->
-   ⬆️ Upload
-</a>
-
-<style>
-/* Zentrieren und Vollbild */
-.meme-viewer {
+{% block extra_style %}
+.meme-page-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    margin-top: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-.meme-container {
+.meme-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    width: 100%;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    margin-bottom: 32px;
+}
+
+.meme-img-container {
     position: relative;
-    text-align: center;
-    max-width: 80%;
+    width: 100%;
+    background: #000;
+    display: flex;
+    justify-content: center;
 }
 
 .meme-img {
-    width: 100%;
-    height: auto;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-width: 100%;
+    max-height: 80vh;
+    display: block;
 }
 
-.meme-info {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background: rgba(0,0,0,0.5);
-    padding: 4px 8px;
-    border-radius: 6px;
-    color: #fff;
-    font-weight: bold;
+.meme-footer {
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.meme-actions {
-    margin-top: 10px;
+.meme-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
 }
 
-.meme-actions button {
-    margin: 0 5px;
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
+.meme-author i {
+    color: #6366f1;
 }
 
 .meme-nav {
-    margin-top: 20px;
+    display: flex;
+    gap: 16px;
+    margin-bottom: 40px;
 }
 
-.meme-nav .nav-btn {
-    margin: 0 10px;
-    font-size: 1.5rem;
+.nav-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
     text-decoration: none;
 }
-</style>
 
+.nav-btn:hover {
+    background: var(--surface-hover);
+    transform: scale(1.1);
+    border-color: #6366f1;
+}
+
+.upload-fab {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    transition: var(--transition);
+    text-decoration: none;
+    z-index: 100;
+}
+
+.upload-fab:hover {
+    transform: scale(1.1) rotate(90deg);
+}
+{% endblock %}
+
+{% block content %}
+<div class="meme-page-container">
+    {% if meme %}
+    <div class="meme-card">
+        <div class="meme-img-container">
+            <img src="/memes/file/{{ meme.filename }}" alt="{{ meme.title or 'Meme' }}" class="meme-img">
+        </div>
+        <div class="meme-footer">
+            <div class="meme-info">
+                <h3 style="font-size: 18px; margin-bottom: 4px;">{{ meme.title or 'Ein lustiges Meme' }}</h3>
+                <div class="meme-author">
+                    <i data-lucide="user"></i>
+                    <span>{{ meme.author or 'Unbekannt' }}</span>
+                </div>
+            </div>
+            <div class="meme-actions">
+                <button class="btn" style="padding: 10px;"><i data-lucide="heart"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="meme-nav">
+        <a href="/memes/" class="nav-btn" title="Zufälliges Meme">
+            <i data-lucide="refresh-cw"></i>
+        </a>
+    </div>
+
+    {% else %}
+    <div class="empty-state" style="padding: 100px; text-align: center; background: var(--surface); border-radius: 32px; border: 1px dashed var(--border);">
+        <i data-lucide="image-off" style="width: 48px; height: 48px; color: var(--text-dim); margin-bottom: 24px;"></i>
+        <p style="color: var(--text-dim); margin-bottom: 24px;">Noch keine Memes vorhanden.</p>
+        <a href="/memes/upload" class="btn btn-primary">Meme hochladen</a>
+    </div>
+    {% endif %}
+</div>
+
+<a href="/memes/upload" class="upload-fab" title="Meme hochladen">
+    <i data-lucide="plus"></i>
+</a>
 {% endblock %}

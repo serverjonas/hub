@@ -1,14 +1,17 @@
-from flask import Blueprint, render_template, abort
-import sys
 import os
 import sqlite3
+import sys
 import time
-from toolbox import DB_PATH
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from flask import Blueprint, abort, render_template
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 from toolbox import get_current_user, get_infos
 
 bp = Blueprint("admin", __name__, template_folder="templates")
+import os
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "users.db")
 
 
 def get_active_bans():
@@ -17,16 +20,20 @@ def get_active_bans():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
-    cur.execute("""
-        SELECT COUNT(*) 
+    cur.execute(
+        """
+        SELECT COUNT(*)
         FROM ban
         WHERE expires_at IS NULL OR expires_at > ?
-    """, (now,))
+    """,
+        (now,),
+    )
 
     count = cur.fetchone()[0]
     conn.close()
 
     return count
+
 
 # ── Admin-Check für alle Routen unter diesem Blueprint ──────────────────────
 @bp.before_request
@@ -38,6 +45,7 @@ def require_admin():
     if infos is None or not infos["admin"]:
         abort(403)
 
+
 # ── Dashboard (Startseite des Admin-Panels) ──────────────────────────────────
 @bp.route("/")
 def admin_dashboard():
@@ -46,22 +54,27 @@ def admin_dashboard():
     bans = get_active_bans()
     return render_template("admin_nav.html", user=user["name"], bans=bans)
 
+
 # ── Platzhalter-Routen – werden später durch eigene Blueprints ersetzt ────────
 @bp.route("/roles")
 def admin_roles():
     abort(501)
 
+
 @bp.route("/sessions")
 def admin_sessions():
     abort(501)
+
 
 @bp.route("/logs")
 def admin_logs():
     abort(501)
 
+
 @bp.route("/announcements")
 def admin_announcements():
     abort(501)
+
 
 @bp.route("/settings")
 def admin_settings():

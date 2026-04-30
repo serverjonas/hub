@@ -1,29 +1,54 @@
-from flask import Blueprint, render_template, request, redirect, url_for, abort, Response, stream_with_context, jsonify
-from toolbox import get_current_user
-from toolbox import DATA_PATH
-import os, json, time, subprocess, threading, uuid, shutil, tempfile
+import json
+import os
+import shutil
+import subprocess
+import tempfile
+import threading
+import time
+import uuid
 from datetime import datetime
 
-tempfile.tempdir = "/var/www/serverjonas-hub/data/films/data/tmp"
-FILMS_DATA_DIR = os.path.join(DATA_PATH, "films", "data")
+from flask import (
+    Blueprint,
+    Response,
+    abort,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    stream_with_context,
+    url_for,
+)
+
+from toolbox import get_current_user
+
+FILMS_DATA_DIR = os.path.join(
+    os.path.dirname(__file__), "..", "..", "data", "films", "data"
+)
+tempfile.tempdir = os.path.join(FILMS_DATA_DIR, "tmp")
 
 bp = Blueprint("films", __name__, template_folder="templates")
 
-@bp.app_template_filter('strftime')
+
+@bp.app_template_filter("strftime")
 def strftime_filter(value):
-    return datetime.fromtimestamp(int(value)).strftime('%d.%m.%Y %H:%M')
+    return datetime.fromtimestamp(int(value)).strftime("%d.%m.%Y %H:%M")
 
 
 # ── Hilfsfunktionen ────────────────────────────────────────────────────────────
 
+
 def user_dir(username: str) -> str:
     return os.path.join(FILMS_DATA_DIR, username, "films")
+
 
 def film_dir(username: str, film_id: str) -> str:
     return os.path.join(user_dir(username), film_id)
 
+
 def meta_path(username: str, film_id: str) -> str:
     return os.path.join(film_dir(username, film_id), "meta.json")
+
 
 def read_meta(username: str, film_id: str) -> dict | None:
     p = meta_path(username, film_id)
@@ -32,9 +57,11 @@ def read_meta(username: str, film_id: str) -> dict | None:
     with open(p) as f:
         return json.load(f)
 
+
 def write_meta(username: str, film_id: str, data: dict):
     with open(meta_path(username, film_id), "w") as f:
         json.dump(data, f, indent=2)
+
 
 def list_films(username: str) -> list:
     base = user_dir(username)
@@ -48,9 +75,11 @@ def list_films(username: str) -> list:
     films.sort(key=lambda m: m.get("uploaded_at", 0), reverse=True)
     return films
 
+
 def list_only_films(username: str) -> list:
     """Nur Einträge ohne Serien-Zugehörigkeit."""
     return [m for m in list_films(username) if not m.get("series")]
+
 
 def list_series(username: str) -> dict:
     """
@@ -71,11 +100,14 @@ def list_series(username: str) -> dict:
     # Episoden innerhalb jeder Staffel sortieren
     for s in series_dict:
         for season in series_dict[s]["seasons"]:
-            series_dict[s]["seasons"][season].sort(key=lambda m: int(m.get("episode", 0)))
+            series_dict[s]["seasons"][season].sort(
+                key=lambda m: int(m.get("episode", 0))
+            )
     return series_dict
 
 
 # ── FFmpeg-Konvertierung ───────────────────────────────────────────────────────
+
 
 def convert_film(username: str, film_id: str, original_path: str):
     fdir = film_dir(username, film_id)
@@ -86,12 +118,25 @@ def convert_film(username: str, film_id: str, original_path: str):
     write_meta(username, film_id, meta)
 
     cmd = [
-        "ffmpeg", "-y", "-i", original_path,
-        "-vf", "scale='min(1920,iw)':'min(1080,ih)':force_original_aspect_ratio=decrease",
-        "-c:v", "libx264", "-crf", "23", "-preset", "ultrafast",
-        "-c:a", "aac", "-b:a", "128k",
-        "-movflags", "+faststart",
-        output_path
+        "ffmpeg",
+        "-y",
+        "-i",
+        original_path,
+        "-vf",
+        "scale='min(1920,iw)':'min(1080,ih)':force_original_aspect_ratio=decrease",
+        "-c:v",
+        "libx264",
+        "-crf",
+        "23",
+        "-preset",
+        "ultrafast",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+        "-movflags",
+        "+faststart",
+        output_path,
     ]
 
     try:
@@ -108,6 +153,7 @@ def convert_film(username: str, film_id: str, original_path: str):
 
 
 # ── Routen ─────────────────────────────────────────────────────────────────────
+
 
 @bp.route("/", methods=["GET"])
 def index():
@@ -147,7 +193,7 @@ def series_detail(series_name):
         "films_series_detail.html",
         user=user["name"],
         series_name=series_name,
-        seasons=series_data[series_name]["seasons"]
+        seasons=series_data[series_name]["seasons"],
     )
 
 
@@ -201,13 +247,18 @@ def upload():
             t = threading.Thread(
                 target=convert_film,
                 args=(user["name"], film_id, original_path),
-                daemon=True
+                daemon=True,
             )
             t.start()
 
             return redirect(url_for("films.film_detail", film_id=film_id))
 
-    return render_template("films_upload.html", user=user["name"], message=message, message_type=message_type)
+    return render_template(
+        "films_upload.html",
+        user=user["name"],
+        message=message,
+        message_type=message_type,
+    )
 
 
 @bp.route("/film/<film_id>")
@@ -238,7 +289,9 @@ def film_detail(film_id):
                 if next_season_eps:
                     next_episode = next_season_eps[0]
 
-    return render_template("films_detail.html", user=user["name"], film=meta, next_episode=next_episode)
+    return render_template(
+        "films_detail.html", user=user["name"], film=meta, next_episode=next_episode
+    )
 
 
 @bp.route("/film/<film_id>/watch")
@@ -275,7 +328,9 @@ def watch(film_id):
                     remaining -= len(chunk)
                     yield chunk
 
-        resp = Response(stream_with_context(generate_range()), 206, mimetype="video/mp4")
+        resp = Response(
+            stream_with_context(generate_range()), 206, mimetype="video/mp4"
+        )
         resp.headers["Content-Range"] = f"bytes {start}-{end}/{file_size}"
         resp.headers["Accept-Ranges"] = "bytes"
         resp.headers["Content-Length"] = str(length)

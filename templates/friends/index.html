@@ -1,63 +1,198 @@
 {% extends "base.html" %}
+{% block title %}Freunde &middot; Serverjonas{% endblock %}
+
+{% block extra_style %}
+.friends-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.section {
+    margin-bottom: 48px;
+}
+
+.section h2 {
+    font-size: 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.friend-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    transition: var(--transition);
+}
+
+.friend-item:hover {
+    background: var(--surface-hover);
+    transform: translateX(4px);
+}
+
+.friend-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.friend-name {
+    font-weight: 600;
+}
+
+.friend-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.add-friend-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    background: var(--surface);
+    padding: 24px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+}
+
+.add-friend-form input {
+    flex: 1;
+}
+
+.empty-state {
+    color: var(--text-dim);
+    font-size: 14px;
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px dashed var(--border);
+}
+
+.message {
+    padding: 12px 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
+
+.message-success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.message-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+{% endblock %}
+
 {% block content %}
+<div class="friends-container">
+    <div class="section">
+        <h2><i data-lucide="user-plus"></i> Freund hinzufügen</h2>
+        
+        {% if message %}
+        <div class="message {% if '✅' in message %}message-success{% else %}message-error{% endif %}">
+            {{ message }}
+        </div>
+        {% endif %}
 
-<h2>Freunde</h2>
-
-{% if message %}
-  <p>{{ message }}</p>
-{% endif %}
-
-<form method="POST">
-  <input type="hidden" name="action" value="send">
-  <input type="text" name="to_username" placeholder="Benutzername" required>
-  <button type="submit">Anfrage senden</button>
-</form>
-
-{% if incoming %}
-  <h3>Eingehende Anfragen</h3>
-  {% for id, name in incoming %}
-    <div>
-      <span>{{ name }}</span>
-      <form method="POST" style="display:inline">
-        <input type="hidden" name="action" value="accept">
-        <input type="hidden" name="from_id" value="{{ id }}">
-        <button type="submit">✅ Annehmen</button>
-      </form>
-      <form method="POST" style="display:inline">
-        <input type="hidden" name="action" value="decline">
-        <input type="hidden" name="other_id" value="{{ id }}">
-        <button type="submit">❌ Ablehnen</button>
-      </form>
+        <form method="POST" class="add-friend-form">
+            <input type="hidden" name="action" value="send">
+            <input type="text" name="to_username" class="form-control" placeholder="Benutzername eingeben..." required>
+            <button type="submit" class="btn btn-primary">
+                Anfrage senden
+                <i data-lucide="send"></i>
+            </button>
+        </form>
     </div>
-  {% endfor %}
-{% endif %}
 
-{% if outgoing %}
-  <h3>Gesendete Anfragen</h3>
-  {% for id, name in outgoing %}
-    <div>
-      <span>{{ name }}</span>
-      <form method="POST" style="display:inline">
-        <input type="hidden" name="action" value="decline">
-        <input type="hidden" name="other_id" value="{{ id }}">
-        <button type="submit">Zurückziehen</button>
-      </form>
+    {% if incoming %}
+    <div class="section">
+        <h2><i data-lucide="mailbox"></i> Eingehende Anfragen</h2>
+        {% for id, name in incoming %}
+        <div class="friend-item">
+            <div class="friend-info">
+                <i data-lucide="user"></i>
+                <span class="friend-name">{{ name }}</span>
+            </div>
+            <div class="friend-actions">
+                <form method="POST" style="display:inline">
+                    <input type="hidden" name="action" value="accept">
+                    <input type="hidden" name="from_id" value="{{ id }}">
+                    <button type="submit" class="btn btn-primary" style="padding: 8px 16px; font-size: 12px; background: #22c55e;">
+                        Annehmen
+                    </button>
+                </form>
+                <form method="POST" style="display:inline">
+                    <input type="hidden" name="action" value="decline">
+                    <input type="hidden" name="other_id" value="{{ id }}">
+                    <button type="submit" class="btn" style="padding: 8px 16px; font-size: 12px;">
+                        Ablehnen
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-  {% endfor %}
-{% endif %}
+    {% endif %}
 
-{% if friends %}
-  <h3>Deine Freunde</h3>
-  {% for id, name in friends %}
-    <div>
-      <span>{{ name }}</span>
-      <form method="POST" style="display:inline">
-        <input type="hidden" name="action" value="remove">
-        <input type="hidden" name="other_id" value="{{ id }}">
-        <button type="submit">Entfernen</button>
-      </form>
+    <div class="section">
+        <h2><i data-lucide="users"></i> Deine Freunde</h2>
+        {% if friends %}
+            {% for id, name in friends %}
+            <div class="friend-item">
+                <div class="friend-info">
+                    <i data-lucide="user"></i>
+                    <span class="friend-name">{{ name }}</span>
+                </div>
+                <div class="friend-actions">
+                    <form method="POST" style="display:inline">
+                        <input type="hidden" name="action" value="remove">
+                        <input type="hidden" name="other_id" value="{{ id }}">
+                        <button type="submit" class="btn" style="padding: 8px 16px; font-size: 12px; color: #ef4444;">
+                            Entfernen
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">Du hast noch keine Freunde hinzugefügt.</div>
+        {% endif %}
     </div>
-  {% endfor %}
-{% endif %}
 
+    {% if outgoing %}
+    <div class="section">
+        <h2><i data-lucide="clock"></i> Gesendete Anfragen</h2>
+        {% for id, name in outgoing %}
+        <div class="friend-item">
+            <div class="friend-info">
+                <i data-lucide="user"></i>
+                <span class="friend-name">{{ name }}</span>
+            </div>
+            <div class="friend-actions">
+                <form method="POST" style="display:inline">
+                    <input type="hidden" name="action" value="decline">
+                    <input type="hidden" name="other_id" value="{{ id }}">
+                    <button type="submit" class="btn" style="padding: 8px 16px; font-size: 12px;">
+                        Zurückziehen
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

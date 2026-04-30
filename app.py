@@ -1,26 +1,32 @@
 # main app.py
-from flask import Flask, request, redirect, send_from_directory, render_template, abort
-import os
-import json
 import importlib.util
+import json
+import os
 import sqlite3
 import time
-from toolbox import get_current_user, is_banned, is_user_active, init_database, DB_PATH
-from dotenv import load_dotenv
 from urllib.parse import quote
+
+from dotenv import load_dotenv
+from flask import Flask, abort, redirect, render_template, request, send_from_directory
+
+from toolbox import get_current_user, is_banned, is_user_active
+
 load_dotenv()
-init_database()
 
 BASE_DIR = os.path.dirname(__file__)
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 MODULE_DIR = os.path.join(BASE_DIR, "modules")
+DB_PATH = os.path.join(BASE_DIR, "users.db")
 
-app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=os.path.join(BASE_DIR, "static"))
+app = Flask(
+    __name__,
+    template_folder=TEMPLATES_DIR,
+    static_folder=os.path.join(BASE_DIR, "static"),
+)
 
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024 * 1024  # 50GB
+app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024 * 1024  # 50GB
 app.secret_key = os.environ.get("SECRET_KEY")
-ALLOWED_EXTENSIONS = {'.html', '.css', '.js', '.png', '.jpg', '.ico', '.svg', '.txt'}
-
+ALLOWED_EXTENSIONS = {".html", ".css", ".js", ".png", ".jpg", ".ico", ".svg", ".txt"}
 
 
 def load_modules():
@@ -35,7 +41,9 @@ def load_modules():
     for name, cfg in modules.items():
         try:
             module_path = os.path.join(MODULE_DIR, cfg["pfad"], "app.py")
-            spec = importlib.util.spec_from_file_location(f"modules.{name}", module_path)
+            spec = importlib.util.spec_from_file_location(
+                f"modules.{name}", module_path
+            )
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             app.register_blueprint(module.bp, url_prefix=cfg["url"])
@@ -43,7 +51,9 @@ def load_modules():
         except Exception as e:
             print(f"❌ Modul {name} konnte nicht geladen werden:", e)
 
+
 load_modules()
+
 
 @app.before_request
 def check_ban():
@@ -53,7 +63,7 @@ def check_ban():
     user = get_current_user()
     if user is None:
         return
-    
+
     banned, reason = is_banned(user["id"])
     if banned:
         reason_encoded = reason if reason else "Kein Grund angegeben"
@@ -61,6 +71,7 @@ def check_ban():
 
     if not is_user_active(user["id"]):
         return render_template("activation_pending.html")
+
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -71,11 +82,13 @@ def page_not_found(e):
         user = user_array["name"]
     return render_template("404.html", user=user), 404
 
+
 @app.errorhandler(403)
 def forbidden(e):
     user_array = get_current_user()
     user = user_array["name"] if user_array else None
     return render_template("403.html", user=user), 403
+
 
 @app.errorhandler(401)
 def not_logged_in(e):
@@ -83,19 +96,15 @@ def not_logged_in(e):
     user = user_array["name"] if user_array else None
     return render_template("not_logged_in.html", user=user), 401
 
+
 @app.errorhandler(418)
 def tea(e):
     return render_template("418.html"), 418
 
 
-
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def hub(path):
-    ua = request.headers.get("User-Agent", "")
-    if "iPhone" in ua or "iPad" in ua or "iPod" in ua:
-        return redirect(f"https://apple.serverjonas.de/{path}", code=302)
-
     if path == "":
         return redirect("/hub")
 
@@ -114,7 +123,8 @@ def hub(path):
     return abort(404)
 
 
-
 if __name__ == "__main__":
     print("Debug mode:")
-    app.run(host="0.0.0.0", port=5000, debug=True) #debug server normalerwiese über wsgi gehostet
+    app.run(
+        host="0.0.0.0", port=5000, debug=True
+    )  # debug server normalerwiese über wsgi gehostet
