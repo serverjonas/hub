@@ -1,0 +1,5 @@
+# Erzwinge UTF-8 für alles im Verzeichnis
+AddDefaultCharset UTF-8
+
+# Optional: explizit für .txt Dateien
+AddType 'text/plain; charset=UTF-8' .txt

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>☁️ Cloud</h1>
+
+<!-- EIN Upload-Feld statt zwei -->
+<form id="uploadForm">
+  <input type="file" name="files" multiple id="fileInput">
+  <button class="btn btn-primary" type="submit">Upload</button>
+</form>
+
+<div id="fileInfo" style="margin-top:10px; opacity:0.8;"></div>
+
+<hr>
+
+<ul>
+{% for i in items %}
+  <li>
+    {% if i.is_dir %}
+      📁 {{ i.name }}
+    {% else %}
+      📄 <a href="/cloud/download/{{ i.name }}">{{ i.name }}</a>
+    {% endif %}
+    <a href="/cloud/delete/{{ i.name }}">🗑</a>
+  </li>
+{% endfor %}
+</ul>
+
+<style>
+ul { margin-top: 20px; padding: 0; }
+li {
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #333;
+}
+li:hover { background: #222; }
+button { cursor: pointer; }
+</style>
+
+<script>
+const form = document.getElementById("uploadForm");
+const fileInput = document.getElementById("fileInput");
+const fileInfo = document.getElementById("fileInfo");
+
+// Zeigt ausgewählte Dateien an
+fileInput.addEventListener("change", () => {
+  const files = [...fileInput.files];
+
+  if (files.length === 0) {
+    fileInfo.innerText = "";
+    return;
+  }
+
+  fileInfo.innerText = "📦 Ausgewählt: " + files.map(f => f.name).join(", ");
+});
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+
+  const data = new FormData();
+
+  // alle Dateien unter EINEM Key
+  for (const file of fileInput.files) {
+    data.append("files", file);
+  }
+
+  try {
+    const res = await fetch("/cloud/upload", {
+      method: "POST",
+      body: data
+    });
+
+    if (!res.ok) {
+      console.error(await res.text());
+      alert("Upload fehlgeschlagen");
+      return;
+    }
+
+    location.reload();
+  } catch (err) {
+    console.error(err);
+    alert("Netzwerkfehler");
+  }
+};
+</script>
+
+{% endblock %}
