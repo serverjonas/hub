@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>☁️ Cloud</h1>
+
+<form id="uploadForm">
+  <input type="file" name="files" multiple>
+  <input type="file" name="zip" accept=".zip">
+  <button class="btn btn-primary">Upload</button>
+</form>
+
+<ul>
+{% for i in items %}
+  <li>
+    {% if i.is_dir %}
+      📁 {{ i.name }}
+    {% else %}
+      📄 <a href="/cloud/download/{{ i.name }}">{{ i.name }}</a>
+    {% endif %}
+    <a href="/cloud/delete/{{ i.name }}">🗑</a>
+  </li>
+{% endfor %}
+</ul>
+
+<style>
+ul {margin-top:20px;}
+li {padding:8px; cursor:pointer; display:flex; justify-content:space-between;}
+li:hover {background:#222;}
+</style>
+
+<script>
+let form = document.getElementById("uploadForm");
+
+form.onsubmit = e => {
+  e.preventDefault();
+  let data = new FormData(form);
+
+  fetch("/cloud/upload", {
+    method: "POST",
+    body: data
+  }).then(() => location.reload());
+};
+</script>
+
+{% endblock %}

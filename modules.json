@@ -63,5 +63,9 @@
   "hub":{
     "url":"/hub",
     "pfad":"hub"
+  },
+  "cloud":{
+    "url":"/cloud",
+    "path":"cloud"
   }
 }
