@@ -5,8 +5,9 @@ import time
 
 from flask import request
 from werkzeug.security import generate_password_hash
-
-DB_PATH = os.path.join(os.path.dirname(__file__), "users.db")
+BASE_DIR = "/var/www/serverjonas-hub"
+DB_PATH = os.path.join(BASE_DIR, "users.db")
+DATA_PATH = os.path.join(BASE_DIR, "data")
 
 def check_or_create_users_db(db_path=DB_PATH):
     import os

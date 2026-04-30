@@ -13,13 +13,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-from toolbox import get_current_user
+from toolbox import get_current_user, DATA_PATH
 
 bp = Blueprint("music", __name__, template_folder="templates")
 
-import os
-
-BASE = os.path.join(os.path.dirname(__file__), "..", "..", "data", "music")
+BASE = os.path.join(DATA_PATH "music")
 
 # -------------------------
 # PATHS
