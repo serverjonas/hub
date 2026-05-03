@@ -9,7 +9,7 @@ from urllib.parse import quote
 from dotenv import load_dotenv
 from flask import Flask, abort, redirect, render_template, request, send_from_directory
 
-from toolbox import get_current_user, is_banned, is_user_active
+from toolbox import get_current_user, is_banned, is_user_active, get_lang
 
 load_dotenv()
 
@@ -102,6 +102,7 @@ def tea(e):
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def hub(path):
+    lang = get_lang()
     if path == "":
         return redirect("/hub")
 
@@ -110,7 +111,7 @@ def hub(path):
 
     if path == "settings":
         user = get_current_user()
-        return render_template("settings.html", user=user["name"] if user else None)
+        return render_template(f"settings_{lang}.html", user=user["name"] if user else None)
 
     # NUR static files erlauben
     ext = os.path.splitext(path)[1].lower()

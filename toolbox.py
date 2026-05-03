@@ -3,11 +3,19 @@ import os
 import sqlite3
 import time
 
-from flask import request
+from flask import request, make_response
 from werkzeug.security import generate_password_hash
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "users.db")
 
+def get_lang():
+    return request.cookies.get("lang", "deu")
+
+
+def set_lang(lang):
+    resp = make_response()
+    resp.set_cookie("lang", lang)
+    return resp
 
 def create_user(username, password):
     password_hash = generate_password_hash(password)
