@@ -11,7 +11,7 @@ bp = Blueprint("mkkey", __name__)
 
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 DB_USERS = os.path.join(BASE_PATH, "users.db")
-DB_API = os.path.join(BASE_PATH, "api", "v1", "api.db")
+DB_API = os.path.join(BASE_PATH, "v1", "api.db")
 
 
 def init_db():
