@@ -67,5 +67,17 @@
   "api-v1-status":{
     "url":"/api/v1/status",
     "pfad":"api/v1/status"
+  },
+  "api-v1-mkkey": {
+    "url": "/api/v1/mkkey",
+    "pfad": "api/v1/mkkey"
+  },
+  "api-v1-listkeys": {
+    "url": "/api/v1/listkeys",
+    "pfad": "api/v1/listkeys"
+  },
+  "api-v1-rmkey": {
+    "url": "/api/v1/rmkey",
+    "pfad": "api/v1/rmkey"
   }
 }

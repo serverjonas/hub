@@ -5,7 +5,8 @@ import time
 from flask import request, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "users.db")
+BASE_PATH = os.path.dirname(__file__)
+DB_PATH = os.path.join(BASE_PATH, "users.db")
 
 def get_lang():
     return request.cookies.get("lang", "deu")
