@@ -63,5 +63,9 @@
   "hub":{
     "url":"/hub",
     "pfad":"hub"
+  },
+  "api-v1-status":{
+    "url":"/api/v1/status",
+    "pfad":"api/v1/status"
   }
 }
