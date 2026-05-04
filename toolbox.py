@@ -2,14 +2,34 @@
 import os
 import sqlite3
 import time
-
 from flask import request, make_response
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "users.db")
 
 def get_lang():
     return request.cookies.get("lang", "deu")
+
+def check_pw(username, password):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT password_hash FROM users WHERE user_name = ?",
+        (username,)
+    )
+    row = cur.fetchone()
+
+    conn.close()
+
+    # User existiert nicht
+    if row is None:
+        return False
+
+    stored_hash = row[0]
+
+    # Passwort prüfen
+    return check_password_hash(stored_hash, password)
 
 
 def set_lang(lang):
