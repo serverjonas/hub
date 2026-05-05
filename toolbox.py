@@ -10,6 +10,29 @@ BASE_DIR = BASE_PATH
 DB_PATH = os.path.join(BASE_PATH, "users.db")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 
+def create_notification(user_id, message, type="system", sender_id=None):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO notifications (
+            user_id,
+            sender_id,
+            type,
+            message,
+            read,
+            created_at
+        ) VALUES (?, ?, ?, ?, 0, ?)
+    """, (
+        user_id,
+        sender_id,
+        type,
+        message,
+        int(time.time())
+    ))
+
+    conn.commit()
+    conn.close()
 
 def get_lang():
     return request.cookies.get("lang", "deu")
