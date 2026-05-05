@@ -9,14 +9,14 @@ from urllib.parse import quote
 from dotenv import load_dotenv
 from flask import Flask, abort, redirect, render_template, request, send_from_directory
 
-from toolbox import get_current_user, is_banned, is_user_active, get_lang
+from toolbox import get_current_user, is_banned, is_user_active, get_lang, BASE_DIR
 
 load_dotenv()
 
-BASE_DIR = os.path.dirname(__file__)
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 MODULE_DIR = os.path.join(BASE_DIR, "modules")
 DB_PATH = os.path.join(BASE_DIR, "users.db")
+
 
 app = Flask(
     __name__,

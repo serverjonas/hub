@@ -1,12 +1,16 @@
 import sys
 import logging
 from logging.handlers import RotatingFileHandler
+import os
 
 sys.path.insert(0, "/var/www/serverjonas-hub")
+from toolbox import LOGS_DIR,
+
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 # Logger einrichten
 handler = RotatingFileHandler(
-    '/var/www/serverjonas-hub/logs/wsgi.log',
+    os.path.join(LOGS_DIR, 'wsgi.log'),
     maxBytes=10*1024*1024,  # 10MB
     backupCount=5
 )
