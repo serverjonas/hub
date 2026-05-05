@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 import os
 
 sys.path.insert(0, "/var/www/serverjonas-hub")
-from toolbox import LOGS_DIR,
+from toolbox import LOGS_DIR
 
 os.makedirs(LOGS_DIR, exist_ok=True)
 
