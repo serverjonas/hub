@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Archive{% endblock %}
+
+{% block content %}
+
+<h1>Archiv (48h+)</h1>
+
+<a href="/news" class="btn" style="margin-bottom: 20px;">
+    ← Zurück zu aktuellen News
+</a>
+
+<div style="display:flex; flex-direction:column; gap:12px;">
+
+{% for n in notifications %}
+
+<div style="
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    opacity: {% if n.read == 1 %}0.7{% else %}1{% endif %};
+">
+
+    <div style="font-weight:800;">
+        {{ n.sender }}
+    </div>
+
+    <div style="font-size:13px; color: var(--text-dim);">
+        {{ n.message }}
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

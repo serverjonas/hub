@@ -4,35 +4,41 @@
 
 {% block content %}
 
-<h1 style="margin-bottom: 24px;">Benachrichtigungen</h1>
+<h1 style="margin-bottom: 18px;">News</h1>
 
-<div style="display: flex; flex-direction: column; gap: 14px;">
-    {% for n in notifications %}
-    <div style="
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 16px;
-        transition: 0.2s;
-    ">
+<a href="/news/archive" class="btn" style="margin-bottom: 20px;">
+    Alte Nachrichten anzeigen (48h+)
+</a>
 
-        <div style="
-            font-size: 16px;
-            font-weight: 800;
-            margin-bottom: 6px;
-        ">
-            {{ n.sender }}
-        </div>
+<div style="display: flex; flex-direction: column; gap: 12px;">
 
-        <div style="
-            font-size: 13px;
-            color: var(--text-dim);
-        ">
-            {{ n.message }}
-        </div>
+{% for n in notifications %}
 
+<a href="/news/read/{{ n.id }}" style="text-decoration:none; color:inherit;">
+
+<div style="
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: {% if n.read == 0 %}4px solid #6366f1{% else %}1px solid var(--border){% endif %};
+    border-radius: 14px;
+    padding: 14px;
+    transition: 0.2s;
+">
+
+    <div style="font-size: 16px; font-weight: 800;">
+        {{ n.sender }}
     </div>
-    {% endfor %}
+
+    <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">
+        {{ n.message }}
+    </div>
+
+</div>
+
+</a>
+
+{% endfor %}
+
 </div>
 
 {% endblock %}

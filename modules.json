@@ -79,5 +79,10 @@
   "api-v1-rmkey": {
     "url": "/api/v1/rmkey",
     "pfad": "api/v1/rmkey"
+  },
+  "news":{
+    "url":"/news",
+    "pfad":"news"
   }
+
 }
