@@ -198,6 +198,21 @@
                     <a href="/films">Media</a>
                     <a href="/friends">Freunde</a>
                 </div>
+                
+                <a href="/news" class="icon-btn" title="Benachrichtigungen" style="position: relative;">
+                    <i data-lucide="bell" style="width: 20px;"></i>
+                    {% if unread_count > 0 %}
+                    <span style="
+                        position: absolute; top: -6px; right: -6px;
+                        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+                        color: white; font-size: 10px; font-weight: 700;
+                        width: 18px; height: 18px; border-radius: 50%;
+                        display: flex; align-items: center; justify-content: center;
+                        font-family: 'Inter', sans-serif;
+                    ">{{ unread_count }}</span>
+                    {% endif %}
+                </a>
+
                 <a href="/settings" class="icon-btn" title="Einstellungen">
                     <i data-lucide="settings" style="width: 20px;"></i>
                 </a>
@@ -225,6 +240,17 @@
             </a>
             <a href="/friends" class="mobile-nav-link">
                 <i data-lucide="users"></i> Freunde
+            </a>
+            <a href="/news" class="mobile-nav-link">
+                <i data-lucide="bell"></i> Benachrichtigungen
+                {% if unread_count > 0 %}
+                <span style="
+                    margin-left: auto;
+                    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+                    color: white; font-size: 11px; font-weight: 700;
+                    padding: 2px 8px; border-radius: 99px;
+                ">{{ unread_count }}</span>
+                {% endif %}
             </a>
             <a href="/settings" class="mobile-nav-link" style="margin-top: auto; background: var(--border);">
                 <i data-lucide="settings"></i> Einstellungen

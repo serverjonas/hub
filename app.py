@@ -72,6 +72,23 @@ def check_ban():
     if not is_user_active(user["id"]):
         return render_template("activation_pending.html")
 
+@app.context_processor
+def inject_notifications():
+    user = get_current_user()
+    if user is None:
+        return {"unread_count": 0}
+    
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT COUNT(*) FROM notifications WHERE user_id = ? AND read = 0",
+        (user["id"],)
+    )
+    count = cur.fetchone()[0]
+    conn.close()
+    
+    return {"unread_count": count}
+
 
 @app.errorhandler(404)
 def page_not_found(e):
