@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}News{% endblock %}
+
+{% block content %}
+
+<h1 style="margin-bottom: 24px;">Benachrichtigungen</h1>
+
+<div style="display: flex; flex-direction: column; gap: 14px;">
+    {% for n in notifications %}
+    <div style="
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        transition: 0.2s;
+    ">
+
+        <div style="
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        ">
+            {{ n.sender }}
+        </div>
+
+        <div style="
+            font-size: 13px;
+            color: var(--text-dim);
+        ">
+            {{ n.message }}
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
