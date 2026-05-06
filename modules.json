@@ -83,6 +83,9 @@
   "news":{
     "url":"/news",
     "pfad":"news"
+  },
+  "api-internal-news":{
+    "path":"api/internal/news",
+    "url":"/api/internal/news"
   }
-
 }
