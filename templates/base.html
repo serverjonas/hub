@@ -287,6 +287,103 @@
             if (menuToggle) menuToggle.addEventListener("click", toggleMenu);
             if (closeMenu) closeMenu.addEventListener("click", toggleMenu);
             if (overlay) overlay.addEventListener("click", toggleMenu);
+
+        (() => {
+            const API_URL = "/api/internal/news";
+            const STORAGE_KEY = "serverjonas_notifications_seen";
+
+            function getSeen() {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+            }
+
+            function setSeen(data) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            }
+
+            function toast(text) {
+                const container = document.getElementById("notif-toast-container");
+                if (!container) return;
+
+                const el = document.createElement("div");
+                el.style = `
+                    background: var(--surface);
+                    border: 1px solid var(--border);
+                    padding: 12px 16px;
+                    border-radius: 12px;
+                    box-shadow: var(--card-shadow);
+                    color: var(--text-main);
+                    min-width: 260px;
+                    transition: all 0.3s ease;
+                `;
+
+                el.innerText = text;
+                container.appendChild(el);
+
+                setTimeout(() => {
+                    el.style.opacity = "0";
+                    el.style.transform = "translateY(-10px)";
+                    setTimeout(() => el.remove(), 300);
+                }, 4000);
+            }
+
+            function grouped(count) {
+                toast(`Du hast während deiner Abwesenheit ${count} neue Nachrichten bekommen. Schaue sie im News Portal an.`);
+            }
+
+            async function syncNews() {
+                try {
+                    const res = await fetch(API_URL);
+                    const data = await res.json();
+
+                    const api = data.notifications || [];
+                    const seen = getSeen();
+
+                    const apiIds = new Set(api.map(n => n.id));
+
+                    // 🆕 neue Nachrichten
+                    const fresh = api.filter(n => !seen.includes(n.id));
+
+                    // 🧹 entfernte Nachrichten (z.B. gelesen im Portal)
+                    const cleaned = seen.filter(id => apiIds.has(id));
+
+                    if (fresh.length > 0) {
+                        if (fresh.length > 4) {
+                            grouped(fresh.length);
+                        } else {
+                            fresh.forEach(n => {
+                                toast(`🔔 ${n.sender_name}: ${n.message}`);
+                            });
+                        }
+
+                        setSeen([
+                            ...cleaned,
+                            ...fresh.map(n => n.id)
+                        ]);
+                    } else {
+                        setSeen(cleaned);
+                    }
+
+                    // 🔴 Badge update
+                    const badge = document.getElementById("notif-badge");
+                    if (badge) {
+                        if (fresh.length > 0) {
+                            badge.style.display = "flex";
+                            badge.innerText = fresh.length > 99 ? "99+" : fresh.length;
+                        } else {
+                            badge.style.display = "none";
+                        }
+                    }
+
+                } catch (err) {
+                    console.error("Notification sync error:", err);
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                syncNews();
+                setInterval(syncNews, 5000);
+            });
+        })();
         </script>
     </body>
 </html>
