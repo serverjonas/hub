@@ -10,6 +10,36 @@ BASE_DIR = BASE_PATH
 DB_PATH = os.path.join(BASE_PATH, "users.db")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 
+def get_notifications(user_id):
+    conn = sqlite3.connect()
+    conn.row_factory = sqlite3.Row  # erlaubt dict-artigen Zugriff
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM notifications
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+    """, (user_id,))
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    notifications = []
+
+    for row in rows:
+        notifications.append({
+            "id": row["id"], 
+            "sender": row["sender_id"],   # kannst du später auf Username mappen
+            "type": row["type"],
+            "message": row["message"],
+            "read": bool(row["read"]),
+            "created_at": row["created_at"]
+        })
+
+    return notifications
+
+
 def create_notification(user_id, message, type="system", sender_id=None):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
