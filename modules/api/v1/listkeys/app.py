@@ -2,14 +2,18 @@ from flask import Blueprint, request, jsonify, abort
 import sqlite3
 import os
 
-from toolbox import get_current_user
 from werkzeug.security import check_password_hash
+from toolbox import BASE_PATH
 
 bp = Blueprint("listkeys", __name__)
 
-DB_API = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "api", "v1", "api.db")
+# 🔧 zentrale DB (keine wilden relativen Pfade mehr)
+DB_API = os.path.join(BASE_PATH, "api.db")
 
 
+# -----------------------------
+# 🧱 DB Init
+# -----------------------------
 def init_db():
     conn = sqlite3.connect(DB_API)
     cur = conn.cursor()
@@ -27,12 +31,44 @@ def init_db():
     conn.close()
 
 
+# -----------------------------
+# 🔐 API KEY AUTH
+# -----------------------------
+def get_user_from_api_key():
+    auth = request.headers.get("Authorization")
+
+    if not auth:
+        return None
+
+    if not auth.startswith("Bearer "):
+        return None
+
+    api_key = auth.replace("Bearer ", "").strip()
+
+    conn = sqlite3.connect(DB_API)
+    cur = conn.cursor()
+
+    # wir prüfen alle Keys (weil hashed)
+    cur.execute("SELECT owner_id, key_hash FROM keys")
+    rows = cur.fetchall()
+    conn.close()
+
+    for owner_id, key_hash in rows:
+        if check_password_hash(key_hash, api_key):
+            return owner_id
+
+    return None
+
+
+# -----------------------------
+# 📋 LIST KEYS
+# -----------------------------
 @bp.route("/", methods=["GET"])
 def list_keys():
     init_db()
 
-    user = get_current_user()
-    if not user:
+    owner_id = get_user_from_api_key()
+    if not owner_id:
         return abort(401)
 
     conn = sqlite3.connect(DB_API)
@@ -42,12 +78,15 @@ def list_keys():
         SELECT key_id, description
         FROM keys
         WHERE owner_id = ?
-    """, (user["id"],))
+    """, (owner_id,))
 
     rows = cur.fetchall()
     conn.close()
 
     return jsonify([
-        {"key_id": r[0], "description": r[1]}
+        {
+            "key_id": r[0],
+            "description": r[1]
+        }
         for r in rows
     ])
