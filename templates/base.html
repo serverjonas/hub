@@ -335,7 +335,7 @@
                     el.style.opacity = "0";
                     el.style.transform = "translateY(-10px)";
                     setTimeout(() => el.remove(), 300);
-                }, 4000);
+                }, 15000);
             }
 
             function grouped(count) {
@@ -363,7 +363,7 @@
                             grouped(fresh.length);
                         } else {
                             fresh.forEach(n => {
-                                toast(`🔔 ${n.sender_name}: ${n.message}`);
+                                toast(` ${n.sender_name}: ${n.message}`);
                             });
                         }
 
