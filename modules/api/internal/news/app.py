@@ -1,13 +1,13 @@
 from flask import Blueprint, jsonify
 from toolbox import get_notifications, get_current_user, get_name
 
-bp = Blueprint("internal_api", __name__)
+bp = Blueprint("internal_api_news", __name__)
 
-@bp.route("/api/internal/notifications")
+@bp.route("/")
 def get_notifications_route():
     user = get_current_user()  # liest session cookie intern aus
 
-    if not user:
+    if not user or not user["id"]:
         return jsonify({"error": "unauthorized"}), 401
 
     user_id = user["id"]
@@ -28,4 +28,3 @@ def get_notifications_route():
             })
 
     return jsonify({"notifications": notifications})
- 
