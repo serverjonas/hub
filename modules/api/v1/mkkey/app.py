@@ -5,13 +5,12 @@ import secrets
 import string
 
 from werkzeug.security import generate_password_hash
-from toolbox import check_pw
+from toolbox import check_pw, BASE_PATH, DB_PATH
 
 bp = Blueprint("mkkey", __name__)
 
-BASE_PATH = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-DB_USERS = os.path.join(BASE_PATH, "users.db")
-DB_API = os.path.join(BASE_PATH, "v1", "api.db")
+DB_USERS = DB_PATH
+DB_API = os.path.join(BASE_PATH,"modules", "api", "v1", "api.db")
 
 
 def init_db():
