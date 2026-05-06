@@ -11,7 +11,7 @@ DB_PATH = os.path.join(BASE_PATH, "users.db")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 
 def get_notifications(user_id):
-    conn = sqlite3.connect()
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row  # erlaubt dict-artigen Zugriff
     cursor = conn.cursor()
 
