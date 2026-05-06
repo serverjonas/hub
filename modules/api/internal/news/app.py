@@ -21,10 +21,11 @@ def get_notifications_route():
             notifications.append({
                 "id": row["id"],
                 "sender_id": row["sender"],
-                "sender_name": get_name(row["sender"]),
+                "sender_name" : get_name(row["sender"]) if row["sender"] else "System",
                 "type": row["type"],
                 "message": row["message"],
                 "created_at": row["created_at"]
             })
 
     return jsonify({"notifications": notifications})
+ 
