@@ -10,7 +10,6 @@ bp = Blueprint("listkeys", __name__)
 # 🔧 zentrale DB (keine wilden relativen Pfade mehr)
 DB_API = os.path.join(BASE_PATH, "api.db")
 
-
 # -----------------------------
 # 🧱 DB Init
 # -----------------------------
@@ -63,6 +62,11 @@ def get_user_from_api_key():
 # -----------------------------
 # 📋 LIST KEYS
 # -----------------------------
+
+@bp.errorhandler(401)
+def unauthorized_error(e):
+    return Response("ungültiger api key", status=401, mimetype="text/plain")
+
 @bp.route("/", methods=["GET"])
 def list_keys():
     init_db()
