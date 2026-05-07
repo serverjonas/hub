@@ -9,7 +9,7 @@ from urllib.parse import quote
 from dotenv import load_dotenv
 from flask import Flask, abort, redirect, render_template, request, send_from_directory
 
-from toolbox import get_current_user, is_banned, is_user_active, get_lang, BASE_DIR
+from toolbox import get_current_user, is_banned, is_user_active, get_lang, BASE_DIR, get_infos
 
 load_dotenv()
 
@@ -76,7 +76,7 @@ def check_ban():
 def inject_notifications():
     user = get_current_user()
     if user is None:
-        return {"unread_count": 0}
+        return {"unread_count": 0, "roles":{"admin":0, "vip":0, "mod":0}}
     
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -87,7 +87,7 @@ def inject_notifications():
     count = cur.fetchone()[0]
     conn.close()
     
-    return {"unread_count": count}
+    return {"unread_count": count, "roles":get_infos(user["id"])}
 
 
 @app.errorhandler(404)

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, Response
 import sqlite3
 import os
 
@@ -8,8 +8,8 @@ from toolbox import BASE_PATH
 bp = Blueprint("listkeys", __name__)
 
 # 🔧 zentrale DB (keine wilden relativen Pfade mehr)
-DB_API = os.path.join(BASE_PATH, "api.db")
-
+DB_API = os.path.join(BASE_PATH, "modules/api/v1/api.db")
+print(DB_API)
 # -----------------------------
 # 🧱 DB Init
 # -----------------------------
@@ -65,7 +65,7 @@ def get_user_from_api_key():
 
 @bp.errorhandler(401)
 def unauthorized_error(e):
-    return Response("ungültiger api key", status=401, mimetype="text/plain")
+    return {"error": "invalid_api_key"}, 401
 
 @bp.route("/", methods=["GET"])
 def list_keys():
