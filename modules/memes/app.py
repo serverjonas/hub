@@ -60,7 +60,7 @@ def get_random_meme():
 def memepage():
     user = get_current_user()
     if user is None:
-        return redirect("/login")
+        return abort(401)
 
     meme_row = get_random_meme()
     if meme_row is None:
