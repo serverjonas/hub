@@ -210,6 +210,9 @@
                     <a href="/films">Media</a>
                     <a href="/friends">Freunde</a>
                     <a href="/cloud">Cloud</a>
+                    {% if roles.admin %}
+                        <a href="/admin">Adminpanel</a>
+                    {% endif %}
                 </div>
                 
                 <a href="/news" class="icon-btn" title="Benachrichtigungen" style="position: relative;">
@@ -270,6 +273,11 @@
             <a href="/settings" class="mobile-nav-link" style="margin-top: auto; background: var(--border);">
                 <i data-lucide="settings"></i> Einstellungen
             </a>
+            {% if roles.admin %}
+                <a href="/admin" class="mobile-nav-link">
+                    <i data-lucide="terminal"></i> Admin
+                </a>
+            {% endif %}
         </div>
 
         <div class="container">{% block content %}{% endblock %}</div>
