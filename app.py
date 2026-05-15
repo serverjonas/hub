@@ -9,7 +9,7 @@ from urllib.parse import quote
 from dotenv import load_dotenv
 from flask import Flask, abort, redirect, render_template, request, send_from_directory
 
-from toolbox import get_current_user, is_banned, is_user_active, get_lang, BASE_DIR, get_infos
+from toolbox.toolbox import get_current_user, is_banned, is_user_active, get_lang, BASE_DIR, get_infos
 
 load_dotenv()
 
