@@ -3,8 +3,8 @@ import sqlite3
 import time
 
 from flask import Blueprint, render_template
+from toolbox.toolbox import DB_PATH
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "users.db")
 
 bp = Blueprint("adminpanel", __name__)
 

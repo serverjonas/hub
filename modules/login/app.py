@@ -5,8 +5,9 @@ import time
 
 from flask import Blueprint, make_response, redirect, render_template, request
 from werkzeug.security import check_password_hash
+from toolbox.toolbox import DB_PATH
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "users.db")
+
 
 bp = Blueprint("login", __name__)
 

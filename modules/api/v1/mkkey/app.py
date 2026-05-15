@@ -5,7 +5,7 @@ import secrets
 import string
 
 from werkzeug.security import generate_password_hash
-from toolbox import check_pw, BASE_PATH, DB_PATH
+from toolbox.toolbox import check_pw, BASE_PATH, DB_PATH
 
 bp = Blueprint("mkkey", __name__)
 

@@ -3,7 +3,7 @@ import sqlite3
 import os
 
 from werkzeug.security import check_password_hash
-from toolbox import BASE_PATH
+from toolbox.toolbox import BASE_PATH
 
 bp = Blueprint("listkeys", __name__)
 

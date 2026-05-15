@@ -20,7 +20,7 @@ from flask import (
     url_for,
 )
 
-from toolbox import get_current_user
+from toolbox.toolbox import get_current_user
 
 FILMS_DATA_DIR = os.path.join(
     os.path.dirname(__file__), "..", "..", "data", "films", "data"

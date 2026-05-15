@@ -5,7 +5,7 @@ import sqlite3
 
 from flask import Blueprint, render_template, request
 
-from toolbox import DB_PATH, create_user
+from toolbox.toolbox import DB_PATH, create_user
 
 blacklist = ["tpm", "admin", "deinemutter"]
 SERVER_KEY = "server"

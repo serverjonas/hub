@@ -6,7 +6,7 @@ import time
 from flask import Blueprint, abort, render_template
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from toolbox import get_current_user, get_infos
+from toolbox.toolbox import get_current_user, get_infos
 
 bp = Blueprint("admin", __name__, template_folder="templates")
 import os

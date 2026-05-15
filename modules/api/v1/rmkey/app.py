@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 import sqlite3
 import os
 
-from toolbox import get_current_user
+from toolbox.toolbox import get_current_user
 
 bp = Blueprint("rmkeys", __name__)
 

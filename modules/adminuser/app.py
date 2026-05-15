@@ -5,7 +5,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-from toolbox import get_current_user, get_infos, DB_PATH
+from toolbox.toolbox import get_current_user, get_infos, DB_PATH
 
 bp = Blueprint("usermanager", __name__, template_folder="templates")
 

@@ -10,7 +10,7 @@ from flask import Blueprint, abort, jsonify, render_template, request, send_file
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 
-from toolbox import get_current_user
+from toolbox.toolbox import get_current_user
 
 bp = Blueprint("music", __name__, template_folder="templates")
 
