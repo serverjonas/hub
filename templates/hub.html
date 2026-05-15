@@ -3,39 +3,118 @@
 {% block title %}Serverjonas &middot; Hub{% endblock %}
 
 {% block extra_style %}
+/* ─── Hero ─── */
 .hero {
     text-align: center;
-    margin-bottom: 60px;
-    animation: fadeIn 1s ease-out;
+    padding: 48px 0 64px;
+    position: relative;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-lighter);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: var(--radius-full);
+    margin-bottom: 24px;
+    border: 1px solid rgba(108, 99, 255, 0.12);
+}
+
+.hero-badge-dot {
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
 }
 
 .hero h1 {
-    font-size: 48px;
+    font-size: clamp(36px, 5vw, 56px);
     font-weight: 800;
-    margin-bottom: 16px;
+    line-height: 1.1;
+    letter-spacing: -2px;
+    margin-bottom: 20px;
+    color: var(--text-main);
+}
+
+.hero h1 .accent-text {
     background: var(--accent-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    letter-spacing: -2px;
+    background-clip: text;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+.hero-subtitle {
+    font-size: 17px;
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin: 0 auto 36px;
+    line-height: 1.7;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero-buttons .btn { padding: 14px 28px; font-size: 15px; }
+
+.user-status {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--surface);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border);
+    display: inline-flex;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ─── Cards Grid ─── */
+.section-title {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.section-title h2 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+}
+
+.section-title p {
+    color: var(--text-dim);
+    font-size: 15px;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
+    margin-bottom: 80px;
 }
 
 .card {
     background: var(--surface);
-    backdrop-filter: blur(16px);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px 24px;
+    border-radius: var(--radius-lg);
+    padding: 40px 28px 36px;
     text-decoration: none;
     color: inherit;
     transition: var(--transition);
@@ -43,90 +122,296 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--accent-gradient);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
 }
 
 .card:hover {
-    transform: translateY(-8px);
-    background: var(--surface-hover);
-    border-color: rgba(99, 102, 241, 0.3);
-    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.3);
+    transform: translateY(-6px);
+    border-color: rgba(108, 99, 255, 0.2);
+    box-shadow: var(--shadow-glow), var(--shadow-lg);
 }
 
-.card-icon-box {
-    width: 48px;
-    height: 48px;
-    background: var(--accent-gradient);
-    border-radius: 12px;
+.card:hover::before { opacity: 0.03; }
+
+.card > * { position: relative; z-index: 1; }
+
+.card-icon-wrap {
+    width: 72px; height: 72px;
+    border-radius: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 20px;
-    color: white;
+    margin-bottom: 24px;
+    transition: var(--transition);
+}
+
+.card-icon-wrap.memes {
+    background: linear-gradient(135deg, #FFF0E5, #FFE0CC);
+    color: #E07B39;
+}
+.card-icon-wrap.media {
+    background: linear-gradient(135deg, #E8E0FF, #D6CCFF);
+    color: #6C63FF;
+}
+.card-icon-wrap.friends {
+    background: linear-gradient(135deg, #D4F5E9, #B8EDDA);
+    color: #2D9F6F;
+}
+
+.card:hover .card-icon-wrap {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
 }
 
 .card h3 {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
 }
 
 .card p {
     color: var(--text-dim);
-    font-size: 13px;
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.65;
+    max-width: 240px;
 }
 
-.user-status {
-    margin-top: 24px;
-    font-size: 14px;
-    color: var(--text-dim);
+.card-arrow {
+    margin-top: 20px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    color: var(--text-dim);
+    transition: var(--transition);
+}
+
+.card:hover .card-arrow {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    transform: translateX(4px);
+}
+
+/* ─── Stats Row ─── */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 80px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 28px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.stat-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+.stat-icon {
+    width: 44px; height: 44px;
+    margin: 0 auto 14px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    background: var(--accent-lighter);
+}
+
+.stat-value {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 500;
+}
+
+/* ─── CTA Banner ─── */
+.cta-banner {
+    background: var(--accent-gradient);
+    border-radius: var(--radius-xl);
+    padding: 56px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-banner::before {
+    content: "";
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 300px; height: 300px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    filter: blur(40px);
+}
+
+.cta-banner::after {
+    content: "";
+    position: absolute;
+    bottom: -40%; left: -10%;
+    width: 250px; height: 250px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+    filter: blur(40px);
+}
+
+.cta-banner > * { position: relative; z-index: 1; }
+
+.cta-banner h2 {
+    font-size: 30px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.cta-banner p {
+    color: rgba(255,255,255,0.85);
+    font-size: 16px;
+    margin-bottom: 28px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cta-banner .btn {
+    background: white;
+    color: var(--accent);
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.cta-banner .btn:hover {
+    box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; gap: 16px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .hero { padding: 24px 0 48px; }
+    .hero h1 { font-size: 32px; letter-spacing: -1px; }
+    .hero-subtitle { font-size: 15px; }
+    .stats-row { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .cta-banner { padding: 40px 24px; }
+    .cta-banner h2 { font-size: 24px; }
 }
 {% endblock %}
 
 {% block content %}
-<div class="hero">
-    <h1>Willkommen bei Serverjonas</h1>
+<!-- Hero -->
+<div class="hero animate-in">
+    <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Community Hub
+    </div>
+    <h1>Willkommen bei<br><span class="accent-text">Serverjonas</span></h1>
+    <p class="hero-subtitle">
+        Dein Ort für Memes, Filme, Serien und echte Freundschaften.
+        Entdecke alles, was unsere Community zu bieten hat.
+    </p>
 
     {% if user %}
     <div class="user-status">
-        <i data-lucide="user-check" style="width: 16px"></i>
+        <i data-lucide="user-check" style="width: 16px; height: 16px;"></i>
         Angemeldet als <b>{{ user }}</b>
     </div>
     {% else %}
-    <a href="/login" class="btn btn-primary">
-        Einloggen
-        <i data-lucide="log-in"></i>
-    </a>
+    <div class="hero-buttons">
+        <a href="/login" class="btn btn-primary">
+            Einloggen
+            <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
+        </a>
+        <a href="/register" class="btn">
+            Registrieren
+            <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
+        </a>
+    </div>
     {% endif %}
 </div>
 
+<!-- Section Title -->
+<div class="section-title animate-in delay-1">
+    <h2>Entdecke die Community</h2>
+    <p>Alles an einem Ort – dein digitales Zuhause.</p>
+</div>
+
+<!-- Cards -->
 <div class="grid">
-    <a href="/memes" class="card">
-        <div class="card-icon-box">
-            <i data-lucide="image"></i>
+    <a href="/memes" class="card animate-in delay-2">
+        <div class="card-icon-wrap memes">
+            <i data-lucide="image" style="width: 30px; height: 30px;"></i>
         </div>
         <h3>Memes</h3>
-        <p>Die beste Sammlung kuratierter Internet-Kultur.</p>
+        <p>Die beste Sammlung kuratierter Internet-Kultur. Teile und entdecke.</p>
+        <div class="card-arrow">
+            <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+        </div>
     </a>
 
-    <a href="/films" class="card">
-        <div class="card-icon-box">
-            <i data-lucide="film"></i>
+    <a href="/films" class="card animate-in delay-3">
+        <div class="card-icon-wrap media">
+            <i data-lucide="clapperboard" style="width: 30px; height: 30px;"></i>
         </div>
         <h3>Media</h3>
-        <p>Filme und Serien in höchster Qualität genießen.</p>
+        <p>Filme und Serien streamen – in höchster Qualität, jederzeit.</p>
+        <div class="card-arrow">
+            <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+        </div>
     </a>
 
-    <a href="/friends" class="card">
-        <div class="card-icon-box">
-            <i data-lucide="users"></i>
+    <a href="/friends" class="card animate-in delay-4">
+        <div class="card-icon-wrap friends">
+            <i data-lucide="users" style="width: 30px; height: 30px;"></i>
         </div>
         <h3>Freunde</h3>
-        <p>Vernetze dich mit der Community.</p>
+        <p>Vernetze dich mit der Community und bleibe in Kontakt.</p>
+        <div class="card-arrow">
+            <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+        </div>
+    </a>
+</div>
+
+<!-- CTA Banner -->
+<div class="cta-banner animate-in delay-3">
+    <h2>Bereit loszulegen?</h2>
+    <p>Werde Teil unserer Plattform und erlebe Community wie sie sein sollte.</p>
+    <a href="/register" class="btn">
+        Jetzt entdecken
+        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
     </a>
 </div>
 {% endblock %}

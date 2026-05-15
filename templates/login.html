@@ -1,77 +1,307 @@
-{% extends "base.html" %} {% block title %}Anmelden &middot; Serverjonas{%
-endblock %} {% block extra_style %} .login-container { max-width: 450px; margin:
-40px auto; background: var(--surface); backdrop-filter: blur(12px); border: 1px
-solid var(--border); border-radius: 32px; padding: 40px; animation: fadeIn 0.8s
-ease-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(20px);
-} to { opacity: 1; transform: translateY(0); } } .login-container h1 {
-font-size: 32px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 8px;
-text-align: center; background: var(--accent-gradient); -webkit-background-clip:
-text; -webkit-text-fill-color: transparent; } .login-container p.subtitle {
-color: var(--text-dim); text-align: center; margin-bottom: 32px; font-size:
-14px; } .form-group { margin-bottom: 18px; } .form-group label { display: block;
-font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-dim);
-padding-left: 4px; } .input-wrapper { position: relative; display: flex;
-align-items: center; } .input-wrapper i { position: absolute; left: 16px; width:
-18px; color: var(--text-dim); pointer-events: none; } .form-control { width:
-100%; background: var(--surface-hover); border: 1px solid var(--border);
-border-radius: 16px; padding: 12px 16px 12px 48px; color: var(--text-main);
-font-family: inherit; font-size: 14px; transition: var(--transition); }
-.form-control:focus { outline: none; border-color: #6366f1; background:
-var(--bg); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); } .btn-submit { width:
-100%; justify-content: center; margin-top: 12px; } .message { padding: 12px;
-border-radius: 12px; font-size: 13px; margin-bottom: 20px; text-align: center;
-border: 1px solid transparent; } .message.error { background: rgba(239, 68, 68,
-0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.2); } .footer-links {
-margin-top: 24px; text-align: center; font-size: 13px; color: var(--text-dim); }
-.footer-links a { color: var(--text-main); text-decoration: none; font-weight:
-600; } {% endblock %} {% block content %}
-<div class="login-container">
-    <h1>Willkommen bei Serverjonas</h1>
-    <p class="subtitle">Bitte melde dich an, um fortzufahren.</p>
+{% extends "base.html" %}
 
-    {% if message %}
-    <div class="message error">{{ message }}</div>
-    {% endif %}
+{% block title %}Anmelden &middot; Serverjonas{% endblock %}
 
-    <form method="post">
-        <div class="form-group">
-            <label for="username">Benutzername</label>
-            <div class="input-wrapper">
-                <i data-lucide="user"></i>
-                <input
-                    type="text"
-                    name="username"
-                    id="username"
-                    class="form-control"
-                    placeholder="Benutzername"
-                    required
-                />
+{% block extra_style %}
+.auth-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 200px);
+    padding: 20px 0;
+}
+
+.auth-container {
+    max-width: 440px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 44px 36px 36px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative gradient accent at top of card */
+.auth-container::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--accent-gradient);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.auth-icon-wrap {
+    width: 60px; height: 60px;
+    margin: 0 auto 20px;
+    background: var(--accent-gradient);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 8px 24px rgba(108, 99, 255, 0.25);
+}
+
+.auth-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+
+.auth-header p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.form-group { margin-bottom: 20px; }
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    padding-left: 4px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 16px;
+    width: 18px; height: 18px;
+    color: var(--text-dim);
+    pointer-events: none;
+    transition: var(--transition);
+}
+
+.input-wrapper .form-control {
+    padding-left: 48px;
+    border-radius: var(--radius-md);
+    height: 48px;
+}
+
+.input-wrapper:focus-within i {
+    color: var(--accent);
+}
+
+/* Password visibility toggle */
+.pw-toggle {
+    position: absolute;
+    right: 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-dim);
+    padding: 4px;
+    display: flex;
+    transition: var(--transition);
+}
+.pw-toggle:hover { color: var(--accent); }
+
+.btn-submit {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+    padding: 14px 24px;
+    font-size: 15px;
+    height: 50px;
+}
+
+.message {
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    margin-bottom: 24px;
+    text-align: center;
+    border: 1px solid transparent;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.message.error {
+    background: rgba(239, 68, 68, 0.06);
+    color: #dc2626;
+    border-color: rgba(239, 68, 68, 0.15);
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 28px 0 24px;
+    color: var(--text-dim);
+    font-size: 13px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.auth-footer {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-dim);
+}
+
+.auth-footer a {
+    color: var(--accent);
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Trust badges */
+.trust-badges {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 500;
+}
+
+.trust-badge i {
+    color: var(--accent);
+}
+
+@media (max-width: 500px) {
+    .auth-container { padding: 36px 24px 28px; }
+    .trust-badges { flex-direction: column; align-items: center; gap: 10px; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-icon-wrap">
+                <i data-lucide="log-in" style="width: 26px; height: 26px;"></i>
             </div>
+            <h1>Willkommen zurück</h1>
+            <p>Melde dich an, um auf Serverjonas zuzugreifen.</p>
         </div>
 
-        <div class="form-group">
-            <label for="password">Passwort</label>
-            <div class="input-wrapper">
-                <i data-lucide="lock"></i>
-                <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    class="form-control"
-                    placeholder="••••••••"
-                    required
-                />
+        {% if message %}
+        <div class="message error">
+            <i data-lucide="alert-circle" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+            {{ message }}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            <div class="form-group">
+                <label for="username">Benutzername</label>
+                <div class="input-wrapper">
+                    <i data-lucide="user"></i>
+                    <input
+                        type="text"
+                        name="username"
+                        id="username"
+                        class="form-control"
+                        placeholder="Dein Benutzername"
+                        autocomplete="username"
+                        required
+                    />
+                </div>
             </div>
+
+            <div class="form-group">
+                <label for="password">Passwort</label>
+                <div class="input-wrapper">
+                    <i data-lucide="lock"></i>
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        class="form-control"
+                        placeholder="••••••••"
+                        autocomplete="current-password"
+                        required
+                    />
+                    <button type="button" class="pw-toggle" id="pwToggle" title="Passwort anzeigen">
+                        <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit">
+                Anmelden
+                <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+            </button>
+        </form>
+
+        <div class="auth-divider">oder</div>
+
+        <div class="auth-footer">
+            Noch keinen Account? <a href="/register">Jetzt registrieren</a>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-submit">
-            Anmelden
-            <i data-lucide="log-in"></i>
-        </button>
-    </form>
-
-    <div class="footer-links">
-        Noch keinen Account? <a href="/register">Jetzt registrieren</a>
+        <div class="trust-badges">
+            <span class="trust-badge">
+                <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+                Verschlüsselt
+            </span>
+            <span class="trust-badge">
+                <i data-lucide="lock" style="width: 14px; height: 14px;"></i>
+                Sicher
+            </span>
+            <span class="trust-badge">
+                <i data-lucide="users" style="width: 14px; height: 14px;"></i>
+                Community
+            </span>
+        </div>
     </div>
 </div>
+
+<script>
+    // Password visibility toggle
+    const pwToggle = document.getElementById('pwToggle');
+    const pwField = document.getElementById('password');
+    if (pwToggle && pwField) {
+        pwToggle.addEventListener('click', () => {
+            const isPassword = pwField.type === 'password';
+            pwField.type = isPassword ? 'text' : 'password';
+            pwToggle.innerHTML = isPassword
+                ? '<i data-lucide="eye-off" style="width: 18px; height: 18px;"></i>'
+                : '<i data-lucide="eye" style="width: 18px; height: 18px;"></i>';
+            lucide.createIcons();
+        });
+    }
+</script>
 {% endblock %}

@@ -5,7 +5,7 @@ import time
 from flask import request, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 
-BASE_PATH = "/var/www/serverjonas-hub"
+BASE_PATH = os.environ.get("SERVERJONAS_BASE", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BASE_DIR = BASE_PATH
 DB_PATH = os.path.join(BASE_PATH, "users.db")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")

@@ -2,18 +2,107 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Account nicht aktiviert</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account nicht aktiviert – Serverjonas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f8f8f8; text-align: center; padding-top: 50px; }
-        .box { background: white; display: inline-block; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-        h1 { color: #ff4d4f; }
-        p { font-size: 1.1em; color: #333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #FAF8F5;
+            color: #1E1E2A;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .card {
+            max-width: 440px;
+            width: 100%;
+            background: #FFFFFF;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 36px;
+            padding: 48px 36px 40px;
+            text-align: center;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+            animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .icon-wrap {
+            width: 64px; height: 64px;
+            margin: 0 auto 24px;
+            background: rgba(245, 158, 11, 0.08);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f59e0b;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.06);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            margin-bottom: 20px;
+        }
+
+        .badge .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #f59e0b;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #8A8A9A;
+            font-size: 15px;
+            line-height: 1.65;
+        }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h1>❌ Account noch nicht aktiviert</h1>
-        <p>Bitte warte, bis ein Moderator/Admin den Zugang freischaltet.</p>
+    <div class="card">
+        <div class="icon-wrap">
+            <i data-lucide="clock" style="width: 28px; height: 28px;"></i>
+        </div>
+        <div class="badge">
+            <span class="dot"></span>
+            Ausstehend
+        </div>
+        <h1>Account noch nicht aktiviert</h1>
+        <p>Bitte warte, bis ein Moderator oder Admin den Zugang freischaltet.</p>
     </div>
+    <script>lucide.createIcons();</script>
 </body>
 </html>

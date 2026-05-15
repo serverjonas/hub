@@ -1,71 +1,143 @@
-{% extends "base.html" %} {% block title %}403 – Keine Berechtigung{% endblock
-%} {% block extra_style %} @import
-url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@800&display=swap');
-@keyframes slideInFromLeft { from { opacity: 0; transform: translateX(-40px); }
-to { opacity: 1; transform: translateX(0); } } @keyframes slideInFromRight {
-from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform:
-translateX(0); } } @keyframes fadeUp { from { opacity: 0; transform:
-translateY(12px); } to { opacity: 1; transform: translateY(0); } } @keyframes
-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4;
-transform: scale(0.7); } } .error-wrapper { min-height: 60vh; display: flex;
-align-items: center; justify-content: center; padding: 2rem; } .error-container
-{ font-family: 'Inter', sans-serif; max-width: 440px; width: 100%; padding:
-2.25rem 2rem 1.75rem; background: rgba(255, 255, 255, 0.07); backdrop-filter:
-blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,
-255, 255, 0.13); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0,
-0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08); text-align: center; animation:
-slideInFromLeft 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; } .error-badge {
-display: inline-flex; align-items: center; gap: 6px; font-size: 11px;
-font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color:
-#fca5a5; background: rgba(239, 68, 68, 0.18); border: 1px solid rgba(239, 68,
-68, 0.28); padding: 5px 12px; border-radius: 999px; margin-bottom: 1.25rem;
-animation: slideInFromRight 0.55s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.error-badge .dot { width: 6px; height: 6px; border-radius: 50%; background:
-#f87171; animation: pulse 1.8s 1s ease-in-out infinite; } .error-code {
-font-family: 'Montserrat', sans-serif; font-size: clamp(5rem, 15vw, 8rem);
-font-weight: 800; background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
--webkit-background-clip: text; -webkit-text-fill-color: transparent;
-background-clip: text; line-height: 1; margin-bottom: 0.75rem; animation: fadeUp
-0.5s 0.15s ease both; } .error-title { font-size: 1.5rem; font-weight: 600;
-margin-bottom: 0.75rem; color: var(--text-main); animation: fadeUp 0.5s 0.25s
-ease both; } .error-message { color: var(--text-dim); margin-bottom: 2rem;
-line-height: 1.65; font-size: 14px; animation: fadeUp 0.5s 0.35s ease both; }
-.btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-animation: fadeUp 0.5s 0.45s ease both; } .error-hint { margin-top: 1.75rem;
-padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size:
-0.875rem; color: var(--text-dim); animation: fadeUp 0.5s 0.55s ease both; } {%
-endblock %} {% block content %}
+{% extends "base.html" %}
+
+{% block title %}403 – Keine Berechtigung{% endblock %}
+
+{% block extra_style %}
+.error-wrapper {
+    min-height: calc(100vh - 280px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.error-container {
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.error-icon-wrap {
+    width: 80px; height: 80px;
+    margin: 0 auto 28px;
+    background: rgba(239, 68, 68, 0.06);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ef4444;
+}
+
+.error-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    margin-bottom: 20px;
+}
+
+.error-badge .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ef4444;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+.error-code {
+    font-size: clamp(4rem, 12vw, 7rem);
+    font-weight: 800;
+    font-family: var(--font-heading);
+    background: linear-gradient(135deg, #f87171, #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 12px;
+}
+
+.error-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-main);
+}
+
+.error-message {
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    line-height: 1.65;
+    font-size: 15px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-hint {
+    margin-top: 36px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    color: var(--text-dim);
+    box-shadow: var(--shadow-sm);
+}
+{% endblock %}
+
+{% block content %}
 <div class="error-wrapper">
     <div class="error-container">
+        <div class="error-icon-wrap">
+            <i data-lucide="shield-x" style="width: 36px; height: 36px;"></i>
+        </div>
         <div class="error-badge">
             <span class="dot"></span>
-            403
+            Zugriff verweigert
         </div>
         <div class="error-code">403</div>
-        <h1 class="error-title">Zugriff verweigert</h1>
+        <h1 class="error-title">Keine Berechtigung</h1>
         <p class="error-message">
             Du hast nicht die nötigen Rechte, um auf diese Seite zuzugreifen.
         </p>
+
         <div class="btn-group">
             <a href="/" class="btn btn-primary">
-                <i data-lucide="home" style="width: 18px"></i>
+                <i data-lucide="home" style="width: 18px; height: 18px;"></i>
                 Zurück zum Hub
             </a>
             {% if user %}
             <a href="#" class="btn">
-                <i data-lucide="user" style="width: 18px"></i>
+                <i data-lucide="user" style="width: 18px; height: 18px;"></i>
                 Konto: {{ user }}
             </a>
             {% else %}
             <a href="/login" class="btn">
-                <i data-lucide="log-in" style="width: 18px"></i>
+                <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
                 Anmelden
             </a>
             {% endif %}
         </div>
+
         <div class="error-hint">
-            Falls du glaubst, dass dies ein Fehler ist, wende dich bitte an
-            einen Administrator.
+            Falls du glaubst, dass dies ein Fehler ist, wende dich bitte an einen Administrator.
         </div>
     </div>
 </div>
