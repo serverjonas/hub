@@ -90,7 +90,7 @@ def is_banned(user_id):
 
     return True, reason
 
-    def get_name(user_id):
+def get_name(user_id):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
