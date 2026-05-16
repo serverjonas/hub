@@ -10,13 +10,12 @@ from flask import Blueprint, abort, jsonify, render_template, request, send_file
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 
-from toolbox.toolbox import get_current_user
+from toolbox.user import get_current_user
+from toolbox.toolbox import DATA_DIR
 
 bp = Blueprint("music", __name__, template_folder="templates")
 
-import os
-
-BASE = os.path.join(os.path.dirname(__file__), "..", "..", "data", "music")
+BASE = os.path.join(DATA_DIR, "music")
 
 # -------------------------
 # PATHS

@@ -3,9 +3,8 @@ import sqlite3
 
 from flask import Blueprint, redirect, render_template, request, url_for
 
-from toolbox.toolbox import get_current_user
-
-DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "users.db")
+from toolbox.user import get_current_user
+from toolbox.toolbox import DB_PATH
 
 bp = Blueprint("friends", __name__, template_folder="../../templates/friends")
 

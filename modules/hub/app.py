@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect
-from toolbox.toolbox import get_current_user
+from toolbox.user import get_current_user
 
 bp = Blueprint("hub", __name__)
 

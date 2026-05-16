@@ -14,7 +14,8 @@ from flask import (
     send_from_directory
 )
 from PIL import Image
-from toolbox.toolbox import DB_PATH, get_current_user, get_name
+from toolbox.toolbox import DB_PATH 
+from toolbox.user import get_current_user, get_name
 
 MEMES_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data", "memes")
 MEMES_DB_PATH = os.path.join(MEMES_DIR, "memes.db")

@@ -5,7 +5,8 @@ import zipfile
 import shutil
 from flask import Blueprint, render_template, request, abort, send_file, redirect, jsonify
 
-from toolbox.toolbox import get_current_user, DATA_PATH
+from toolbox.user import get_current_user, 
+from toolbox.toolbox import DATA_PATH
 
 bp = Blueprint("cloud", __name__, template_folder="templates")
 

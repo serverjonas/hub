@@ -8,7 +8,7 @@ from flask import Blueprint, abort, jsonify, redirect, render_template, request
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 import os
 
-from toolbox.toolbox import get_current_user, get_infos
+from toolbox.user import get_current_user, get_infos
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "users.db")
 
