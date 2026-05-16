@@ -3,6 +3,7 @@ import sqlite3
 import time
 from flask import request, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
+from toolbox.files import *
 
 def check_pw(username, password):
     conn = sqlite3.connect(DB_PATH)
