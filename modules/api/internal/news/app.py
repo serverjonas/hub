@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from toolbox.toolbox import get_notifications, 
+from toolbox.toolbox import get_notifications
 from toolbox.user import get_current_user, get_name
 
 bp = Blueprint("internal_api_news", __name__)
