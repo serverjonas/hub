@@ -1,0 +1,7 @@
+Flask>=3.0.0
+python-dotenv>=1.0.0
+Werkzeug>=3.0.0
+Pillow>=10.0.0
+mutagen>=1.47.0
+psutil>=6.0.0
+requests>=2.32.0
