@@ -1,160 +1,56 @@
-{% extends "base.html" %}
-
-{% block title %}Registrieren &middot; Serverjonas{% endblock %}
-
-{% block extra_style %}
-.auth-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - 260px);
-    padding: 20px 0;
-}
-
-.auth-container {
-    max-width: 440px;
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: 44px 36px 36px;
-    box-shadow: var(--shadow-lg);
-    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.auth-header {
-    text-align: center;
-    margin-bottom: 36px;
-}
-
-.auth-icon-wrap {
-    width: 56px; height: 56px;
-    margin: 0 auto 20px;
-    background: linear-gradient(135deg, #34d399, #06b6d4);
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    box-shadow: 0 6px 20px rgba(52, 211, 153, 0.25);
-}
-
-.auth-header h1 {
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: -0.8px;
-    margin-bottom: 8px;
-    color: var(--text-main);
-}
-
-.auth-header p {
-    color: var(--text-dim);
-    font-size: 14px;
-}
-
-.form-group { margin-bottom: 20px; }
-
-.form-group label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--text-secondary);
-    padding-left: 4px;
-}
-
-.input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.input-wrapper i {
-    position: absolute;
-    left: 16px;
-    width: 18px; height: 18px;
-    color: var(--text-dim);
-    pointer-events: none;
-    transition: var(--transition);
-}
-
-.input-wrapper .form-control {
-    padding-left: 48px;
-    border-radius: var(--radius-md);
-}
-
-.input-wrapper:focus-within i {
-    color: var(--accent);
-}
-
-.btn-submit {
-    width: 100%;
-    justify-content: center;
-    margin-top: 8px;
-    padding: 14px 24px;
-    font-size: 15px;
-}
-
-.message {
-    padding: 14px 16px;
-    border-radius: var(--radius-md);
-    font-size: 13px;
-    margin-bottom: 24px;
-    text-align: center;
-    border: 1px solid transparent;
-    font-weight: 500;
-}
-
-.message.error {
-    background: rgba(239, 68, 68, 0.06);
-    color: #dc2626;
-    border-color: rgba(239, 68, 68, 0.15);
-}
-
-.message.success {
-    background: rgba(34, 197, 94, 0.06);
-    color: #16a34a;
-    border-color: rgba(34, 197, 94, 0.15);
-}
-
-.auth-footer {
-    margin-top: 28px;
-    text-align: center;
-    font-size: 14px;
-    color: var(--text-dim);
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-}
-
-.auth-footer a {
-    color: var(--accent);
-    font-weight: 600;
-    transition: var(--transition);
-}
-
-.auth-footer a:hover {
-    text-decoration: underline;
-}
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Registrieren &middot; Serverjonas{%
+endblock %} {% block extra_style %} .auth-wrapper { display: flex; align-items:
+center; justify-content: center; min-height: calc(100vh - 260px); padding: 20px
+0; } .auth-container { max-width: 440px; width: 100%; background:
+var(--surface); border: 1px solid var(--border); border-radius:
+var(--radius-xl); padding: 44px 36px 36px; box-shadow: var(--shadow-lg);
+animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; } .auth-header
+{ text-align: center; margin-bottom: 36px; } .auth-icon-wrap { width: 56px;
+height: 56px; margin: 0 auto 20px; background: linear-gradient(135deg, #34d399,
+#06b6d4); border-radius: 18px; display: flex; align-items: center;
+justify-content: center; color: white; box-shadow: 0 6px 20px rgba(52, 211, 153,
+0.25); } .auth-header h1 { font-size: 26px; font-weight: 700; letter-spacing:
+-0.8px; margin-bottom: 8px; color: var(--text-main); } .auth-header p { color:
+var(--text-dim); font-size: 14px; } .form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600;
+margin-bottom: 8px; color: var(--text-secondary); padding-left: 4px; }
+.input-wrapper { position: relative; display: flex; align-items: center; }
+.input-wrapper i { position: absolute; left: 16px; width: 18px; height: 18px;
+color: var(--text-dim); pointer-events: none; transition: var(--transition); }
+.input-wrapper .form-control { padding-left: 48px; border-radius:
+var(--radius-md); } .input-wrapper:focus-within i { color: var(--accent); }
+.btn-submit { width: 100%; justify-content: center; margin-top: 8px; padding:
+14px 24px; font-size: 15px; } .message { padding: 14px 16px; border-radius:
+var(--radius-md); font-size: 13px; margin-bottom: 24px; text-align: center;
+border: 1px solid transparent; font-weight: 500; } .message.error { background:
+rgba(239, 68, 68, 0.06); color: #dc2626; border-color: rgba(239, 68, 68, 0.15);
+} .message.success { background: rgba(34, 197, 94, 0.06); color: #16a34a;
+border-color: rgba(34, 197, 94, 0.15); } .auth-footer { margin-top: 28px;
+text-align: center; font-size: 14px; color: var(--text-dim); padding-top: 24px;
+border-top: 1px solid var(--border); } .auth-footer a { color: var(--accent);
+font-weight: 600; transition: var(--transition); } .auth-footer a:hover {
+text-decoration: underline; } {% endblock %} {% block content %}
 <div class="auth-wrapper">
     <div class="auth-container">
         <div class="auth-header">
             <div class="auth-icon-wrap">
-                <i data-lucide="user-plus" style="width: 24px; height: 24px;"></i>
+                <i
+                    data-lucide="user-plus"
+                    style="width: 24px; height: 24px"
+                ></i>
             </div>
             <h1>Account erstellen</h1>
             <p>Werde Teil der exklusiven Community.</p>
         </div>
 
         {% if message %}
-        <div class="message {% if '❌' in message %}error{% else %}success{% endif %}">
-            {% if message is iterable and message is not string %}
-                {% for m in message %}<div>{{ m }}</div>{% endfor %}
-            {% else %}
-                {{ message }}
-            {% endif %}
+        <div
+            class="message {% if '❌' in message %}error{% else %}success{% endif %}"
+        >
+            {% if message is iterable and message is not string %} {% for m in
+            message %}
+            <div>{{ m }}</div>
+            {% endfor %} {% else %} {{ message }} {% endif %}
         </div>
         {% endif %}
 
@@ -168,7 +64,7 @@
                         name="username"
                         id="username"
                         class="form-control"
-                        placeholder="dein_name"
+                        placeholder="Username"
                         required
                     />
                 </div>
@@ -206,7 +102,10 @@
 
             <button type="submit" class="btn btn-primary btn-submit">
                 Account erstellen
-                <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                <i
+                    data-lucide="arrow-right"
+                    style="width: 18px; height: 18px"
+                ></i>
             </button>
         </form>
 
