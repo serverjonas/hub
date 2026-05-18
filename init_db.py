@@ -64,34 +64,6 @@ cur.executescript("""
         FOREIGN KEY (friend_id) REFERENCES users(user_id)
     );
 
-    -- Memes
-    CREATE TABLE IF NOT EXISTS memes (
-        meme_id    INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id    INTEGER NOT NULL,
-        filename   TEXT    NOT NULL,
-        title      TEXT    NOT NULL,
-        created_at INTEGER NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(user_id)
-    );
-
-    -- Meme-Likes
-    CREATE TABLE IF NOT EXISTS likes (
-        meme_id INTEGER NOT NULL,
-        user_id INTEGER NOT NULL,
-        PRIMARY KEY (meme_id, user_id),
-        FOREIGN KEY (meme_id) REFERENCES memes(meme_id),
-        FOREIGN KEY (user_id) REFERENCES users(user_id)
-    );
-
-    -- API-Keys
-    CREATE TABLE IF NOT EXISTS keys (
-        id          INTEGER PRIMARY KEY AUTOINCREMENT,
-        owner_id    INTEGER NOT NULL,
-        key_hash    TEXT    NOT NULL UNIQUE,
-        description TEXT,
-        FOREIGN KEY (owner_id) REFERENCES users(user_id)
-    );
-
 """)
 
 conn.commit()
