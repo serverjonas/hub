@@ -89,7 +89,7 @@
     "url":"/api/internal/news"
   },
   "cloud:{
-	"pfad":"clloud",
-	"url":"/cloud"
- "
+    "pfad":"cloud",
+    "url":"/cloud"
+ }
 }
