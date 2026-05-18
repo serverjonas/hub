@@ -47,7 +47,7 @@ def load_modules():
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             app.register_blueprint(module.bp, url_prefix=cfg["url"])
-            print(f"Modules Lodet: {name} -> {cfg['url']}")
+            print(f"Module loadet: {name} -> {cfg['url']}")
         except Exception as e:
             print(f"❌ Modul {name} konnte nicht geladen werden:", e)
 

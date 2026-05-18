@@ -334,11 +334,11 @@
 {% block content %}
 <!-- Hero -->
 <div class="hero animate-in">
-    <div class="hero-badge">
+    <!--<div class="hero-badge">
         <span class="hero-badge-dot"></span>
         Community Hub
-    </div>
-    <h1>Willkommen bei<br><span class="accent-text">Serverjonas</span></h1>
+    </div>-->
+    <h1>Willkommen bei<br><span class="accent-text">serverjonas</span></h1>
     <p class="hero-subtitle">
         Dein Ort für Memes, Filme, Serien und echte Freundschaften.
         Entdecke alles, was unsere Community zu bieten hat.
@@ -405,6 +405,7 @@
     </a>
 </div>
 
+{% if not user %}
 <!-- CTA Banner -->
 <div class="cta-banner animate-in delay-3">
     <h2>Bereit loszulegen?</h2>
@@ -414,4 +415,5 @@
         <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
     </a>
 </div>
+{% endif %}
 {% endblock %}

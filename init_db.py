@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DB_PATH = "/var/www/serverjonas-hub/users.db"
+DB_PATH = "./users.db"
 
 conn = sqlite3.connect(DB_PATH)
 cur = conn.cursor()

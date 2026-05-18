@@ -1,6 +1,8 @@
 # Python
 _pycache_/
 *.pyc
+venv/
+env/
 
 # Databases
 *.db

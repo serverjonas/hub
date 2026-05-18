@@ -4,12 +4,16 @@ import re
 import sqlite3
 
 from flask import Blueprint, render_template, request
+from dotenv import load_dotenv
 
 from toolbox.toolbox import DB_PATH
 from toolbox.user import create_user
 
+load_dotenv()
+
 blacklist = ["tpm", "admin", "deinemutter"]
-SERVER_KEY = "server"
+#SERVER_KEY = "server"
+SERVER_KEY = os.environ.get("REGISTER_SERVER_KEY", "server")
 
 
 def valid_password(password):
@@ -62,9 +66,9 @@ def register():
         elif not valid_str(username):
             message = "❌ Ungültiger Benutzername (3–32 Zeichen)."
         elif exist_account(username):
-            message = "❌ Accountname bereits belegt"
+            message = "❌ Benutzername bereits belegt"
         elif username in blacklist:
-            message = "❌ Dieser Username ist verboten"
+            message = "❌ Dieser Benutzername ist verboten"
         else:
             valid, pw_message = valid_password(password)
             if not valid:

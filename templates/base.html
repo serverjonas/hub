@@ -2,9 +2,9 @@
 <html lang="de">
     <head>
         <meta charset="UTF-8" />
-        <title>{% block title %}Serverjonas{% endblock %}</title>
+        <title>{% block title %}serverjonas{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Serverjonas – Deine moderne Community-Plattform für Memes, Media und Freunde." />
+        <meta name="description" content="serverjonas – Deine moderne Community-Plattform für Memes, Media und Freunde." />
         <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" />
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -232,11 +232,14 @@
 
             .brand-icon {
                 width: 36px; height: 36px;
-                background: var(--accent-gradient);
-                border-radius: var(--radius-sm);
+                /*background: var(--accent-gradient);
+                border-radius: var(--radius-sm);*/
                 display: flex; align-items: center; justify-content: center;
                 color: white;
-                box-shadow: 0 2px 8px rgba(108, 99, 255, 0.3);
+                /*box-shadow: 0 2px 8px rgba(108, 99, 255, 0.3);*/
+                img {
+                    width: 36px; height: 36px;
+                }
             }
 
             .nav-right { display: flex; align-items: center; gap: 6px; }
@@ -416,7 +419,8 @@
             }
 
             .footer-inner {
-                max-width: 1140px;
+                /*max-width: 1140px;*/
+                width: 100%;
                 margin: 0 auto;
                 padding-top: 32px;
                 border-top: 1px solid var(--border);
@@ -499,9 +503,10 @@
         <nav>
             <a href="/" class="brand">
                 <div class="brand-icon">
-                    <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
+                    <!--<i data-lucide="layers" style="width: 20px; height: 20px;"></i>-->
+                    <img src="{{ url_for('static', filename='logo.png') }}">
                 </div>
-                Serverjonas
+                serverjonas
             </a>
             <div class="nav-right">
                 <div class="nav-links">
@@ -577,8 +582,8 @@
         <!-- Footer -->
         <footer>
             <div class="footer-inner">
-                <div class="footer-brand">Serverjonas</div>
-                <div class="footer-text">&copy; 2026 Serverjonas &middot; Version 5.3</div>
+                <div class="footer-brand">serverjonas</div>
+                <div class="footer-text">&copy; 2026 serverjonas &middot; Version 5.3</div>
                 <div class="footer-links">
                     <a href="/rights">Datenschutz</a>
                     <a href="/status">Serverstatus</a>
