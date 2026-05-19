@@ -5,7 +5,7 @@ import os
 import sqlite3
 import time
 from urllib.parse import quote
-
+import tomllib
 from dotenv import load_dotenv
 from flask import Flask, abort, redirect, render_template, request, send_from_directory
 
@@ -29,28 +29,45 @@ app.secret_key = os.environ.get("SECRET_KEY")
 ALLOWED_EXTENSIONS = {".html", ".css", ".js", ".png", ".jpg", ".ico", ".svg", ".txt"}
 
 emergency_mode = False
-
 def load_modules():
-    config_path = os.path.join(BASE_DIR, "modules.json")
+    config_path = os.path.join(BASE_DIR, "modules.toml")
+
     if not os.path.isfile(config_path):
-        print("❌ modules.json fehlt")
+        print("\033[91m[FAILED]\033[0m \033[90mmodules.toml fehlt\033[0m")
         return
 
-    with open(config_path) as f:
-        modules = json.load(f)
+    with open(config_path, "rb") as f:
+        modules = tomllib.load(f)
 
     for name, cfg in modules.items():
         try:
             module_path = os.path.join(MODULE_DIR, cfg["pfad"], "app.py")
+
             spec = importlib.util.spec_from_file_location(
-                f"modules.{name}", module_path
+                f"modules.{name}",
+                module_path
             )
+
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
-            app.register_blueprint(module.bp, url_prefix=cfg["url"])
-            print(f"[  OK  ] Module loadet: {name} -> {cfg['url']}")
+
+            app.register_blueprint(
+                module.bp,
+                url_prefix=cfg["url"]
+            )
+
+            print(
+                f"\033[92m[  OK  ]\033[0m "
+                f"{name} "
+                f"\033[90m-> {cfg['url']}\033[0m"
+            )
+
         except Exception as e:
-            print(f"[FAILED] Modul {name} konnte nicht geladen werden:", e)
+            print(
+                f"\033[91m[FAILED]\033[0m "
+                f"{name} "
+                f"\033[90m-> {e}\033[0m"
+            )
 
 
 try:
