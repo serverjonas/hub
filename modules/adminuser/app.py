@@ -10,6 +10,18 @@ from toolbox.user import get_current_user, get_infos
 
 bp = Blueprint("usermanager", __name__, template_folder="templates")
 
+def get_active_bans():
+    now = int(time.time())
+    con = sqlite3.connect(DB_PATH)
+    cur = con.cursor()
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM ban
+        WHERE expires_at IS NULL OR expires_at > ?
+    """, (now,))
+    count = cur.fetchone()[0]
+    con.close()
+    return count
 
 @bp.before_request
 def require_admin():
@@ -61,7 +73,8 @@ def get_all_users():
 def user_index():
     user = get_current_user()
     users = get_all_users()
-    return render_template("admin_users_manager.html", users=users, user=user["name"])
+    bans = get_active_bans()
+    return render_template("admin_users_manager.html", users=users, user=user["name"], bans=bans, user_count=len(users))
 
 
 @bp.route("/set-role", methods=["POST"])
@@ -76,7 +89,7 @@ def set_role():
     # Schutz: eigene Admin-Rolle nicht entziehen
     current_user = get_current_user()
     if target_id == current_user["id"] and role == "admin" and value == 0:
-        abort(403)
+        return redirect("/admin/users")
 
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()

@@ -14,6 +14,18 @@ DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "users.db")
 
 bp = Blueprint("adminban", __name__, template_folder="templates")
 
+def get_active_bans_count():
+    now = int(time.time())
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM ban
+        WHERE expires_at IS NULL OR expires_at > ?
+    """, (now,))
+    count = cur.fetchone()[0]
+    conn.close()
+    return count
 
 @bp.before_request
 def require_admin():
@@ -59,12 +71,18 @@ def admin_index():
             }
         )
 
-    return render_template("adminban.html", users=users, user=user["name"])
+    bans_count = get_active_bans_count()
+    user_count = len(users)
+    return render_template("adminban.html", users=users, user=user["name"], current_user_id=user["id"], bans=bans_count, user_count=user_count)
 
 
 @bp.route("/ban", methods=["POST"])
 def ban_user():
     target_id = request.form.get("user_id", type=int)
+    current_user = get_current_user()
+    if target_id == current_user["id"]:
+        abort(403)
+
     reason = request.form.get("reason", "Kein Grund angegeben")
     permanent = request.form.get("permanent") == "1"
     expires_at = None

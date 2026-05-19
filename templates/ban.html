@@ -1,175 +1,127 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>Gesperrt – Serverjonas network</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+{% extends "base.html" %}
 
-        body {
-            margin: 0;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: #e2e8f0;
-            font-family: 'Syne', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-            overflow: hidden;
-        }
+{% block title %}Gesperrt &middot; Serverjonas{% endblock %}
 
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(251,113,133,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(251,113,133,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-        }
+{% block extra_style %}
+.ban-wrapper {
+    min-height: calc(100vh - 280px); /* Adjust based on header/footer height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
 
-        .container {
-            max-width: 560px;
-            padding: 48px 40px;
-            border-radius: 16px;
-            background: rgba(15, 23, 42, 0.88);
-            box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(251,113,133,0.08);
-            animation: fadeUp 0.4s ease-out both;
-            position: relative;
-        }
+.ban-container {
+    max-width: 480px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 44px 36px 36px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+.ban-icon-wrap {
+    width: 64px; height: 64px;
+    margin: 0 auto 24px;
+    background: rgba(239, 68, 68, 0.08); /* Red accent lighter */
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ef4444; /* Red accent */
+}
 
-        .code {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 5rem;
-            font-weight: 700;
-            margin: 0;
-            color: #fb7185;
-            text-shadow: 0 2px 12px rgba(251,113,133,0.35);
-            letter-spacing: -2px;
-            line-height: 1;
-        }
+.ban-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    margin-bottom: 20px;
+}
 
-        .icon {
-            font-size: 2.5rem;
-            margin: 16px 0 0 0;
-            display: block;
-            animation: pulse 2.5s ease-in-out infinite;
-        }
+.ban-badge .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ef4444;
+    animation: pulse 2s ease-in-out infinite;
+}
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50%       { opacity: 0.5; }
-        }
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+}
 
-        .tag {
-            display: inline-block;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            background: rgba(251,113,133,0.1);
-            color: #fb7185;
-            border: 1px solid rgba(251,113,133,0.2);
-            border-radius: 4px;
-            padding: 2px 8px;
-            margin: 16px 0 4px 0;
-            letter-spacing: 0.05em;
-        }
+.ban-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-main);
+}
 
-        .title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin: 12px 0 8px 0;
-            color: #e2e8f0;
-            letter-spacing: 0.02em;
-        }
+.ban-message {
+    color: var(--text-dim);
+    margin-bottom: 28px;
+    line-height: 1.65;
+    font-size: 15px;
+}
 
-        p {
-            font-size: 1rem;
-            margin: 0 0 24px 0;
-            color: #94a3b8;
-            line-height: 1.6;
-        }
+.reason-box {
+    background: var(--bg-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-top: 24px;
+    text-align: left;
+}
 
-        .reason-box {
-            background: rgba(251,113,133,0.07);
-            border: 1px solid rgba(251,113,133,0.15);
-            border-radius: 8px;
-            padding: 14px 18px;
-            margin: 0 0 32px 0;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: #fda4af;
-            text-align: left;
-            word-break: break-word;
-        }
+.reason-box-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    display: block;
+}
 
-        .reason-box .label {
-            font-size: 0.65rem;
-            color: #fb7185;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            display: block;
-        }
+.reason-box-text {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-main);
+    word-break: break-word;
+}
+{% endblock %}
 
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .buttons a {
-            display: inline-block;
-            padding: 12px 28px;
-            background: #38bdf8;
-            color: #0f172a;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            transition: all 0.2s ease-in-out;
-            min-width: 180px;
-            font-family: 'Syne', sans-serif;
-        }
-
-        .buttons a:hover {
-            background: #0ea5e9;
-            transform: scale(1.04);
-            box-shadow: 0 4px 16px rgba(56,189,248,0.3);
-        }
-
-        .hint {
-            margin-top: 28px;
-            font-size: 0.8rem;
-            opacity: 0.4;
-            font-family: 'JetBrains Mono', monospace;
-            color: #94a3b8;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <p class="code">BAN</p>
-        <span class="icon">🚫</span>
-        <div class="tag">ACCOUNT GESPERRT</div>
-        <p class="title">Du wurdest vom Serverjonas network ausgeschlossen.</p>
-        <p>Dein Account wurde von einem Moderator oder Administrator gesperrt.</p>
+{% block content %}
+<div class="ban-wrapper">
+    <div class="ban-container">
+        <div class="ban-icon-wrap">
+            <i data-lucide="ban" style="width: 28px; height: 28px;"></i>
+        </div>
+        <div class="ban-badge">
+            <span class="dot"></span>
+            Account gesperrt
+        </div>
+        <h1 class="ban-title">Du wurdest vom Serverjonas network ausgeschlossen.</h1>
+        <p class="ban-message">
+            Dein Account wurde von einem Moderator oder Administrator gesperrt.
+        </p>
 
         <div class="reason-box">
-            <span class="label">Grund</span>
-            {{ reason }}
-        </div>
-
-        <div class="hint">
-            Serverjonas network // access.denied
+            <span class="reason-box-label">Grund</span>
+            <span class="reason-box-text">{{ reason }}</span>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

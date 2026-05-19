@@ -34,6 +34,16 @@ def get_active_bans():
 
     return count
 
+def get_user_count():
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM users")
+
+    count = cur.fetchone()[0]
+    conn.close()
+
+    return count
 
 # ── Admin-Check für alle Routen unter diesem Blueprint ──────────────────────
 @bp.before_request
@@ -50,9 +60,10 @@ def require_admin():
 @bp.route("/")
 def admin_dashboard():
     user = get_current_user()
-    # Hier später echte Stats laden
+    
     bans = get_active_bans()
-    return render_template("admin_nav.html", user=user["name"], bans=bans)
+    user_count = get_user_count()
+    return render_template("admin_nav.html", user=user["name"], bans=bans, user_count=user_count)
 
 
 # ── Platzhalter-Routen – werden später durch eigene Blueprints ersetzt ────────
