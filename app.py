@@ -106,6 +106,12 @@ def internal_error(e):
     user = user_array["name"] if user_array else None
     return render_template("500.html", user=user), 500
 
+@app.errorhandler(501)
+def internal_error(e):
+    user_array = get_current_user()
+    user = user_array["name"] if user_array else None
+    return render_template("501.html", user=user), 500
+
 @app.errorhandler(403)
 def forbidden(e):
     user_array = get_current_user()

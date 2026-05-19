@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}501 – Nicht Umgesetzt{% endblock %}
+
+{% block extra_style %}
+.error-wrapper {
+    min-height: calc(100vh - 280px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.error-container {
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.error-icon-wrap {
+    width: 80px; height: 80px;
+    margin: 0 auto 28px;
+    background: var(--accent-lighter);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+}
+
+.error-code {
+    font-size: clamp(4rem, 12vw, 7rem);
+    font-weight: 800;
+    font-family: var(--font-heading);
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 12px;
+}
+
+.error-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-main);
+}
+
+.error-message {
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    line-height: 1.65;
+    font-size: 15px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-hint {
+    margin-top: 36px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    color: var(--text-dim);
+    box-shadow: var(--shadow-sm);
+}
+{% endblock %}
+
+{% block content %}
+<div class="error-wrapper">
+    <div class="error-container">
+        <div class="error-icon-wrap">
+            <i data-lucide="file-x" style="width: 36px; height: 36px;"></i>
+        </div>
+        <div class="error-code">501</div>
+        <h1 class="error-title">Nicht Umgesetzt</h1>
+        <p class="error-message">
+            Die gewünschte Seite ist noch nicht verfügbar.
+            {% if user %}<br>Angemeldet als <strong>{{ user }}</strong>{% endif %}
+        </p>
+
+        <div class="btn-group">
+            <a href="/" class="btn btn-primary">
+                <i data-lucide="home" style="width: 18px; height: 18px;"></i>
+                Zurück zum Hub
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
