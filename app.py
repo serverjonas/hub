@@ -47,13 +47,16 @@ def load_modules():
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             app.register_blueprint(module.bp, url_prefix=cfg["url"])
-            print(f"Module loadet: {name} -> {cfg['url']}")
+            print(f"[  OK  ] Module loadet: {name} -> {cfg['url']}")
         except Exception as e:
-            print(f"❌ Modul {name} konnte nicht geladen werden:", e)
+            print(f"[FAILED] Modul {name} konnte nicht geladen werden:", e)
 
 
-load_modules()
-
+try:
+    load_modules()
+except Exception as e:
+    print(str(e))
+    emergency_mode = True
 
 @app.before_request
 def check_ban():
@@ -96,6 +99,9 @@ def page_not_found(e):
     user = user_array["name"] if user_array else None
     return render_template("404.html", user=user), 404
 
+@app.errorhandler(500)
+def internal_error(e):
+    return render_template("500.html"), 500
 
 @app.errorhandler(403)
 def forbidden(e):
@@ -119,6 +125,9 @@ def tea(e):
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def hub(path):
+    if emergency_mode:
+        return abort(500)
+    
     lang = get_lang()
     if path == "":
         return redirect("/hub")
