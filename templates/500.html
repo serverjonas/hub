@@ -1,71 +1,87 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>System Failure</title>
-  <style>
-    body {
-      margin: 0;
-      background: #0b0f14;
-      color: #e6e6e6;
-      font-family: monospace;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      padding: 24px;
-      box-sizing: border-box;
-    }
-    .box {
-      max-width: 900px;
-      border: 1px solid #2a2f36;
-      padding: 24px;
-      background: #0f1620;
-    }
-    .critical {
-      color: #ff4d4d;
-      font-weight: bold;
-      margin-bottom: 16px;
-    }
-    ul {
-      margin-top: 12px;
-    }
-  </style>
-</head>
-<body>
-  <div class="box" id="content"></div>  <script>
-    const lang = localStorage.getItem("lang") || "en";
+{% extends "base.html" %}
 
-    const messages = {
-      eng: `
-<div class="critical">[CRITICAL SYSTEM FAILURE]</div>
-Core application instability detected.<br><br>
-This message is shown on all routes because normal operation cannot be guaranteed.<br><br>
-If you are seeing this:
-<ul>
-  <li>the system is partially or fully degraded</li>
-  <li>routing is unreliable</li>
-  <li>recovery attempts may already be in progress</li>
-</ul>
-DO NOT rely on any functionality.<br>
-Contact the administrator immediately.
-      `,
+{% block title %}500 – Interner Fehler{% endblock %}
 
-      deu: `
-<div class="critical">[KRITISCHER SYSTEMAUSFALL]</div>
-Instabilität der Hauptanwendung erkannt.<br><br>
-Diese Meldung wird auf allen Routen angezeigt, da der normale Betrieb nicht mehr garantiert werden kann.<br><br>
-Falls du das siehst:
-<ul>
-  <li>das System ist teilweise oder vollständig beeinträchtigt</li>
-  <li>Routing ist nicht zuverlässig</li>
-  <li>Wiederherstellungsversuche laufen möglicherweise bereits</li>
-</ul>
-VERLASS DICH AUF KEINE FUNKTION.<br>
-Kontaktiere sofort den Administrator.
-      `
-    };
+{% block extra_style %}
+.error-wrapper {
+    min-height: calc(100vh - 280px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
 
-    document.getElementById("content").innerHTML = messages[lang] || messages.eng;
-  </script></body>
-</html>
+.error-container {
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.error-icon-wrap {
+    width: 80px; height: 80px;
+    margin: 0 auto 28px;
+    background: var(--accent-lighter);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+}
+
+.error-code {
+    font-size: clamp(4rem, 12vw, 7rem);
+    font-weight: 800;
+    font-family: var(--font-heading);
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 12px;
+}
+
+.error-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-main);
+}
+
+.error-message {
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    line-height: 1.65;
+    font-size: 15px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+{% endblock %}
+
+{% block content %}
+<div class="error-wrapper">
+    <div class="error-container">
+        <div class="error-icon-wrap">
+            <i data-lucide="server-crash" style="width: 36px; height: 36px;"></i>
+        </div>
+        <div class="error-code">500</div>
+        <h1 class="error-title">Interner Fehler</h1>
+        <p class="error-message">
+            Hier läuft etwas schief. Der Fehler liegt bei uns, nicht bei dir. Bitte versuche es gleich noch einmal.
+            {% if user %}<br>Angemeldet als <strong>{{ user }}</strong>{% endif %}
+        </p>
+
+        <div class="btn-group">
+            <a href="/" class="btn btn-primary">
+                <i data-lucide="home" style="width: 18px; height: 18px;"></i>
+                Zurück zum Hub
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

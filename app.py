@@ -28,6 +28,7 @@ app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024 * 1024  # 50GB
 app.secret_key = os.environ.get("SECRET_KEY")
 ALLOWED_EXTENSIONS = {".html", ".css", ".js", ".png", ".jpg", ".ico", ".svg", ".txt"}
 
+emergency_mode = False
 
 def load_modules():
     config_path = os.path.join(BASE_DIR, "modules.json")
@@ -101,7 +102,9 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_error(e):
-    return render_template("500.html"), 500
+    user_array = get_current_user()
+    user = user_array["name"] if user_array else None
+    return render_template("500.html", user=user), 500
 
 @app.errorhandler(403)
 def forbidden(e):
