@@ -2,91 +2,117 @@
 pfad = "login"
 url = "/login"
 description = "login erstellt cockies"
+avtive = true
 
 [register]
 pfad = "register"
 url = "/register"
 description = "erstellt accounts"
+active = true
 
 [Musikauswahlsystem]
 pfad = "Musikauswahlsystem"
 url = "/musik"
 description = "Party organizer für wiedergabelisten"
+active = true
 
 [memes]
 pfad = "memes"
 url = "/memes"
 description = "memepage"
+active = true
 
 [rights]
 pfad = "rights"
 url = "/rights"
 description = "datenschutzt und cokei erklärung"
+active = true
 
 [status]
 pfad = "status"
 url = "/status"
 description = "serverstatus"
+active = true
 
 [friends]
 pfad = "friends"
 url = "/friends"
 description = "freundesliste"
+active = true
 
 [media]
 pfad = "films"
 url = "/films"
 description = "mediaserver für filme serien und musik"
+active = true
 
 [ban]
 pfad = "ban"
 url = "/ban"
 description = "zeig an das man gebannt wurde"
+active = true
 
 [banner]
 pfad = "banner"
 url = "/admin/ban"
+description = "möglichkeit leute zu bannen"
+active = true
 
 [adminnavigator]
 pfad = "adminnavigator"
 url = "/admin"
+description = "eine page um die verschidenen adminfeatures zu erreiche"
+active = true
 
 [adminuser]
 pfad = "adminuser"
 url = "/admin/users"
+description ="möglichkeit user anzuzeigen"
+active = true
 
 [music]
 pfad = "music"
 url = "/music"
+description = "musik libary"
+active = true
 
 [hub]
 pfad = "hub"
 url = "/hub"
+description = "einfach ein hub"
+active = true
 
 ["api-v1-status"]
 pfad = "api/v1/status"
 url = "/api/v1/status"
+active = true
 
 ["api-v1-mkkey"]
 pfad = "api/v1/mkkey"
 url = "/api/v1/mkkey"
+active = true
 
 ["api-v1-listkeys"]
 pfad = "api/v1/listkeys"
 url = "/api/v1/listkeys"
+active = true
 
 ["api-v1-rmkey"]
 pfad = "api/v1/rmkey"
 url = "/api/v1/rmkey"
+active = true
 
 [news]
 pfad = "news"
 url = "/news"
+active = true
 
 ["api-internal-news"]
 pfad = "api/internal/news"
 url = "/api/internal/news"
+active = true
 
 [cloud]
 pfad = "cloud"
 url = "/cloud"
+active = true
