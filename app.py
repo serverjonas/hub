@@ -151,10 +151,11 @@ def tea(e):
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def hub(path):
+    user = get_current_user()
+    
     if emergency_mode:
         return abort(500)
     
-    lang = get_lang()
     if path == "":
         return redirect("/hub")
 
@@ -162,8 +163,7 @@ def hub(path):
         abort(418)
 
     if path == "settings":
-        user = get_current_user()
-        return render_template(f"settings_{lang}.html", user=user["name"] if user else None)
+        return render_template(f"settings.html", user=user["name"] if user else None)
 
     # NUR static files erlauben
     ext = os.path.splitext(path)[1].lower()
