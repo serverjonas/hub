@@ -2,7 +2,7 @@
 pfad = "login"
 url = "/login"
 description = "login erstellt cockies"
-avtive = true
+active = true
 
 [register]
 pfad = "register"
