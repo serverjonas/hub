@@ -41,6 +41,9 @@ def load_modules():
 
     for name, cfg in modules.items():
         try:
+            if not cfg["active"]:
+                continue
+            
             module_path = os.path.join(MODULE_DIR, cfg["pfad"], "app.py")
 
             spec = importlib.util.spec_from_file_location(
