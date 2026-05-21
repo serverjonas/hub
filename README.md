@@ -52,5 +52,7 @@ Example `modules.json` entry:
 
 ```toml
 [example]
-pfad = example
+pfad = "example
 url = example
+description = "mynicemodule"
+active = true
