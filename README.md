@@ -48,7 +48,7 @@ Each module:
 - Is registered with a URL prefix defined in configuration
 
 
-Example `modules.json` entry:
+Example `modules.toml` entry:
 
 ```toml
 [example]
