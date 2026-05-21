@@ -39,7 +39,7 @@ It provides:
 
 ## Module System
 
-Modules are defined in `modules.json` and loaded dynamically at runtime.
+Modules are defined in `modules.toml` and loaded dynamically at runtime.
 
 Each module:
 
@@ -50,10 +50,7 @@ Each module:
 
 Example `modules.json` entry:
 
-```json
-{
-  "example": {
-    "pfad": "example",
-    "url": "/example"
-  }
-}
+```toml
+[example]
+pfad = example
+url = example
