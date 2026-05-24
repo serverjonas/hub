@@ -11,6 +11,65 @@ DB_PATH = os.path.join(BASE_PATH, "users.db")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
+def get_last_message_id(user_a, user_b):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT MAX(id)
+        FROM notifications
+        WHERE (
+            user_id = ? AND sender_id = ?
+        ) OR (
+            user_id = ? AND sender_id = ?
+        )
+    """, (user_a, user_b, user_b, user_a))
+
+    row = cur.fetchone()
+    conn.close()
+
+    return row[0] if row and row[0] else 0
+
+def send_dm(from_user, to_user, message):
+    return create_notification(
+        user_id=to_user,
+        message=message,
+        type="dm",
+        sender_id=from_user
+    )
+
+def get_chat_messages(user_a, user_b, after_id=0):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM notifications
+        WHERE (
+            user_id = ? AND sender_id = ?
+        ) OR (
+            user_id = ? AND sender_id = ?
+        )
+        AND id > ?
+        ORDER BY id ASC
+    """, (user_a, user_b, user_b, user_a, after_id))
+
+    rows = cur.fetchall()
+    conn.close()
+
+    return [
+        {
+            "id": r["id"],
+            "from": r["sender_id"],
+            "to": r["user_id"],
+            "message": r["message"],
+            "created_at": r["created_at"],
+            "type": r["type"]
+        }
+        for r in rows
+    ]
+
 def get_notifications(user_id):
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row  # erlaubt dict-artigen Zugriff
