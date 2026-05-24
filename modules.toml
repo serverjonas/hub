@@ -116,3 +116,8 @@ active = true
 pfad = "cloud"
 url = "/cloud"
 active = true
+
+[notification_manager]
+pfad = "notifmanager"
+url = "/admin/notifications"
+active = true

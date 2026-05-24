@@ -54,11 +54,11 @@ def login():
         user = get_user(username)
 
         if not user:
-            message = "Benutzer existiert nicht ❌"
+            message = "Benutzer existiert nicht"
         else:
             user_id, pw_hash = user
             if not check_password_hash(pw_hash, password):
-                message = "Falsches Passwort ❌"
+                message = "Falsches Passwort"
             else:
                 session_id = create_session(user_id)
                 resp = make_response(redirect("/"))
