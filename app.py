@@ -165,8 +165,8 @@ def hub(path):
     if path == "make_me_a_coffee":
         abort(418)
 
-    if path == "settings":
-        return render_template(f"settings.html", user=user["name"] if user else None)
+    #if path == "settings":
+    #    return render_template(f"settings.html", user=user["name"] if user else None)
 
     # NUR static files erlauben
     ext = os.path.splitext(path)[1].lower()

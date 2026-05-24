@@ -398,7 +398,7 @@
             </h2>
             <p class="settings-description">Verwalte dein Passwort und deine Sicherheitsoptionen.</p>
 
-            <div class="setting-row">
+            <!--<div class="setting-row">
                 <div class="setting-info">
                     <div class="setting-label">Passwort ändern</div>
                     <div class="setting-hint">Ändere dein Passwort regelmäßig für mehr Sicherheit.</div>
@@ -407,9 +407,9 @@
                     <i data-lucide="key" style="width: 14px; height: 14px;"></i>
                     Ändern
                 </button>
-            </div>
+            </div>-->
 
-            <div class="password-form" id="passwordForm">
+            <!-- <div class="password-form" id="passwordForm">
                 <div class="form-group">
                     <label for="current_pw">Aktuelles Passwort</label>
                     <input type="password" id="current_pw" class="form-control" placeholder="••••••••" />
@@ -429,17 +429,19 @@
                     </button>
                     <button class="setting-action" id="cancelPassword">Abbrechen</button>
                 </div>
-            </div>
+            </div>-->
 
             <div class="setting-row">
                 <div class="setting-info">
                     <div class="setting-label">Aktive Sitzungen</div>
                     <div class="setting-hint">Melde dich auf allen anderen Geräten ab.</div>
                 </div>
-                <button class="setting-action danger" id="logoutAll">
-                    <i data-lucide="log-out" style="width: 14px; height: 14px;"></i>
-                    Alle abmelden
-                </button>
+                <form action="/settings/logout-all" method="POST">
+                    <button type="submit" class="setting-action danger">
+                        <i data-lucide="log-out" style="width: 14px; height: 14px;"></i>
+                        Alle abmelden
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -568,13 +570,13 @@
     }
 
     // Logout all sessions
-    const logoutAllBtn = document.getElementById('logoutAll');
+    /*const logoutAllBtn = document.getElementById('logoutAll');
     if (logoutAllBtn) {
         logoutAllBtn.addEventListener('click', () => {
             showToast('Sitzungen werden abgemeldet...', 'success');
             // TODO: POST to server endpoint
         });
-    }
+    }*/
 
     // Toast helper
     function showToast(message, type) {

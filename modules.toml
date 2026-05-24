@@ -121,3 +121,8 @@ active = true
 pfad = "notifmanager"
 url = "/admin/notifications"
 active = true
+
+[settings]
+pfad = "settings"
+url = "/settings"
+active = true
