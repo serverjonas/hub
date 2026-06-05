@@ -14,12 +14,15 @@
 
 {% for n in notifications %}
 
+<a href="/news/read/{{ n.id }}" style="text-decoration:none; color:inherit;">
+
 <div style="
     background: var(--surface);
     border: 1px solid var(--border);
+    border-left: {% if n.read == 0 %}4px solid #6366f1{% else %}1px solid var(--border){% endif %};
     border-radius: 14px;
     padding: 14px;
-    opacity: {% if n.read == 1 %}0.7{% else %}1{% endif %};
+    transition: 0.2s;
 ">
 
     <div style="font-weight:800;">
@@ -31,6 +34,8 @@
     </div>
 
 </div>
+
+</a>
 
 {% endfor %}
 

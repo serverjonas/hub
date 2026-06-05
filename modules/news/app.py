@@ -1,6 +1,6 @@
 import sqlite3
 import time
-from flask import Blueprint, render_template, redirect
+from flask import Blueprint, render_template, redirect, request
 
 from toolbox.toolbox import DB_PATH 
 from toolbox.user import get_current_user, get_name
@@ -68,7 +68,10 @@ def mark_read(nid):
     conn.commit()
     conn.close()
 
-    return redirect("/news")
+    if request.referrer and "/news/archive" in request.referrer:
+        return redirect("/news/archive")
+    else:
+        return redirect("/news")
 
 
 # 📂 ältere + bereits gelesene Nachrichten (Toggle-View)
