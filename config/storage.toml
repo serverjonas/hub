@@ -1,0 +1,4 @@
+[user_data]
+max_storage_user=15 #in GB
+max_storage_VIP=50 #in GB
+max_storage_admin=150 #in GB
