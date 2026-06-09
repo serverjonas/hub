@@ -30,6 +30,9 @@ tmp_dir = os.path.join(FILMS_DATA_DIR, "tmp")
 os.makedirs(tmp_dir, exist_ok=True)
 tempfile.tempdir = tmp_dir
 
+UPLOAD_TMP_DIR = os.path.join(FILMS_DATA_DIR, "chunk_uploads")
+os.makedirs(UPLOAD_TMP_DIR, exist_ok=True)
+
 bp = Blueprint("films", __name__, template_folder="templates")
 
 
@@ -262,6 +265,163 @@ def upload():
         message=message,
         message_type=message_type,
     )
+
+@bp.route("/upload/init", methods=["POST"])
+def upload_init():
+    user = get_current_user()
+    if not user:
+        abort(403)
+
+    data = request.json
+
+    upload_id = str(uuid.uuid4())
+
+    upload_dir = os.path.join(UPLOAD_TMP_DIR, upload_id)
+    os.makedirs(upload_dir, exist_ok=True)
+
+    with open(os.path.join(upload_dir, "meta.json"), "w") as f:
+        json.dump(data, f)
+
+    return jsonify({
+        "upload_id": upload_id
+    })
+
+@bp.route("/upload/chunk", methods=["POST"])
+def upload_chunk():
+    user = get_current_user()
+    if not user:
+        abort(403)
+
+    upload_id = request.form["upload_id"]
+    chunk_index = int(request.form["chunk_index"])
+
+    chunk = request.files["chunk"]
+
+    upload_dir = os.path.join(
+        UPLOAD_TMP_DIR,
+        upload_id
+    )
+
+    chunk_path = os.path.join(
+        upload_dir,
+        f"{chunk_index:08d}.part"
+    )
+
+    chunk.save(chunk_path)
+
+    return jsonify({
+        "ok": True
+    })
+
+@bp.route("/upload/finish", methods=["POST"])
+def upload_finish():
+    user = get_current_user()
+    if not user:
+        abort(403)
+
+    data = request.json
+
+    upload_id = data["upload_id"]
+
+    upload_dir = os.path.join(
+        UPLOAD_TMP_DIR,
+        upload_id
+    )
+
+    with open(
+        os.path.join(upload_dir, "meta.json")
+    ) as f:
+        upload_meta = json.load(f)
+
+    film_id = str(uuid.uuid4())[:8]
+
+    fdir = film_dir(
+        user["name"],
+        film_id
+    )
+
+    os.makedirs(fdir, exist_ok=True)
+
+    ext = upload_meta.get(
+        "extension",
+        ".mp4"
+    )
+
+    original_filename = f"original{ext}"
+
+    original_path = os.path.join(
+        fdir,
+        original_filename
+    )
+
+    with open(original_path, "wb") as out:
+
+        chunks = sorted(
+            x for x in os.listdir(upload_dir)
+            if x.endswith(".part")
+        )
+
+        for chunk_name in chunks:
+
+            chunk_path = os.path.join(
+                upload_dir,
+                chunk_name
+            )
+
+            with open(chunk_path, "rb") as inp:
+
+                while True:
+                    buf = inp.read(1024 * 1024)
+
+                    if not buf:
+                        break
+
+                    out.write(buf)
+
+    meta = {
+        "film_id": film_id,
+        "title": upload_meta["title"],
+        "username": user["name"],
+        "uploaded_at": int(time.time()),
+        "status": "queued",
+        "filename": None,
+        "original": original_filename,
+    }
+
+    if upload_meta["upload_type"] == "series":
+        meta["series"] = upload_meta["series_name"]
+        meta["season"] = int(upload_meta["season"])
+        meta["episode"] = int(upload_meta["episode"])
+
+    write_meta(
+        user["name"],
+        film_id,
+        meta
+    )
+
+    threading.Thread(
+        target=convert_film,
+        args=(
+            user["name"],
+            film_id,
+            original_path
+        ),
+        daemon=True
+    ).start()
+
+    shutil.rmtree(
+        upload_dir,
+        ignore_errors=True
+    )
+
+    return jsonify({
+        "film_id": film_id,
+        "redirect":
+            url_for(
+                "films.film_detail",
+                film_id=film_id
+            )
+    })
 
 
 @bp.route("/film/<film_id>")

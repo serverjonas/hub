@@ -87,6 +87,17 @@
     border-color: #6366f1;
     background: rgba(99, 102, 241, 0.05);
 }
+
+/* NEW UI */
+.upload-progress {
+    margin-top: 20px;
+    display: none;
+}
+
+progress {
+    width: 100%;
+    height: 18px;
+}
 {% endblock %}
 
 {% block content %}
@@ -97,13 +108,9 @@
     </div>
 
     <div class="upload-card">
-        {% if message %}
-        <div class="message {% if message_type == 'error' %}message-error{% else %}message-success{% endif %}" style="margin-bottom: 24px;">
-            {{ message }}
-        </div>
-        {% endif %}
 
-        <form method="POST" enctype="multipart/form-data">
+        <form id="upload-form" enctype="multipart/form-data">
+
             <div class="radio-group">
                 <div class="radio-item">
                     <input type="radio" name="upload_type" value="film" id="type_film" checked>
@@ -121,68 +128,131 @@
 
             <div class="form-group">
                 <label for="title">Titel</label>
-                <input type="text" name="title" id="title" class="form-control" placeholder="z.B. Inception" required>
+                <input type="text" name="title" id="title" class="form-control" required>
             </div>
 
             <div class="series-only" id="series_fields">
                 <div class="form-group">
                     <label for="series_name">Name der Serie</label>
-                    <input type="text" name="series_name" id="series_name" class="form-control" placeholder="z.B. Breaking Bad">
+                    <input type="text" name="series_name" id="series_name" class="form-control">
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                     <div class="form-group">
-                        <label for="season">Staffel</label>
-                        <input type="number" name="season" id="season" class="form-control" value="1" min="1">
+                        <label>Staffel</label>
+                        <input type="number" name="season" id="season" class="form-control" value="1">
                     </div>
                     <div class="form-group">
-                        <label for="episode">Episode</label>
-                        <input type="number" name="episode" id="episode" class="form-control" value="1" min="1">
+                        <label>Episode</label>
+                        <input type="number" name="episode" id="episode" class="form-control" value="1">
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Datei auswählen</label>
+                <label>Datei</label>
                 <div class="file-input-wrapper" onclick="document.getElementById('file').click()">
-                    <i data-lucide="cloud-upload" style="width: 32px; height: 32px; color: var(--text-dim); margin-bottom: 12px;"></i>
-                    <p style="font-size: 14px; color: var(--text-dim);" id="file-label">Klicke zum Auswählen oder Drag & Drop</p>
-                    <input type="file" name="file" id="file" style="display: none;" onchange="updateFileName(this)">
+                    <i data-lucide="cloud-upload"></i>
+                    <p id="file-label">Datei auswählen</p>
+                    <input type="file" id="file" style="display:none">
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 12px;">
+            <button type="submit" class="btn btn-primary" style="width:100%;">
                 Upload starten
-                <i data-lucide="upload-cloud"></i>
             </button>
+
+            <div class="upload-progress" id="progress-box">
+                <progress id="progress" value="0" max="100"></progress>
+                <div id="progress-text" style="margin-top:10px;color:var(--text-dim)"></div>
+            </div>
+
         </form>
     </div>
 </div>
 
 <script>
-    const radioFilm = document.getElementById('type_film');
-    const radioSeries = document.getElementById('type_series');
-    const seriesFields = document.getElementById('series_fields');
-    const seriesNameInput = document.getElementById('series_name');
+const radioFilm = document.getElementById('type_film');
+const radioSeries = document.getElementById('type_series');
+const seriesFields = document.getElementById('series_fields');
 
-    function toggleFields() {
-        if (radioSeries.checked) {
-            seriesFields.style.display = 'block';
-            seriesNameInput.required = true;
-        } else {
-            seriesFields.style.display = 'none';
-            seriesNameInput.required = false;
-        }
+radioFilm.onchange = toggle;
+radioSeries.onchange = toggle;
+
+function toggle() {
+    seriesFields.style.display = radioSeries.checked ? 'block' : 'none';
+}
+
+document.getElementById('upload-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const file = document.getElementById('file').files[0];
+    if (!file) return;
+
+    const progressBox = document.getElementById('progress-box');
+    const progress = document.getElementById('progress');
+    const text = document.getElementById('progress-text');
+
+    progressBox.style.display = 'block';
+
+    const CHUNK = 10 * 1024 * 1024;
+
+    const meta = {
+        title: document.getElementById('title').value,
+        upload_type: radioSeries.checked ? "series" : "film",
+        series_name: document.getElementById('series_name').value,
+        season: document.getElementById('season').value,
+        episode: document.getElementById('episode').value,
+        extension: file.name.split('.').pop()
+    };
+
+    const init = await fetch('/upload/init', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(meta)
+    });
+
+    const { upload_id } = await init.json();
+
+    const totalChunks = Math.ceil(file.size / CHUNK);
+    const start = Date.now();
+
+    for (let i = 0; i < totalChunks; i++) {
+        const blob = file.slice(i * CHUNK, (i + 1) * CHUNK);
+
+        const fd = new FormData();
+        fd.append("upload_id", upload_id);
+        fd.append("chunk_index", i);
+        fd.append("chunk", blob);
+
+        await fetch('/upload/chunk', {
+            method: 'POST',
+            body: fd
+        });
+
+        const percent = Math.round(((i + 1) / totalChunks) * 100);
+        const elapsed = (Date.now() - start) / 1000;
+        const speed = ((i + 1) * CHUNK) / elapsed;
+        const eta = (file.size - ((i + 1) * CHUNK)) / speed;
+
+        progress.value = percent;
+
+        text.innerText =
+            `${percent}% | ${(speed/1024/1024).toFixed(1)} MB/s | ETA ${Math.round(eta)}s`;
     }
 
-    radioFilm.addEventListener('change', toggleFields);
-    radioSeries.addEventListener('change', toggleFields);
+    const finish = await fetch('/upload/finish', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ upload_id })
+    });
 
-    function updateFileName(input) {
-        const label = document.getElementById('file-label');
-        if (input.files && input.files.length > 0) {
-            label.textContent = input.files[0].name;
-            label.style.color = 'var(--text-main)';
-        }
-    }
+    const result = await finish.json();
+    window.location.href = result.redirect;
+});
+
+function updateFileName(input) {
+    document.getElementById('file-label').innerText =
+        input.files[0]?.name || "Datei auswählen";
+}
 </script>
 {% endblock %}
