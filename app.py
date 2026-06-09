@@ -9,7 +9,8 @@ import tomllib
 from dotenv import load_dotenv
 from flask import Flask, abort, redirect, render_template, request, send_from_directory
 
-from toolbox.toolbox import get_current_user, is_banned, is_user_active, get_lang, BASE_DIR, get_infos
+from toolbox.files import BASE_DIR
+from toolbox.user import get_current_user, is_banned, is_user_active, get_lang, get_infos
 
 load_dotenv()
 

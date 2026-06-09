@@ -36,3 +36,13 @@ def _folder_size(folder: str) -> int:
                 pass
 
     return size
+
+
+def get_lang():
+    return request.cookies.get("lang", "deu")
+
+
+def set_lang(lang):
+    resp = make_response()
+    resp.set_cookie("lang", lang)
+    return resp
