@@ -1,5 +1,6 @@
 # toolbox.py
 import os
+import tomllib
 import sqlite3
 import time
 from flask import request, make_response
@@ -12,8 +13,7 @@ LOGS_DIR = os.path.join(BASE_DIR, "logs")
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
 
-import os
-import tomllib
+
 
 
 def load_configs(config_dir: str) -> dict:
