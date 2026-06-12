@@ -174,7 +174,7 @@ def films():
     user = get_current_user()
     if not user:
         return render_template("not_logged_in.html")
-    films = list_only_films(user["name"])
+    films = list_only_films(user["id"])
     return render_template("films_films.html", user=user["name"], films=films)
 
 
@@ -183,7 +183,7 @@ def series():
     user = get_current_user()
     if not user:
         return render_template("not_logged_in.html")
-    series_data = list_series(user["name"])
+    series_data = list_series(user["id"])
     return render_template("films_series.html", user=user["name"], series=series_data)
 
 
@@ -192,7 +192,7 @@ def series_detail(series_name):
     user = get_current_user()
     if not user:
         return render_template("not_logged_in.html")
-    series_data = list_series(user["name"])
+    series_data = list_series(user["id"])
     if series_name not in series_data:
         abort(404)
     return render_template(
@@ -225,7 +225,7 @@ def upload():
             message_type = "error"
         else:
             film_id = str(uuid.uuid4())[:8]
-            fdir = film_dir(user["name"], film_id)
+            fdir = film_dir(user["id"], film_id)
             os.makedirs(fdir, exist_ok=True)
 
             ext = os.path.splitext(file.filename)[1].lower() or ".mp4"
@@ -248,11 +248,11 @@ def upload():
                 meta["season"] = int(season) if season.isdigit() else 1
                 meta["episode"] = int(episode) if episode.isdigit() else 1
 
-            write_meta(user["name"], film_id, meta)
+            write_meta(user["id"], film_id, meta)
 
             t = threading.Thread(
                 target=convert_film,
-                args=(user["name"], film_id, original_path),
+                args=(user["id"], film_id, original_path),
                 daemon=True,
             )
             t.start()
@@ -336,7 +336,7 @@ def upload_finish():
     film_id = str(uuid.uuid4())[:8]
 
     fdir = film_dir(
-        user["name"],
+        user["id"],
         film_id
     )
 
@@ -402,7 +402,7 @@ def upload_finish():
     threading.Thread(
         target=convert_film,
         args=(
-            user["name"],
+            user["id"],
             film_id,
             original_path
         ),
@@ -429,14 +429,14 @@ def film_detail(film_id):
     user = get_current_user()
     if not user:
         return render_template("not_logged_in.html")
-    meta = read_meta(user["name"], film_id)
+    meta = read_meta(user["id"], film_id)
     if not meta:
         abort(404)
 
     # Nächste Episode ermitteln (falls Serie)
     next_episode = None
     if meta.get("series"):
-        series_data = list_series(user["name"])
+        series_data = list_series(user["id"])
         s = meta["series"]
         season = int(meta.get("season", 1))
         episode = int(meta.get("episode", 1))
@@ -463,11 +463,11 @@ def watch(film_id):
     if not user:
         abort(403)
 
-    meta = read_meta(user["name"], film_id)
+    meta = read_meta(user["id"], film_id)
     if not meta or meta.get("status") != "ready":
         abort(404)
 
-    fpath = os.path.join(film_dir(user["name"], film_id), meta["filename"])
+    fpath = os.path.join(film_dir(user["id"], film_id), meta["filename"])
     if not os.path.isfile(fpath):
         abort(404)
 
@@ -518,7 +518,7 @@ def film_status(film_id):
     user = get_current_user()
     if not user:
         abort(403)
-    meta = read_meta(user["name"], film_id)
+    meta = read_meta(user["id"], film_id)
     if not meta:
         abort(404)
     return jsonify({"status": meta.get("status"), "film_id": film_id})
@@ -529,7 +529,7 @@ def delete_film(film_id):
     user = get_current_user()
     if not user:
         abort(403)
-    fdir = film_dir(user["name"], film_id)
+    fdir = film_dir(user["id"], film_id)
     if os.path.isdir(fdir):
         shutil.rmtree(fdir)
     return redirect(url_for("films.index"))
