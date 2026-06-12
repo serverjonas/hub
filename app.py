@@ -17,7 +17,7 @@ load_dotenv()
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 MODULE_DIR = os.path.join(BASE_DIR, "modules")
 DB_PATH = os.path.join(BASE_DIR, "users.db")
-ACTIVITY_LOG = "logs/activity.log"
+ACTIVITY_LOG = os.path.join(BASE_DIR, "logs", "activity.log")
 
 
 app = Flask(
