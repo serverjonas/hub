@@ -7,8 +7,8 @@ import time
 from urllib.parse import quote
 import tomllib
 from dotenv import load_dotenv
-from flask import Flask, abort, redirect, render_template, request, send_from_directory
-
+from flask import Flask, abort, redirect, render_template, request, send_from_directory,  g
+from datetime import datetime
 from toolbox.files import BASE_DIR
 from toolbox.user import get_current_user, is_banned, is_user_active, get_lang, get_infos
 
@@ -17,6 +17,7 @@ load_dotenv()
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 MODULE_DIR = os.path.join(BASE_DIR, "modules")
 DB_PATH = os.path.join(BASE_DIR, "users.db")
+ACTIVITY_LOG = "logs/activity.log"
 
 
 app = Flask(
@@ -82,6 +83,7 @@ except Exception as e:
 
 @app.before_request
 def check_ban():
+    g.start_time = time.time()
     if request.path.startswith("/ban") or request.path.startswith("/static"):
         return
 
@@ -114,6 +116,22 @@ def inject_notifications():
     
     return {"unread_count": count, "roles":get_infos(user["id"])}
 
+@app.after_request
+def log_activity(response):
+    duration = time.time() - g.start_time
+
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    if ip and "," in ip:
+        ip = ip.split(",")[0].strip()
+
+    line = f"{timestamp}; {ip}; {request.path}; {response.status_code}; {duration:.3f}s\n"
+
+    with open(ACTIVITY_LOG, "a") as f:
+        f.write(line)
+
+    return response
 
 @app.errorhandler(404)
 def page_not_found(e):
