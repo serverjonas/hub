@@ -455,7 +455,7 @@ def film_detail(film_id):
     return render_template(
         "films_detail.html", user=user["name"], film=meta, next_episode=next_episode
     )
-c
+
 
 @bp.route("/film/<film_id>/watch")
 def watch(film_id):
