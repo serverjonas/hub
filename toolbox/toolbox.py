@@ -5,6 +5,7 @@ import sqlite3
 import time
 from flask import request, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
+from toolbox.files import *
 
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = BASE_PATH

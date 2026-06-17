@@ -1,6 +1,7 @@
 from flask import render_template, Blueprint, request, redirect
 import sqlite3
-from toolbox.toolbox import get_current_user, DB_PATH
+from toolbox.files import DB_PATH
+from toolbox.user import get_current_user
 
 bp = Blueprint("settings", __name__)
 

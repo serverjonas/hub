@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
 
-from toolbox.toolbox import get_current_user, is_banned
+from toolbox.user import get_current_user, is_banned
 
 bp = Blueprint("ban", __name__, template_folder="templates")
 
