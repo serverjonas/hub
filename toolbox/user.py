@@ -64,15 +64,28 @@ def is_user_active(user_id):
 def get_infos(user_id):
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
-    cur.execute("SELECT admin, vip, mod FROM users WHERE user_id = ?", (user_id,))
+
+    cur.execute("""
+        SELECT user_name, email, email_active,
+               admin, vip, mod
+        FROM users
+        WHERE user_id = ?
+    """, (user_id,))
+
     row = cur.fetchone()
     con.close()
 
     if row is None:
         return None
 
-    return {"admin": bool(row[0]), "vip": bool(row[1]), "mod": bool(row[2])}
-
+    return {
+        "user_name": row[0],
+        "email": row[1],
+        "email_active": bool(row[2]),
+        "admin": bool(row[3]),
+        "vip": bool(row[4]),
+        "mod": bool(row[5]),
+    }
 
 def is_banned(user_id):
     con = sqlite3.connect(DB_PATH)
