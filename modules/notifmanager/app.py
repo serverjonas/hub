@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 from toolbox.files import DB_PATH
 from toolbox.user import get_current_user, get_infos
-from toolbox.toolbox import create_notification
+from toolbox.news import create_notification
 
 bp = Blueprint("notification_manager", __name__, template_folder="templates")
 
