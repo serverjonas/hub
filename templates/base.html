@@ -287,59 +287,6 @@
 
             .menu-toggle { display: none; }
 
-            /* ─── Language Switcher ─── */
-            .lang-switcher { position: relative; }
-
-            .lang-menu {
-                position: absolute;
-                top: calc(100% + 10px);
-                right: 0;
-                background: var(--surface);
-                border: 1px solid var(--border);
-                border-radius: var(--radius-md);
-                padding: 6px;
-                min-width: 160px;
-                box-shadow: var(--shadow-lg);
-                display: none;
-                flex-direction: column;
-                gap: 2px;
-                z-index: 2000;
-            }
-
-            .lang-menu.open { display: flex; }
-
-            .lang-menu button {
-                background: none;
-                border: none;
-                padding: 10px 14px;
-                border-radius: var(--radius-sm);
-                cursor: pointer;
-                font-family: var(--font-body);
-                font-size: 14px;
-                color: var(--text-main);
-                text-align: left;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                transition: var(--transition-fast);
-            }
-
-            .lang-menu button:hover {
-                background: var(--accent-lighter);
-                color: var(--accent);
-            }
-
-            .lang-menu button.i18n-active {
-                background: var(--accent-lighter);
-                color: var(--accent);
-                font-weight: 600;
-            }
-
-            .lang-menu .lang-emoji {
-                font-size: 16px;
-                line-height: 1;
-            }
-
             /* ─── Mobile Nav Overlay ─── */
             .overlay {
                 position: fixed; top: 0; left: 0;
@@ -587,28 +534,6 @@
                     <i data-lucide="settings" style="width: 19px; height: 19px;"></i>
                 </a>
 
-                <!-- Language Switcher -->
-                <div class="lang-switcher">
-                    <button class="icon-btn" id="langToggle"
-                            data-i18n-title="lang.switcher.title"
-                            title="Sprache wechseln"
-                            aria-haspopup="menu"
-                            aria-expanded="false"
-                            aria-controls="langMenu">
-                        <i data-lucide="globe" style="width: 19px; height: 19px;"></i>
-                    </button>
-                    <div class="lang-menu" id="langMenu" role="menu" aria-label="Language">
-                        <button data-lang="deu" type="button" role="menuitem" aria-current="false">
-                            <span class="lang-emoji">🇩🇪</span>
-                            <span data-i18n="lang.deu">Deutsch</span>
-                        </button>
-                        <button data-lang="eng" type="button" role="menuitem" aria-current="false">
-                            <span class="lang-emoji">🇬🇧</span>
-                            <span data-i18n="lang.eng">English</span>
-                        </button>
-                    </div>
-                </div>
-
                 <button class="icon-btn menu-toggle" id="menuToggle">
                     <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
                 </button>
@@ -692,38 +617,6 @@
             if (menuToggle) menuToggle.addEventListener("click", toggleMenu);
             if (closeMenu) closeMenu.addEventListener("click", toggleMenu);
             if (overlay) overlay.addEventListener("click", toggleMenu);
-
-            // Language switcher
-            const langToggle = document.getElementById("langToggle");
-            const langMenu = document.getElementById("langMenu");
-            if (langToggle && langMenu) {
-                function setMenuOpen(open) {
-                    langMenu.classList.toggle("open", open);
-                    langToggle.setAttribute("aria-expanded", open ? "true" : "false");
-                }
-                langToggle.addEventListener("click", function(e) {
-                    e.stopPropagation();
-                    setMenuOpen(!langMenu.classList.contains("open"));
-                });
-                document.addEventListener("click", function() {
-                    setMenuOpen(false);
-                });
-                document.addEventListener("keydown", function(e) {
-                    if (e.key === "Escape" && langMenu.classList.contains("open")) {
-                        setMenuOpen(false);
-                        langToggle.focus();
-                    }
-                });
-                langMenu.querySelectorAll("[data-lang]").forEach(function(btn) {
-                    btn.addEventListener("click", function(e) {
-                        e.stopPropagation();
-                        const lang = btn.getAttribute("data-lang");
-                        if (window.i18n) window.i18n.setLanguage(lang);
-                        setMenuOpen(false);
-                        lucide.createIcons();
-                    });
-                });
-            }
 
             // Intersection Observer for scroll animations
             const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -40px 0px' };

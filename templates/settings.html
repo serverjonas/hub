@@ -71,6 +71,17 @@
     color: var(--accent);
 }
 
+.settings-title-icon.lang {
+    background: var(--pastel-sky);
+    color: #3b82f6;
+}
+
+.option-card .lang-flag {
+    font-size: 28px;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
 .settings-title-icon.security {
     background: rgba(34, 197, 94, 0.08);
     color: #22c55e;
@@ -363,6 +374,29 @@
         </div>
     </div>
 
+    <!-- Language Settings -->
+    <div class="settings-card">
+        <div class="settings-section">
+            <h2 class="settings-title">
+                <div class="settings-title-icon lang">
+                    <i data-lucide="globe" style="width: 18px; height: 18px;"></i>
+                </div>
+                <span data-i18n="settings.language.title">Sprache</span>
+            </h2>
+            <p class="settings-description" data-i18n="settings.language.desc">Wähle die Anzeigesprache der Oberfläche.</p>
+            <div class="options-grid">
+                <div class="option-card" data-option="lang" data-value="deu">
+                    <div class="lang-flag" aria-hidden="true">🇩🇪</div>
+                    <div class="option-name" data-i18n="lang.deu">Deutsch</div>
+                </div>
+                <div class="option-card" data-option="lang" data-value="eng">
+                    <div class="lang-flag" aria-hidden="true">🇬🇧</div>
+                    <div class="option-name" data-i18n="lang.eng">English</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% if user %}
     <!-- Account Settings -->
     <div class="settings-card">
@@ -502,19 +536,40 @@
     // Theme switching
     function updateActiveStates() {
         const theme = localStorage.getItem("theme") || "light";
+        const lang = localStorage.getItem("serverjonas_lang") || "deu";
 
         document.querySelectorAll('[data-option="theme"]').forEach(el => {
             el.classList.toggle('active', el.getAttribute('data-value') === theme);
+        });
+        document.querySelectorAll('[data-option="lang"]').forEach(el => {
+            el.classList.toggle('active', el.getAttribute('data-value') === lang);
         });
     }
 
     document.querySelectorAll('.option-card').forEach(card => {
         card.addEventListener('click', () => {
+            const option = card.getAttribute('data-option');
             const value = card.getAttribute('data-value');
-            localStorage.setItem("theme", value);
-            document.documentElement.setAttribute("data-theme", value);
+
+            if (option === 'theme') {
+                localStorage.setItem("theme", value);
+                document.documentElement.setAttribute("data-theme", value);
+                showToast(
+                    (window.t && window.t('settings.toast.theme_changed')) || 'Erscheinungsbild geändert',
+                    'success'
+                );
+            } else if (option === 'lang') {
+                if (window.i18n) {
+                    window.i18n.setLanguage(value).then(() => {
+                        showToast(
+                            (window.t && window.t('settings.toast.lang_changed')) || 'Sprache geändert',
+                            'success'
+                        );
+                    });
+                }
+            }
+
             updateActiveStates();
-            showToast((window.t && window.t('settings.toast.theme_changed')) || 'Erscheinungsbild geändert', 'success');
             lucide.createIcons();
         });
     });
