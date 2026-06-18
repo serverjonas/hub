@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Adminpanel &middot; Users{% endblock %}
+{% block page_id %}admin_users{% endblock %}
+{% block title %}<span data-i18n="admin.title">Adminpanel</span> &middot; Users{% endblock %}
 
 {% block extra_style %}
 .admin-table-container {
@@ -53,8 +54,8 @@ tr:hover td {
 
 {% block content %}
 <div style="margin-bottom: 32px;">
-    <h1>Adminpanel</h1>
-    <p style="color: var(--text-dim);">Benutzerverwaltung und Systemübersicht</p>
+    <h1 data-i18n="admin.title">Adminpanel</h1>
+    <p style="color: var(--text-dim);" data-i18n="adminpanel.subtitle">Benutzerverwaltung und Systemübersicht</p>
 </div>
 
 <div class="admin-table-container">
@@ -86,7 +87,7 @@ tr:hover td {
         </tbody>
     </table>
     {% else %}
-    <p class="empty-state">Keine User in der Datenbank.</p>
+    <p class="empty-state" data-i18n="adminpanel.empty">Keine User in der Datenbank.</p>
     {% endif %}
 </div>
 {% endblock %}

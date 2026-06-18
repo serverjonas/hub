@@ -1,0 +1,5 @@
+{
+    "_meta": { "page": "error_500_bad" },
+    "errors.500.title": "Interner Fehler",
+    "errors.500.body": "Hier läuft etwas schief. Der Fehler liegt bei uns, nicht bei dir. Bitte versuche es gleich noch einmal."
+}

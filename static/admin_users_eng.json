@@ -1,0 +1,6 @@
+{
+    "_meta": { "page": "admin_users" },
+    "admin.title": "Admin panel",
+    "adminpanel.subtitle": "User management and system overview",
+    "adminpanel.empty": "No users in the database."
+}

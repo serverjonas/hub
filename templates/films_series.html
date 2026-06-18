@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Serien · Serverjonas{% endblock %}
+{% block page_id %}films_series{% endblock %}
+{% block title %}<span data-i18n="films_series.title">Serien</span> · Serverjonas{% endblock %}
 {% block head %}
 <style>
 .series-grid {
@@ -46,10 +47,10 @@
 {% endblock %}
 {% block content %}
 <div class="topbar">
-    <h1 style="margin:0; font-size:2em;">📺 Serien</h1>
-    <a href="{{ url_for('films.upload') }}" class="btn">⬆️ Episode hochladen</a>
+    <h1 style="margin:0; font-size:2em;">📺 <span data-i18n="films_series.heading">Serien</span></h1>
+    <a href="{{ url_for('films.upload') }}" class="btn">⬆️ <span data-i18n="films_series.upload_episode">Episode hochladen</span></a>
 </div>
-<p>Alle deine Serien</p>
+<p data-i18n="films_series.intro">Alle deine Serien</p>
 
 {% if series %}
 <div class="series-grid">
@@ -60,17 +61,20 @@
         <div class="icon">📺</div>
         <h3>{{ series_name }}</h3>
         <div class="meta">
-            {{ total_seasons }} Staffel{% if total_seasons != 1 %}n{% endif %} ·
-            {{ total_eps }} Episode{% if total_eps != 1 %}n{% endif %}
+            {{ total_seasons }}
+            {% if total_seasons == 1 %}<span data-i18n="films.season.one">Staffel</span>{% else %}<span data-i18n="films.season.other">Staffeln</span>{% endif %}
+            ·
+            {{ total_eps }}
+            {% if total_eps == 1 %}<span data-i18n="films.episode.one">Episode</span>{% else %}<span data-i18n="films.episode.other">Episoden</span>{% endif %}
         </div>
     </div>
     {% endfor %}
 </div>
 {% else %}
 <div class="empty">
-    <p>📭 Noch keine Serien vorhanden.</p>
-    <p style="font-size:0.9em;">Beim Upload einfach "Serie" wählen und Serienname angeben.</p>
-    <a href="{{ url_for('films.upload') }}" class="btn">Jetzt hochladen</a>
+    <p>📭 <span data-i18n="films_series.empty">Noch keine Serien vorhanden.</span></p>
+    <p style="font-size:0.9em;" data-i18n="films_series.empty.hint">Beim Upload einfach "Serie" wählen und Serienname angeben.</p>
+    <a href="{{ url_for('films.upload') }}" class="btn"><span data-i18n="films_series.upload_now">Jetzt hochladen</span></a>
 </div>
 {% endif %}
 {% endblock %}

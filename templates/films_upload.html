@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Upload &middot; Serverjonas{% endblock %}
+{% block page_id %}films_upload{% endblock %}
+{% block title %}<span data-i18n="films.upload_label">Upload</span> &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
 .upload-container {
@@ -103,8 +104,8 @@ progress {
 {% block content %}
 <div class="upload-container">
     <div style="margin-bottom: 32px; text-align: center;">
-        <h1>Medien hochladen</h1>
-        <p style="color: var(--text-dim);">Füge neue Filme oder Serien zur Mediathek hinzu.</p>
+        <h1 data-i18n="films_upload.title">Medien hochladen</h1>
+        <p style="color: var(--text-dim);" data-i18n="films_upload.subtitle">Füge neue Filme oder Serien zur Mediathek hinzu.</p>
     </div>
 
     <div class="upload-card">
@@ -115,50 +116,50 @@ progress {
                 <div class="radio-item">
                     <input type="radio" name="upload_type" value="film" id="type_film" checked>
                     <label for="type_film" class="radio-label">
-                        <i data-lucide="film"></i> Film
+                        <i data-lucide="film"></i> <span data-i18n="films_upload.type.film">Film</span>
                     </label>
                 </div>
                 <div class="radio-item">
                     <input type="radio" name="upload_type" value="series" id="type_series">
                     <label for="type_series" class="radio-label">
-                        <i data-lucide="tv"></i> Serie
+                        <i data-lucide="tv"></i> <span data-i18n="films_upload.type.series">Serie</span>
                     </label>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="title">Titel</label>
+                <label for="title" data-i18n="films_upload.label.title">Titel</label>
                 <input type="text" name="title" id="title" class="form-control" required>
             </div>
 
             <div class="series-only" id="series_fields">
                 <div class="form-group">
-                    <label for="series_name">Name der Serie</label>
+                    <label for="series_name" data-i18n="films_upload.label.series_name">Name der Serie</label>
                     <input type="text" name="series_name" id="series_name" class="form-control">
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                     <div class="form-group">
-                        <label>Staffel</label>
+                        <label data-i18n="films.season.one">Staffel</label>
                         <input type="number" name="season" id="season" class="form-control" value="1">
                     </div>
                     <div class="form-group">
-                        <label>Episode</label>
+                        <label data-i18n="films_upload.label.episode">Episode</label>
                         <input type="number" name="episode" id="episode" class="form-control" value="1">
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Datei</label>
+                <label data-i18n="films_upload.label.file">Datei</label>
                 <div class="file-input-wrapper" onclick="document.getElementById('file').click()">
                     <i data-lucide="cloud-upload"></i>
-                    <p id="file-label">Datei auswählen</p>
+                    <p id="file-label" data-i18n="films_upload.choose_file">Datei auswählen</p>
                     <input type="file" id="file" style="display:none">
                 </div>
             </div>
 
             <button type="submit" class="btn btn-primary" style="width:100%;">
-                Upload starten
+                <span data-i18n="films_upload.submit">Upload starten</span>
             </button>
 
             <div class="upload-progress" id="progress-box">
@@ -251,8 +252,9 @@ document.getElementById('upload-form').addEventListener('submit', async (e) => {
 });
 
 function updateFileName(input) {
+    const fallback = (window.t && window.t('films_upload.choose_file')) || "Datei auswählen";
     document.getElementById('file-label').innerText =
-        input.files[0]?.name || "Datei auswählen";
+        input.files[0]?.name || fallback;
 }
 </script>
 {% endblock %}

@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 
+{% block page_id %}cloud{% endblock %}
 {% block content %}
 
-<h1>☁️ Cloud</h1>
+<h1>☁️ <span data-i18n="nav.cloud">Cloud</span></h1>
 
 <!-- EIN Upload-Feld statt zwei -->
 <form id="uploadForm">
   <input type="file" name="files" multiple id="fileInput">
-  <button class="btn btn-primary" type="submit">Upload</button>
+  <button class="btn btn-primary" type="submit"><span data-i18n="films.upload_label">Upload</span></button>
 </form>
 
 <div id="fileInfo" style="margin-top:10px; opacity:0.8;"></div>
@@ -22,7 +23,7 @@
     {% else %}
       📄 <a href="/cloud/download/{{ i.name }}">{{ i.name }}</a>
     {% endif %}
-    <a href="/cloud/delete/{{ i.name }}">🗑</a>
+    <a href="/cloud/delete/{{ i.name }}" data-i18n-title="cloud.delete" title="🗑">🗑</a>
   </li>
 {% endfor %}
 </ul>
@@ -53,7 +54,8 @@ fileInput.addEventListener("change", () => {
     return;
   }
 
-  fileInfo.innerText = "📦 Ausgewählt: " + files.map(f => f.name).join(", ");
+  const tmpl = (window.t && window.t('cloud.selected_template')) || '📦 Ausgewählt: {files}';
+  fileInfo.innerText = tmpl.replace(/\{files\}/g, files.map(f => f.name).join(", "));
 });
 
 form.onsubmit = async (e) => {
@@ -74,14 +76,16 @@ form.onsubmit = async (e) => {
 
     if (!res.ok) {
       console.error(await res.text());
-      alert("Upload fehlgeschlagen");
+      const msg = (window.t && window.t('cloud.upload_failed')) || 'Upload fehlgeschlagen';
+      alert(msg);
       return;
     }
 
     location.reload();
   } catch (err) {
     console.error(err);
-    alert("Netzwerkfehler");
+    const msg = (window.t && window.t('cloud.network_error')) || 'Netzwerkfehler';
+    alert(msg);
   }
 };
 </script>

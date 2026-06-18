@@ -1,0 +1,5 @@
+{
+    "_meta": { "page": "error_500_bad" },
+    "errors.500.title": "Internal error",
+    "errors.500.body": "Something is wrong here. The error is on our side, not yours. Please try again in a moment."
+}

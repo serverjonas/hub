@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Einstellungen &middot; Serverjonas{% endblock %}
+{% block page_id %}settings{% endblock %}
+{% block title %}<span data-i18n="nav.settings">Einstellungen</span> &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
 .settings-container {
@@ -327,8 +328,8 @@
 {% block content %}
 <div class="settings-container">
     <div class="settings-header">
-        <h1>Einstellungen</h1>
-        <p>Passe dein Erlebnis auf Serverjonas an.</p>
+        <h1 data-i18n="nav.settings">Einstellungen</h1>
+        <p data-i18n="settings.subtitle">Passe dein Erlebnis auf Serverjonas an.</p>
     </div>
 
     <!-- Theme Settings -->
@@ -338,17 +339,17 @@
                 <div class="settings-title-icon theme">
                     <i data-lucide="palette" style="width: 18px; height: 18px;"></i>
                 </div>
-                Erscheinungsbild
+                <span data-i18n="settings.theme.title">Erscheinungsbild</span>
             </h2>
-            <p class="settings-description">Wähle ein Farbschema, das dir gefällt.</p>
+            <p class="settings-description" data-i18n="settings.theme.desc">Wähle ein Farbschema, das dir gefällt.</p>
             <div class="options-grid">
                 <div class="option-card" data-option="theme" data-value="light">
                     <i data-lucide="sun" class="option-icon"></i>
-                    <div class="option-name">Hell</div>
+                    <div class="option-name" data-i18n="settings.theme.light">Hell</div>
                 </div>
                 <div class="option-card" data-option="theme" data-value="dark">
                     <i data-lucide="moon" class="option-icon"></i>
-                    <div class="option-name">Dunkel</div>
+                    <div class="option-name" data-i18n="settings.theme.dark">Dunkel</div>
                 </div>
                 <div class="option-card" data-option="theme" data-value="oled">
                     <i data-lucide="zap" class="option-icon"></i>
@@ -370,18 +371,18 @@
                 <div class="settings-title-icon account">
                     <i data-lucide="user" style="width: 18px; height: 18px;"></i>
                 </div>
-                Account
+                <span data-i18n="settings.account.title">Account</span>
             </h2>
-            <p class="settings-description">Angemeldet als <strong>{{ user }}</strong></p>
+            <p class="settings-description"><span data-i18n="settings.account.loggedin">Angemeldet als</span> <strong>{{ user }}</strong></p>
 
             <div class="setting-row">
                 <div class="setting-info">
-                    <div class="setting-label">Benutzername</div>
+                    <div class="setting-label" data-i18n="settings.account.username">Benutzername</div>
                     <div class="setting-hint">{{ user }}</div>
                 </div>
                 <span class="setting-action" style="cursor: default; color: var(--accent);">
                     <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i>
-                    Aktiv
+                    <span data-i18n="settings.account.active">Aktiv</span>
                 </span>
             </div>
         </div>
@@ -394,9 +395,9 @@
                 <div class="settings-title-icon security">
                     <i data-lucide="shield" style="width: 18px; height: 18px;"></i>
                 </div>
-                Sicherheit
+                <span data-i18n="settings.security.title">Sicherheit</span>
             </h2>
-            <p class="settings-description">Verwalte dein Passwort und deine Sicherheitsoptionen.</p>
+            <p class="settings-description" data-i18n="settings.security.desc">Verwalte dein Passwort und deine Sicherheitsoptionen.</p>
 
             <!--<div class="setting-row">
                 <div class="setting-info">
@@ -433,13 +434,13 @@
 
             <div class="setting-row">
                 <div class="setting-info">
-                    <div class="setting-label">Aktive Sitzungen</div>
-                    <div class="setting-hint">Melde dich auf allen anderen Geräten ab.</div>
+                    <div class="setting-label" data-i18n="settings.security.sessions">Aktive Sitzungen</div>
+                    <div class="setting-hint" data-i18n="settings.security.sessions.hint">Melde dich auf allen anderen Geräten ab.</div>
                 </div>
                 <form action="/settings/logout-all" method="POST">
                     <button type="submit" class="setting-action danger">
                         <i data-lucide="log-out" style="width: 14px; height: 14px;"></i>
-                        Alle abmelden
+                        <span data-i18n="settings.security.logout_all">Alle abmelden</span>
                     </button>
                 </form>
             </div>
@@ -452,11 +453,11 @@
             <div class="settings-title-icon security" style="margin: 0 auto 16px; width: 48px; height: 48px; border-radius: 16px;">
                 <i data-lucide="lock" style="width: 22px; height: 22px;"></i>
             </div>
-            <div class="setting-label" style="font-size: 16px; margin-bottom: 8px;">Sicherheitseinstellungen</div>
-            <div class="setting-hint" style="margin-bottom: 20px;">Melde dich an, um Passwort und Sicherheitsoptionen zu verwalten.</div>
+            <div class="setting-label" style="font-size: 16px; margin-bottom: 8px;" data-i18n="settings.security.title">Sicherheitseinstellungen</div>
+            <div class="setting-hint" style="margin-bottom: 20px;" data-i18n="settings.security.not_logged_in">Melde dich an, um Passwort und Sicherheitsoptionen zu verwalten.</div>
             <a href="/login" class="btn btn-primary" style="font-size: 13px; padding: 10px 20px;">
                 <i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
-                Anmelden
+                <span data-i18n="hub.action.login">Anmelden</span>
             </a>
         </div>
     </div>
@@ -469,17 +470,17 @@
                 <div class="settings-title-icon info">
                     <i data-lucide="info" style="width: 18px; height: 18px;"></i>
                 </div>
-                Über Serverjonas
+                <span data-i18n="settings.about.title">Über Serverjonas</span>
             </h2>
-            <p class="settings-description">Informationen über die Plattform.</p>
+            <p class="settings-description" data-i18n="settings.about.desc">Informationen über die Plattform.</p>
 
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="info-item-label">Version</div>
+                    <div class="info-item-label" data-i18n="settings.about.version">Version</div>
                     <div class="info-item-value">5.3</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-item-label">Plattform</div>
+                    <div class="info-item-label" data-i18n="settings.about.platform">Plattform</div>
                     <div class="info-item-value">Web</div>
                 </div>
             </div>
@@ -513,7 +514,7 @@
             localStorage.setItem("theme", value);
             document.documentElement.setAttribute("data-theme", value);
             updateActiveStates();
-            showToast('Erscheinungsbild geändert', 'success');
+            showToast((window.t && window.t('settings.toast.theme_changed')) || 'Erscheinungsbild geändert', 'success');
             lucide.createIcons();
         });
     });
@@ -548,22 +549,22 @@
             const confirm = document.getElementById('confirm_pw').value;
 
             if (!current || !newPw || !confirm) {
-                showToast('Bitte alle Felder ausfüllen', 'error');
+                showToast((window.t && window.t('settings.toast.fill_all')) || 'Bitte alle Felder ausfüllen', 'error');
                 return;
             }
 
             if (newPw.length < 8) {
-                showToast('Passwort muss mindestens 8 Zeichen lang sein', 'error');
+                showToast((window.t && window.t('settings.toast.pw_short')) || 'Passwort muss mindestens 8 Zeichen lang sein', 'error');
                 return;
             }
 
             if (newPw !== confirm) {
-                showToast('Passwörter stimmen nicht überein', 'error');
+                showToast((window.t && window.t('settings.toast.pw_mismatch')) || 'Passwörter stimmen nicht überein', 'error');
                 return;
             }
 
             // TODO: POST to server endpoint
-            showToast('Passwort-Änderung wird noch implementiert', 'success');
+            showToast((window.t && window.t('settings.toast.pw_todo')) || 'Passwort-Änderung wird noch implementiert', 'success');
             pwForm.classList.remove('visible');
             pwForm.querySelectorAll('input').forEach(i => i.value = '');
         });

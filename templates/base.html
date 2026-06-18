@@ -287,6 +287,59 @@
 
             .menu-toggle { display: none; }
 
+            /* ─── Language Switcher ─── */
+            .lang-switcher { position: relative; }
+
+            .lang-menu {
+                position: absolute;
+                top: calc(100% + 10px);
+                right: 0;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-md);
+                padding: 6px;
+                min-width: 160px;
+                box-shadow: var(--shadow-lg);
+                display: none;
+                flex-direction: column;
+                gap: 2px;
+                z-index: 2000;
+            }
+
+            .lang-menu.open { display: flex; }
+
+            .lang-menu button {
+                background: none;
+                border: none;
+                padding: 10px 14px;
+                border-radius: var(--radius-sm);
+                cursor: pointer;
+                font-family: var(--font-body);
+                font-size: 14px;
+                color: var(--text-main);
+                text-align: left;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                transition: var(--transition-fast);
+            }
+
+            .lang-menu button:hover {
+                background: var(--accent-lighter);
+                color: var(--accent);
+            }
+
+            .lang-menu button.i18n-active {
+                background: var(--accent-lighter);
+                color: var(--accent);
+                font-weight: 600;
+            }
+
+            .lang-menu .lang-emoji {
+                font-size: 16px;
+                line-height: 1;
+            }
+
             /* ─── Mobile Nav Overlay ─── */
             .overlay {
                 position: fixed; top: 0; left: 0;
@@ -481,11 +534,15 @@
             {% block extra_style %}{% endblock %}
         </style>
     </head>
-    <body>
+    <body data-page="{% block page_id %}base{% endblock %}">
         <script>
             (function() {
                 const theme = localStorage.getItem("theme");
                 if (theme) document.documentElement.setAttribute("data-theme", theme);
+
+                var LANG_MAP = { deu: "de", eng: "en" };
+                var lang = localStorage.getItem("serverjonas_lang");
+                document.documentElement.setAttribute("lang", LANG_MAP[lang] || "de");
             })();
         </script>
         <div id="notif-toast-container"></div>
@@ -506,29 +563,51 @@
                     <!--<i data-lucide="layers" style="width: 20px; height: 20px;"></i>-->
                     <img src="{{ url_for('static', filename='logo.png') }}">
                 </div>
-                serverjonas
+                <span data-i18n="brand.name">serverjonas</span>
             </a>
             <div class="nav-right">
                 <div class="nav-links">
-                    <a href="/memes">Memes</a>
-                    <a href="/films">Media</a>
-                    <a href="/friends">Freunde</a>
+                    <a href="/memes" data-i18n="nav.memes">Memes</a>
+                    <a href="/films" data-i18n="nav.media">Media</a>
+                    <a href="/friends" data-i18n="nav.friends">Freunde</a>
                     {% if roles.admin %}
-                        <a href="/admin">Admin</a>
+                        <a href="/admin" data-i18n="nav.admin">Admin</a>
                     {% endif %}
-                    <a href="/cloud">Cloud</a>
+                    <a href="/cloud" data-i18n="nav.cloud">Cloud</a>
                 </div>
 
-                <a href="/news" class="icon-btn" title="Benachrichtigungen">
+                <a href="/news" class="icon-btn" data-i18n-title="nav.notifications" title="Benachrichtigungen">
                     <i data-lucide="bell" style="width: 19px; height: 19px;"></i>
                     {% if unread_count > 0 %}
                     <span class="notif-badge">{{ unread_count }}</span>
                     {% endif %}
                 </a>
 
-                <a href="/settings" class="icon-btn" title="Einstellungen">
+                <a href="/settings" class="icon-btn" data-i18n-title="nav.settings" title="Einstellungen">
                     <i data-lucide="settings" style="width: 19px; height: 19px;"></i>
                 </a>
+
+                <!-- Language Switcher -->
+                <div class="lang-switcher">
+                    <button class="icon-btn" id="langToggle"
+                            data-i18n-title="lang.switcher.title"
+                            title="Sprache wechseln"
+                            aria-haspopup="menu"
+                            aria-expanded="false"
+                            aria-controls="langMenu">
+                        <i data-lucide="globe" style="width: 19px; height: 19px;"></i>
+                    </button>
+                    <div class="lang-menu" id="langMenu" role="menu" aria-label="Language">
+                        <button data-lang="deu" type="button" role="menuitem" aria-current="false">
+                            <span class="lang-emoji">🇩🇪</span>
+                            <span data-i18n="lang.deu">Deutsch</span>
+                        </button>
+                        <button data-lang="eng" type="button" role="menuitem" aria-current="false">
+                            <span class="lang-emoji">🇬🇧</span>
+                            <span data-i18n="lang.eng">English</span>
+                        </button>
+                    </div>
+                </div>
 
                 <button class="icon-btn menu-toggle" id="menuToggle">
                     <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
@@ -539,26 +618,26 @@
         <!-- Mobile Nav -->
         <div class="mobile-nav" id="mobileNav">
             <div class="mobile-nav-header">
-                <span class="brand" style="font-size: 17px;">Menü</span>
+                <span class="brand" style="font-size: 17px;"><span data-i18n="mobile.menu">Menü</span></span>
                 <button class="icon-btn" id="closeMenu">
                     <i data-lucide="x"></i>
                 </button>
             </div>
             <a href="/hub" class="mobile-nav-link">
-                <i data-lucide="home" style="width: 20px;"></i> Hub
+                <i data-lucide="home" style="width: 20px;"></i> <span>Hub</span>
             </a>
             <a href="/memes" class="mobile-nav-link">
-                <i data-lucide="image" style="width: 20px;"></i> Memes
+                <i data-lucide="image" style="width: 20px;"></i> <span data-i18n="nav.memes">Memes</span>
             </a>
             <a href="/films" class="mobile-nav-link">
-                <i data-lucide="clapperboard" style="width: 20px;"></i> Media
+                <i data-lucide="clapperboard" style="width: 20px;"></i> <span data-i18n="nav.media">Media</span>
             </a>
             <a href="/friends" class="mobile-nav-link">
-                <i data-lucide="users" style="width: 20px;"></i> Freunde
+                <i data-lucide="users" style="width: 20px;"></i> <span data-i18n="nav.friends">Freunde</span>
             </a>
 
             <a href="/news" class="mobile-nav-link">
-                <i data-lucide="bell" style="width: 20px;"></i> Benachrichtigungen
+                <i data-lucide="bell" style="width: 20px;"></i> <span data-i18n="nav.notifications">Benachrichtigungen</span>
                 {% if unread_count > 0 %}
                 <span style="
                     margin-left: auto;
@@ -569,15 +648,15 @@
                 {% endif %}
             </a>
             <a href="/settings" class="mobile-nav-link" style="margin-top: auto;">
-                <i data-lucide="settings" style="width: 20px;"></i> Einstellungen
+                <i data-lucide="settings" style="width: 20px;"></i> <span data-i18n="nav.settings">Einstellungen</span>
             </a>
             {% if roles.admin %}
                 <a href="/admin" class="mobile-nav-link">
-                    <i data-lucide="terminal" style="width: 20px;"></i> Admin
+                    <i data-lucide="terminal" style="width: 20px;"></i> <span data-i18n="nav.admin">Admin</span>
                 </a>
             {% endif %}
             <a href="/cloud" class="mobile-nav-link">
-                <i data-lucide="cloud" style="width: 20px;"></i> Cloud
+                <i data-lucide="cloud" style="width: 20px;"></i> <span data-i18n="nav.cloud">Cloud</span>
             </a>
         </div>
 
@@ -586,12 +665,12 @@
         <!-- Footer -->
         <footer>
             <div class="footer-inner">
-                <div class="footer-brand">serverjonas</div>
-                <div class="footer-text">&copy; 2026 serverjonas &middot; Version 5.3</div>
+                <div class="footer-brand" data-i18n="brand.name">serverjonas</div>
+                <div class="footer-text" data-i18n="footer.copyright">&copy; 2026 serverjonas &middot; Version 5.3</div>
                 <div class="footer-links">
-                    <a href="/rights">Datenschutz</a>
-                    <a href="/status">Serverstatus</a>
-                    <a href="/news">Neuigkeiten</a>
+                    <a href="/rights" data-i18n="footer.privacy">Datenschutz</a>
+                    <a href="/status" data-i18n="footer.status">Serverstatus</a>
+                    <a href="/news" data-i18n="footer.news">Neuigkeiten</a>
                 </div>
             </div>
         </footer>
@@ -613,6 +692,38 @@
             if (menuToggle) menuToggle.addEventListener("click", toggleMenu);
             if (closeMenu) closeMenu.addEventListener("click", toggleMenu);
             if (overlay) overlay.addEventListener("click", toggleMenu);
+
+            // Language switcher
+            const langToggle = document.getElementById("langToggle");
+            const langMenu = document.getElementById("langMenu");
+            if (langToggle && langMenu) {
+                function setMenuOpen(open) {
+                    langMenu.classList.toggle("open", open);
+                    langToggle.setAttribute("aria-expanded", open ? "true" : "false");
+                }
+                langToggle.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    setMenuOpen(!langMenu.classList.contains("open"));
+                });
+                document.addEventListener("click", function() {
+                    setMenuOpen(false);
+                });
+                document.addEventListener("keydown", function(e) {
+                    if (e.key === "Escape" && langMenu.classList.contains("open")) {
+                        setMenuOpen(false);
+                        langToggle.focus();
+                    }
+                });
+                langMenu.querySelectorAll("[data-lang]").forEach(function(btn) {
+                    btn.addEventListener("click", function(e) {
+                        e.stopPropagation();
+                        const lang = btn.getAttribute("data-lang");
+                        if (window.i18n) window.i18n.setLanguage(lang);
+                        setMenuOpen(false);
+                        lucide.createIcons();
+                    });
+                });
+            }
 
             // Intersection Observer for scroll animations
             const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -40px 0px' };
@@ -657,7 +768,9 @@
             }
 
             function grouped(count) {
-                toast(`Du hast während deiner Abwesenheit ${count} neue Nachrichten bekommen. Schaue sie im News Portal an.`);
+                // Reads via window.t() so language switch updates future toasts.
+                const tpl = (window.t && window.t("notif.away.summary")) || "You received {count} new messages.";
+                toast(tpl.replace(/\{count\}/g, count));
             }
 
             async function syncNews() {
@@ -678,7 +791,8 @@
                             grouped(fresh.length);
                         } else {
                             fresh.forEach(n => {
-                                toast(` ${n.sender_name}: ${n.message}`);
+                                const tpl = (window.t && window.t("notif.toast.format")) || "{sender}: {message}";
+                                toast(tpl.replace(/\{sender\}/g, n.sender_name).replace(/\{message\}/g, n.message));
                             });
                         }
 
@@ -705,11 +819,19 @@
                 }
             }
 
-            document.addEventListener("DOMContentLoaded", () => {
+            function bootNotif() {
                 syncNews();
                 setInterval(syncNews, 5000);
-            });
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", bootNotif);
+            } else {
+                bootNotif();
+            }
         })();
         </script>
+
+        <script src="/static/i18n.js"></script>
     </body>
 </html>

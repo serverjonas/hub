@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}500 – Interner Fehler{% endblock %}
+{% block page_id %}error_500_bad{% endblock %}
+{% block title %}500 – <span data-i18n="errors.500.title">Interner Fehler</span>{% endblock %}
 
 {% block extra_style %}
 .error-wrapper {
@@ -70,16 +71,16 @@
             <i data-lucide="server-crash" style="width: 36px; height: 36px;"></i>
         </div>
         <div class="error-code">500</div>
-        <h1 class="error-title">Interner Fehler</h1>
-        <p class="error-message">
+        <h1 class="error-title" data-i18n="errors.500.title">Interner Fehler</h1>
+        <p class="error-message" data-i18n="errors.500.body">
             Hier läuft etwas schief. Der Fehler liegt bei uns, nicht bei dir. Bitte versuche es gleich noch einmal.
-            {% if user %}<br>Angemeldet als <strong>{{ user }}</strong>{% endif %}
+            {% if user %}<br><span data-i18n="hub.user.loggedin">Angemeldet als</span> <strong>{{ user }}</strong>{% endif %}
         </p>
 
         <div class="btn-group">
             <a href="/" class="btn btn-primary">
                 <i data-lucide="home" style="width: 18px; height: 18px;"></i>
-                Zurück zum Hub
+                <span data-i18n="errors.back_hub">Zurück zum Hub</span>
             </a>
         </div>
     </div>

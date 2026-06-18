@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Nicht angemeldet{% endblock %}
+{% block page_id %}not_logged_in{% endblock %}
+{% block title %><span data-i18n="loggedin.title">Nicht angemeldet</span>{% endblock %}
 
 {% block extra_style %}
 .error-wrapper {
@@ -92,20 +93,20 @@
         </div>
         <div class="error-badge">
             <span class="dot"></span>
-            Wichtig
+            <span data-i18n="loggedin.important">Wichtig</span>
         </div>
-        <h1 class="error-title">Anmeldung erforderlich</h1>
-        <p class="error-message">
+        <h1 class="error-title" data-i18n="loggedin.heading">Anmeldung erforderlich</h1>
+        <p class="error-message" data-i18n="loggedin.body">
             Du musst angemeldet sein, um auf diese Seite zuzugreifen.
         </p>
         <div class="btn-group">
             <a href="/login" class="btn btn-primary">
                 <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
-                Jetzt anmelden
+                <span data-i18n="loggedin.cta">Jetzt anmelden</span>
             </a>
             <a href="/" class="btn">
                 <i data-lucide="home" style="width: 18px; height: 18px;"></i>
-                Zurück zum Hub
+                <span data-i18n="errors.back_hub">Zurück zum Hub</span>
             </a>
         </div>
     </div>

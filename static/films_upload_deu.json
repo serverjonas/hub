@@ -1,0 +1,14 @@
+{
+    "_meta": { "page": "films_upload" },
+    "films.upload_label": "Upload",
+    "films_upload.title": "Medien hochladen",
+    "films_upload.subtitle": "Füge neue Filme oder Serien zur Mediathek hinzu.",
+    "films_upload.type.film": "Film",
+    "films_upload.type.series": "Serie",
+    "films_upload.label.title": "Titel",
+    "films_upload.label.series_name": "Name der Serie",
+    "films_upload.label.episode": "Episode",
+    "films_upload.label.file": "Datei",
+    "films_upload.choose_file": "Datei auswählen",
+    "films_upload.submit": "Upload starten"
+}

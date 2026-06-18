@@ -1,0 +1,15 @@
+{
+    "_meta": { "page": "login" },
+    "login.title": "Anmelden",
+    "login.heading": "Willkommen zurück",
+    "login.subtitle": "Melde dich an, um auf Serverjonas zuzugreifen.",
+    "login.label.username": "Benutzername",
+    "login.label.password": "Passwort",
+    "login.placeholder.username": "Dein Benutzername",
+    "login.pw_show": "Passwort anzeigen",
+    "login.pw_hide": "Passwort verbergen",
+    "login.submit": "Anmelden",
+    "login.or": "oder",
+    "login.no_account": "Noch keinen Account?",
+    "login.register_link": "Jetzt registrieren"
+}

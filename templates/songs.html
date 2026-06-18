@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block page_id %}songs{% endblock %}
 {% block content %}
 
 <h1>{{artist}} - {{album}}</h1>
@@ -18,6 +19,6 @@ function play(track){
 }
 </script>
 
-<a href="/music/artist/{{artist}}">← zurück</a>
+<a href="/music/artist/{{artist}}"><span data-i18n="music.back">← zurück</span></a>
 
 {% endblock %}

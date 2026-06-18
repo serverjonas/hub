@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}403 – Keine Berechtigung{% endblock %}
+{% block page_id %}error_403{% endblock %}
+{% block title %}403 – <span data-i18n="errors.403.title">Keine Berechtigung</span>{% endblock %}
 
 {% block extra_style %}
 .error-wrapper {
@@ -110,33 +111,33 @@
         </div>
         <div class="error-badge">
             <span class="dot"></span>
-            Zugriff verweigert
+            <span data-i18n="errors.access_denied">Zugriff verweigert</span>
         </div>
         <div class="error-code">403</div>
-        <h1 class="error-title">Keine Berechtigung</h1>
-        <p class="error-message">
+        <h1 class="error-title" data-i18n="errors.403.title">Keine Berechtigung</h1>
+        <p class="error-message" data-i18n="errors.403.body">
             Du hast nicht die nötigen Rechte, um auf diese Seite zuzugreifen.
         </p>
 
         <div class="btn-group">
             <a href="/" class="btn btn-primary">
                 <i data-lucide="home" style="width: 18px; height: 18px;"></i>
-                Zurück zum Hub
+                <span data-i18n="errors.back_hub">Zurück zum Hub</span>
             </a>
             {% if user %}
             <a href="#" class="btn">
                 <i data-lucide="user" style="width: 18px; height: 18px;"></i>
-                Konto: {{ user }}
+                <span data-i18n="errors.account">Konto</span>: {{ user }}
             </a>
             {% else %}
             <a href="/login" class="btn">
                 <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
-                Anmelden
+                <span data-i18n="hub.action.login">Anmelden</span>
             </a>
             {% endif %}
         </div>
 
-        <div class="error-hint">
+        <div class="error-hint" data-i18n="errors.contact_admin">
             Falls du glaubst, dass dies ein Fehler ist, wende dich bitte an einen Administrator.
         </div>
     </div>

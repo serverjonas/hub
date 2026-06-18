@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Panel &middot; Serverjonas{% endblock %}
+{% block page_id %}admin_nav{% endblock %}
+{% block title %}<span data-i18n="admin.title">Admin Panel</span> &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
 /* ─── Admin Dashboard Styles ─── */
@@ -105,41 +106,41 @@
 
 {% block content %}
 <div class="admin-header">
-    <h1>Admin Dashboard</h1>
+    <h1 data-i18n="admin.dashboard">Admin Dashboard</h1>
 </div>
 
 <div class="stats-row  delay-1">
     <div class="stat-item">
-        <span class="stat-label">Nutzer</span>
+        <span class="stat-label" data-i18n="admin.stats.users">Nutzer</span>
         <span class="stat-value">{{ user_count if user_count is defined else '-' }}</span>
     </div>
     <div class="stat-item">
-        <span class="stat-label">Aktive Bans</span>
+        <span class="stat-label" data-i18n="admin.stats.bans">Aktive Bans</span>
         <span class="stat-value" style="color: #ef4444;">{{ bans }}</span>
     </div>
     <div class="stat-item">
-        <span class="stat-label">Server Status</span>
-        <span class="stat-value" style="color: #22c55e;">Online</span>
+        <span class="stat-label" data-i18n="admin.stats.status">Server Status</span>
+        <span class="stat-value" style="color: #22c55e;" data-i18n="admin.stats.online">Online</span>
     </div>
 </div>
 
 <div class="admin-grid">
     <a href="/admin/users" class="nav-card">
         <div class="card-icon"><i data-lucide="users"></i></div>
-        <h3>Nutzerverwaltung</h3>
-        <p style="font-size: 13px; color: var(--text-dim);">Accounts, Rollen und Sessions verwalten.</p>
+        <h3 data-i18n="admin.cards.users">Nutzerverwaltung</h3>
+        <p style="font-size: 13px; color: var(--text-dim);" data-i18n="admin.cards.users.desc">Accounts, Rollen und Sessions verwalten.</p>
     </a>
 
     <a href="/admin/ban" class="nav-card">
         <div class="card-icon"><i data-lucide="ban"></i></div>
-        <h3>Ban-Verwaltung</h3>
-        <p style="font-size: 13px; color: var(--text-dim);">Sanktionen und Ausschlusslisten kontrollieren.</p>
+        <h3 data-i18n="admin.cards.bans">Ban-Verwaltung</h3>
+        <p style="font-size: 13px; color: var(--text-dim);" data-i18n="admin.cards.bans.desc">Sanktionen und Ausschlusslisten kontrollieren.</p>
     </a>
 
     <a href="/admin/notifications" class="nav-card">
         <div class="card-icon"><i data-lucide="bell"></i></div>
-        <h3>Benachrichtigungs-Manager</h3>
-        <p style="font-size: 13px; color: var(--text-dim);">Benachrichtigungen erstellen und verwalten.</p>
+        <h3 data-i18n="admin.cards.notifs">Benachrichtigungs-Manager</h3>
+        <p style="font-size: 13px; color: var(--text-dim);" data-i18n="admin.cards.notifs.desc">Benachrichtigungen erstellen und verwalten.</p>
     </a>
 
     <!--<a href="/admin/logs" class="nav-card">

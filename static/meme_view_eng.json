@@ -1,0 +1,7 @@
+{
+    "_meta": { "page": "meme_view" },
+    "memes.view.title": "Meme Viewer",
+    "memes.view.next": "Next meme",
+    "memes.view.empty": "No memes yet.",
+    "memes.view.upload_title": "Upload meme"
+}

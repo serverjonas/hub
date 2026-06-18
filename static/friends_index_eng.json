@@ -1,0 +1,14 @@
+{
+    "_meta": { "page": "friends_index" },
+    "friends.add.title": "Add friend",
+    "friends.add.placeholder": "Enter username...",
+    "friends.add.submit": "Send request",
+    "friends.incoming": "Incoming requests",
+    "friends.accept": "Accept",
+    "friends.decline": "Decline",
+    "friends.your": "Your friends",
+    "friends.remove": "Remove",
+    "friends.empty": "You haven't added any friends yet.",
+    "friends.outgoing": "Sent requests",
+    "friends.withdraw": "Withdraw"
+}

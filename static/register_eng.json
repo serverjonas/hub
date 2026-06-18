@@ -1,0 +1,12 @@
+{
+    "_meta": { "page": "register" },
+    "register.title": "Sign up",
+    "register.heading": "Create account",
+    "register.subtitle": "Become part of the exclusive community.",
+    "register.label.server_key": "Server key",
+    "register.placeholder.username": "Username",
+    "register.placeholder.server_key": "Enter key",
+    "register.submit": "Create account",
+    "register.has_account": "Already have an account?",
+    "register.login_link": "Sign in here"
+}

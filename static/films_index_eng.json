@@ -1,0 +1,11 @@
+{
+    "_meta": { "page": "films_index" },
+    "films_index.title": "Media Center",
+    "films_index.subtitle": "Films, series and music in the highest quality.",
+    "films_index.filmes.title": "Films",
+    "films_index.filmes.desc": "Your collection of feature films.",
+    "films_index.series.title": "Series",
+    "films_index.series.desc": "Seasons and episodes of your favourite shows.",
+    "films_index.upload.title": "Upload",
+    "films_index.upload.desc": "Add new media to the library."
+}

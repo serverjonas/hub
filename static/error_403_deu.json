@@ -1,0 +1,5 @@
+{
+    "_meta": { "page": "error_403" },
+    "errors.403.title": "Keine Berechtigung",
+    "errors.403.body": "Du hast nicht die nötigen Rechte, um auf diese Seite zuzugreifen."
+}

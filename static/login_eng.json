@@ -1,0 +1,15 @@
+{
+    "_meta": { "page": "login" },
+    "login.title": "Login",
+    "login.heading": "Welcome back",
+    "login.subtitle": "Sign in to access Serverjonas.",
+    "login.label.username": "Username",
+    "login.label.password": "Password",
+    "login.placeholder.username": "Your username",
+    "login.pw_show": "Show password",
+    "login.pw_hide": "Hide password",
+    "login.submit": "Sign in",
+    "login.or": "or",
+    "login.no_account": "Don't have an account?",
+    "login.register_link": "Sign up now"
+}

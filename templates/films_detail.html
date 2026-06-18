@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% block page_id %}films_detail{% endblock %}
 {% block title %}{{ film.title }} &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
@@ -125,7 +126,7 @@ video {
     {% else %}
         <a href="/films/films" class="back-btn">
             <i data-lucide="arrow-left"></i>
-            Alle Filme
+            <span data-i18n="films_detail.back.films">Alle Filme</span>
         </a>
     {% endif %}
 
@@ -133,16 +134,16 @@ video {
     <div class="player-card">
         <video controls autoplay preload="metadata">
             <source src="/films/film/{{ film.film_id }}/watch" type="video/mp4">
-            Dein Browser unterstützt kein HTML5-Video.
+            <span data-i18n="films_detail.video.fallback">Dein Browser unterstützt kein HTML5-Video.</span>
         </video>
     </div>
     {% elif film.status == "converting" or film.status == "queued" %}
     <div class="status-placeholder">
         <i data-lucide="loader-2" class="spin" style="width: 48px; height: 48px; color: #6366f1; margin-bottom: 24px;"></i>
         <h3>
-            {% if film.status == "converting" %}Wird konvertiert...{% else %}In der Warteschlange...{% endif %}
+            {% if film.status == "converting" %}<span data-i18n="films_detail.status.converting">Wird konvertiert...</span>{% else %}<span data-i18n="films_detail.status.queued">In der Warteschlange...</span>{% endif %}
         </h3>
-        <p style="color: var(--text-dim);">Die Seite aktualisiert sich automatisch.</p>
+        <p style="color: var(--text-dim);" data-i18n="films_detail.auto_refresh">Die Seite aktualisiert sich automatisch.</p>
     </div>
     <script>
         setInterval(async () => {
@@ -154,7 +155,7 @@ video {
     {% else %}
     <div class="status-placeholder" style="border-color: #ef4444;">
         <i data-lucide="alert-circle" style="width: 48px; height: 48px; color: #ef4444; margin-bottom: 24px;"></i>
-        <h3>Fehler bei der Verarbeitung</h3>
+        <h3 data-i18n="films_detail.status.error">Fehler bei der Verarbeitung</h3>
         {% if film.error %}<pre style="font-size: 12px; margin-top: 16px; opacity: 0.6;">{{ film.error }}</pre>{% endif %}
     </div>
     {% endif %}
@@ -164,23 +165,23 @@ video {
             <div class="series-tag">SERIE · S{{ film.season }} E{{ film.episode }}</div>
         {% endif %}
         <h2>{{ film.title }}</h2>
-        <div class="meta-text">Hochgeladen am {{ film.uploaded_at | strftime }}</div>
+        <div class="meta-text"><span data-i18n="films_detail.uploaded_at">Hochgeladen am</span> {{ film.uploaded_at | strftime }}</div>
 
         {% if next_episode %}
         <a href="/films/film/{{ next_episode.film_id }}" class="next-episode-card">
             <div class="next-icon"><i data-lucide="play"></i></div>
             <div>
-                <div style="font-size: 12px; color: var(--text-dim);">Nächste Episode · S{{ next_episode.season }} E{{ next_episode.episode }}</div>
+                <div style="font-size: 12px; color: var(--text-dim);"><span data-i18n="films_detail.next_episode">Nächste Episode</span> · S{{ next_episode.season }} E{{ next_episode.episode }}</div>
                 <div style="font-weight: 700;">{{ next_episode.title }}</div>
             </div>
         </a>
         {% endif %}
 
         <div style="margin-top: 32px; display: flex; gap: 12px;">
-             <form method="POST" action="/films/film/{{ film.film_id }}/delete" onsubmit="return confirm('Wirklich löschen?')">
+             <form method="POST" action="/films/film/{{ film.film_id }}/delete" onsubmit="return confirm(window.t ? window.t('films_detail.delete.confirm') : 'Wirklich löschen?')">
                 <button type="submit" class="btn" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.2);">
                     <i data-lucide="trash-2"></i>
-                    Löschen
+                    <span data-i18n="films_detail.delete">Löschen</span>
                 </button>
             </form>
         </div>

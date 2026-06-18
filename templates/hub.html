@@ -331,6 +331,8 @@
 }
 {% endblock %}
 
+{% block page_id %}hub{% endblock %}
+
 {% block content %}
 <!-- Hero -->
 <div class="hero animate-in">
@@ -338,8 +340,8 @@
         <span class="hero-badge-dot"></span>
         Community Hub
     </div>-->
-    <h1>Willkommen bei<br><span class="accent-text">serverjonas</span></h1>
-    <p class="hero-subtitle">
+    <h1><span data-i18n="hub.hero.welcome">Willkommen bei</span><br><span class="accent-text" data-i18n="brand.name">serverjonas</span></h1>
+    <p class="hero-subtitle" data-i18n="hub.hero.subtitle">
         Dein Ort für Memes, Filme, Serien und echte Freundschaften.
         Entdecke alles, was unsere Community zu bieten hat.
     </p>
@@ -347,16 +349,16 @@
     {% if user %}
     <div class="user-status">
         <i data-lucide="user-check" style="width: 16px; height: 16px;"></i>
-        Angemeldet als <b>{{ user }}</b>
+        <span data-i18n="hub.user.loggedin">Angemeldet als</span> <b>{{ user }}</b>
     </div>
     {% else %}
     <div class="hero-buttons">
         <a href="/login" class="btn btn-primary">
-            Einloggen
+            <span data-i18n="hub.action.login">Einloggen</span>
             <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
         </a>
         <a href="/register" class="btn">
-            Registrieren
+            <span data-i18n="hub.action.register">Registrieren</span>
             <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
         </a>
     </div>
@@ -365,8 +367,8 @@
 
 <!-- Section Title -->
 <div class="section-title animate-in delay-1">
-    <h2>Entdecke die Community</h2>
-    <p>Alles an einem Ort – dein digitales Zuhause.</p>
+    <h2 data-i18n="hub.section.title">Entdecke die Community</h2>
+    <p data-i18n="hub.section.subtitle">Alles an einem Ort – dein digitales Zuhause.</p>
 </div>
 
 <!-- Cards -->
@@ -375,8 +377,8 @@
         <div class="card-icon-wrap memes">
             <i data-lucide="image" style="width: 30px; height: 30px;"></i>
         </div>
-        <h3>Memes</h3>
-        <p>Die beste Sammlung kuratierter Internet-Kultur. Teile und entdecke.</p>
+        <h3 data-i18n="nav.memes">Memes</h3>
+        <p data-i18n="hub.cards.memes.desc">Die beste Sammlung kuratierter Internet-Kultur. Teile und entdecke.</p>
         <div class="card-arrow">
             <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
         </div>
@@ -386,8 +388,8 @@
         <div class="card-icon-wrap media">
             <i data-lucide="clapperboard" style="width: 30px; height: 30px;"></i>
         </div>
-        <h3>Media</h3>
-        <p>Filme und Serien streamen – in höchster Qualität, jederzeit.</p>
+        <h3 data-i18n="nav.media">Media</h3>
+        <p data-i18n="hub.cards.media.desc">Filme und Serien streamen – in höchster Qualität, jederzeit.</p>
         <div class="card-arrow">
             <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
         </div>
@@ -397,8 +399,8 @@
         <div class="card-icon-wrap friends">
             <i data-lucide="users" style="width: 30px; height: 30px;"></i>
         </div>
-        <h3>Freunde</h3>
-        <p>Vernetze dich mit der Community und bleibe in Kontakt.</p>
+        <h3 data-i18n="nav.friends">Freunde</h3>
+        <p data-i18n="hub.cards.friends.desc">Vernetze dich mit der Community und bleibe in Kontakt.</p>
         <div class="card-arrow">
             <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
         </div>
@@ -408,10 +410,10 @@
 {% if not user %}
 <!-- CTA Banner -->
 <div class="cta-banner animate-in delay-3">
-    <h2>Bereit loszulegen?</h2>
-    <p>Werde Teil unserer Plattform und erlebe Community wie sie sein sollte.</p>
+    <h2 data-i18n="hub.cta.title">Bereit loszulegen?</h2>
+    <p data-i18n="hub.cta.body">Werde Teil unserer Plattform und erlebe Community wie sie sein sollte.</p>
     <a href="/register" class="btn">
-        Jetzt entdecken
+        <span data-i18n="hub.cta.button">Jetzt entdecken</span>
         <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
     </a>
 </div>

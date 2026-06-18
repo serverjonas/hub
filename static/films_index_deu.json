@@ -1,0 +1,11 @@
+{
+    "_meta": { "page": "films_index" },
+    "films_index.title": "Media Center",
+    "films_index.subtitle": "Filme, Serien und Musik in höchster Qualität.",
+    "films_index.filmes.title": "Filme",
+    "films_index.filmes.desc": "Deine Sammlung an Spielfilmen.",
+    "films_index.series.title": "Serien",
+    "films_index.series.desc": "Staffeln und Episoden deiner Lieblingsshows.",
+    "films_index.upload.title": "Upload",
+    "films_index.upload.desc": "Neue Medien zur Bibliothek hinzufügen."
+}

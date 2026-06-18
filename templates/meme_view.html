@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Meme Viewer &middot; Serverjonas{% endblock %}
+{% block page_id %}meme_view{% endblock %}
+{% block title %}<span data-i18n="memes.view.title">Meme Viewer</span> &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
 .meme-page-container {
@@ -175,7 +176,7 @@
     </div>
 
     <div class="meme-nav">
-        <a href="/memes/" class="nav-btn" title="Nächstes Meme">
+        <a href="/memes/" class="nav-btn" data-i18n-title="memes.view.next" title="Nächstes Meme">
             <i data-lucide="refresh-cw"></i>
         </a>
     </div>
@@ -183,13 +184,13 @@
     {% else %}
     <div class="empty-state" style="padding: 100px; text-align: center; background: var(--surface); border-radius: 32px; border: 1px dashed var(--border);">
         <i data-lucide="image-off" style="width: 48px; height: 48px; color: var(--text-dim); margin-bottom: 24px;"></i>
-        <p style="color: var(--text-dim); margin-bottom: 24px;">Noch keine Memes vorhanden.</p>
-        <a href="/memes/upload" class="btn btn-primary">Meme hochladen</a>
+        <p style="color: var(--text-dim); margin-bottom: 24px;" data-i18n="memes.view.empty">Noch keine Memes vorhanden.</p>
+        <a href="/memes/upload" class="btn btn-primary"><span data-i18n="memes.upload.heading">Meme hochladen</span></a>
     </div>
     {% endif %}
 </div>
 
-<a href="/memes/upload" class="upload-fab" title="Meme hochladen">
+<a href="/memes/upload" class="upload-fab" data-i18n-title="memes.view.upload_title" title="Meme hochladen">
     <i data-lucide="plus"></i>
 </a>
 

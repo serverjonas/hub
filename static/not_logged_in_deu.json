@@ -1,0 +1,8 @@
+{
+    "_meta": { "page": "not_logged_in" },
+    "loggedin.title": "Nicht angemeldet",
+    "loggedin.important": "Wichtig",
+    "loggedin.heading": "Anmeldung erforderlich",
+    "loggedin.body": "Du musst angemeldet sein, um auf diese Seite zuzugreifen.",
+    "loggedin.cta": "Jetzt anmelden"
+}

@@ -1,0 +1,16 @@
+{
+    "_meta": { "page": "admin_nav" },
+    "admin.title": "Admin Panel",
+    "admin.dashboard": "Admin Dashboard",
+    "admin.stats.users": "Nutzer",
+    "admin.stats.bans": "Aktive Bans",
+    "admin.stats.status": "Server Status",
+    "admin.stats.online": "Online",
+    "admin.stats.registered": "Registrierte Nutzer",
+    "admin.cards.users": "Nutzerverwaltung",
+    "admin.cards.users.desc": "Accounts, Rollen und Sessions verwalten.",
+    "admin.cards.bans": "Ban-Verwaltung",
+    "admin.cards.bans.desc": "Sanktionen und Ausschlusslisten kontrollieren.",
+    "admin.cards.notifs": "Benachrichtigungs-Manager",
+    "admin.cards.notifs.desc": "Benachrichtigungen erstellen und verwalten."
+}

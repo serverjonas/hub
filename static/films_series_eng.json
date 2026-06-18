@@ -1,0 +1,14 @@
+{
+    "_meta": { "page": "films_series" },
+    "films_series.title": "Series",
+    "films_series.heading": "Series",
+    "films_series.upload_episode": "Upload episode",
+    "films_series.intro": "All your series",
+    "films_series.empty": "No series yet.",
+    "films_series.empty.hint": "When uploading, choose „Series\" and give the series name.",
+    "films_series.upload_now": "Upload now",
+    "films.season.one": "Season",
+    "films.season.other": "Seasons",
+    "films.episode.one": "Episode",
+    "films.episode.other": "Episodes"
+}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account nicht aktiviert – Serverjonas</title>
+    <title><span data-i18n="activation.title">Account nicht aktiviert</span> – Serverjonas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" rel="stylesheet" />
@@ -98,11 +98,19 @@
         </div>
         <div class="badge">
             <span class="dot"></span>
-            Ausstehend
+            <span data-i18n="activation.badge">Ausstehend</span>
         </div>
-        <h1>Account noch nicht aktiviert</h1>
-        <p>Bitte warte, bis ein Moderator oder Admin den Zugang freischaltet.</p>
+        <h1 data-i18n="activation.heading">Account noch nicht aktiviert</h1>
+        <p data-i18n="activation.body">Bitte warte, bis ein Moderator oder Admin den Zugang freischaltet.</p>
     </div>
     <script>lucide.createIcons();</script>
+    <script src="/static/i18n.js" data-page="activation_pending"></script>
+    <script>
+        (function(){
+            const lang = localStorage.getItem('serverjonas_lang');
+            const LANG_MAP = { deu: 'de', eng: 'en' };
+            document.documentElement.setAttribute('lang', LANG_MAP[lang] || 'de');
+        })();
+    </script>
 </body>
 </html>

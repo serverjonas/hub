@@ -1,0 +1,15 @@
+{
+    "_meta": { "page": "adminban" },
+    "admin.table.user": "User",
+    "admin.table.roles": "Roles",
+    "admin.table.status": "Status",
+    "admin.table.actions": "Actions",
+    "banadmin.unban": "Unban",
+    "banadmin.reason_placeholder": "Reason...",
+    "banadmin.days": "Days",
+    "banadmin.permanent": "Permanent",
+    "banadmin.ban": "Ban",
+    "banadmin.banned": "BANNED",
+    "banadmin.until": "until",
+    "banadmin.active": "Active"
+}

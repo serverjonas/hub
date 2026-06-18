@@ -1,0 +1,13 @@
+{
+    "_meta": { "page": "films_detail" },
+    "films_detail.back.films": "Alle Filme",
+    "films_detail.video.fallback": "Dein Browser unterstützt kein HTML5-Video.",
+    "films_detail.status.converting": "Wird konvertiert...",
+    "films_detail.status.queued": "In der Warteschlange...",
+    "films_detail.status.error": "Fehler bei der Verarbeitung",
+    "films_detail.auto_refresh": "Die Seite aktualisiert sich automatisch.",
+    "films_detail.uploaded_at": "Hochgeladen am",
+    "films_detail.next_episode": "Nächste Episode",
+    "films_detail.delete": "Löschen",
+    "films_detail.delete.confirm": "Wirklich löschen?"
+}

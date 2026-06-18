@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}501 – Nicht Umgesetzt{% endblock %}
+{% block page_id %}error_501{% endblock %}
+{% block title %}501 – <span data-i18n="errors.501.title">Nicht Umgesetzt</span>{% endblock %}
 
 {% block extra_style %}
 .error-wrapper {
@@ -81,16 +82,16 @@
             <i data-lucide="file-x" style="width: 36px; height: 36px;"></i>
         </div>
         <div class="error-code">501</div>
-        <h1 class="error-title">Nicht Umgesetzt</h1>
-        <p class="error-message">
+        <h1 class="error-title" data-i18n="errors.501.title">Nicht Umgesetzt</h1>
+        <p class="error-message" data-i18n="errors.501.body">
             Die gewünschte Seite ist noch nicht verfügbar.
-            {% if user %}<br>Angemeldet als <strong>{{ user }}</strong>{% endif %}
+            {% if user %}<br><span data-i18n="hub.user.loggedin">Angemeldet als</span> <strong>{{ user }}</strong>{% endif %}
         </p>
 
         <div class="btn-group">
             <a href="/" class="btn btn-primary">
                 <i data-lucide="home" style="width: 18px; height: 18px;"></i>
-                Zurück zum Hub
+                <span data-i18n="errors.back_hub">Zurück zum Hub</span>
             </a>
         </div>
     </div>

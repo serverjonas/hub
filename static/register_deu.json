@@ -1,0 +1,12 @@
+{
+    "_meta": { "page": "register" },
+    "register.title": "Registrieren",
+    "register.heading": "Account erstellen",
+    "register.subtitle": "Werde Teil der exklusiven Community.",
+    "register.label.server_key": "Server-Key",
+    "register.placeholder.username": "Benutzername",
+    "register.placeholder.server_key": "Key eingeben",
+    "register.submit": "Account erstellen",
+    "register.has_account": "Bereits einen Account?",
+    "register.login_link": "Hier anmelden"
+}

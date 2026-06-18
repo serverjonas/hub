@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}418 – I'm a Teapot{% endblock %}
+{% block page_id %}error_418{% endblock %}
+{% block title %}418 – <span data-i18n="errors.418.title">I'm a Teapot</span>{% endblock %}
 
 {% block extra_style %}
 .error-wrapper {
@@ -69,8 +70,8 @@
     <div class="error-container">
         <div class="teapot-icon">🫖</div>
         <div class="error-code">418</div>
-        <h1 class="error-title">I'm a Teapot</h1>
-        <p class="error-message">
+        <h1 class="error-title" data-i18n="errors.418.title">I'm a Teapot</h1>
+        <p class="error-message" data-i18n="errors.418.body">
             Ups! Dein Request kann hier nicht verarbeitet werden – dieser Server ist
             eine Teekanne und keine Kaffeemaschine.
         </p>
@@ -78,7 +79,7 @@
         <div class="btn-group">
             <a href="/" class="btn btn-primary">
                 <i data-lucide="home" style="width: 18px; height: 18px;"></i>
-                Zurück zum Hub
+                <span data-i18n="errors.back_hub">Zurück zum Hub</span>
             </a>
             <a
                 href="https://developer.mozilla.org/de/docs/Web/HTTP/Reference/Status/418"
@@ -86,7 +87,7 @@
                 class="btn"
             >
                 <i data-lucide="external-link" style="width: 18px; height: 18px;"></i>
-                Was ist das?
+                <span data-i18n="errors.418.learn_more">Was ist das?</span>
             </a>
         </div>
     </div>

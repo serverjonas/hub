@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+{% block page_id %}artists{% endblock %}
 {% block content %}
 
-<h1>🎧 Musik</h1>
+<h1>🎧 <span data-i18n="music.title">Musik</span></h1>
 
 <form id="uploadForm">
   <input type="file" name="files" multiple webkitdirectory>
   <input type="file" name="zip" accept=".zip">
-  <button>Upload</button>
+  <button data-i18n="music.upload_btn">Upload</button>
 </form>
 
 <div class="progress"><div id="bar"></div></div>

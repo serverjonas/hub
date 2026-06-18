@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}News{% endblock %}
+{% block page_id %}news{% endblock %}
+{% block title %}<span data-i18n="news.title">News</span>{% endblock %}
 
 {% block content %}
 
-<h1 style="margin-bottom: 18px;">News</h1>
+<h1 style="margin-bottom: 18px;" data-i18n="news.heading">News</h1>
 
 <a href="/news/archive" class="btn" style="margin-bottom: 20px;">
-    Alte Nachrichten anzeigen (48h+)
+    <span data-i18n="news.show_old">Alte Nachrichten anzeigen (48h+)</span>
 </a>
 
 <div style="display: flex; flex-direction: column; gap: 12px;">

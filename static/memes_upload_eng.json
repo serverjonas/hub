@@ -1,0 +1,11 @@
+{
+    "_meta": { "page": "memes_upload" },
+    "memes.upload.title": "Meme Upload",
+    "memes.upload.heading": "Upload meme",
+    "memes.upload.subtitle": "Share your humour with the community.",
+    "memes.upload.label.title": "Title (optional)",
+    "memes.upload.placeholder.title": "A fitting title...",
+    "memes.upload.label.file": "Choose file (image/video)",
+    "memes.upload.submit": "Upload",
+    "memes.upload.back": "Back to feed"
+}

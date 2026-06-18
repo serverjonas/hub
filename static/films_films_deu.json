@@ -1,0 +1,12 @@
+{
+    "_meta": { "page": "films_films" },
+    "films_films.title": "Filme",
+    "films_films.heading": "Filme",
+    "films_films.upload": "Upload",
+    "films_films.status.ready": "Bereit",
+    "films_films.status.converting": "Konvertiert...",
+    "films_films.status.queued": "Warteschlange",
+    "films_films.status.error": "Fehler",
+    "films_films.empty": "Noch keine Filme in der Mediathek.",
+    "films_films.empty.cta": "Ersten Film hochladen"
+}

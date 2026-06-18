@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Gesperrt &middot; Serverjonas{% endblock %}
+{% block page_id %}ban{% endblock %}
+{% block title %}<span data-i18n="ban.title">Gesperrt</span> &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
 .ban-wrapper {
@@ -111,15 +112,15 @@
         </div>
         <div class="ban-badge">
             <span class="dot"></span>
-            Account gesperrt
+            <span data-i18n="ban.badge">Account gesperrt</span>
         </div>
-        <h1 class="ban-title">Du wurdest vom Serverjonas network ausgeschlossen.</h1>
-        <p class="ban-message">
+        <h1 class="ban-title" data-i18n="ban.heading">Du wurdest vom Serverjonas network ausgeschlossen.</h1>
+        <p class="ban-message" data-i18n="ban.body">
             Dein Account wurde von einem Moderator oder Administrator gesperrt.
         </p>
 
         <div class="reason-box">
-            <span class="reason-box-label">Grund</span>
+            <span class="reason-box-label" data-i18n="ban.reason_label">Grund</span>
             <span class="reason-box-text">{{ reason }}</span>
         </div>
     </div>

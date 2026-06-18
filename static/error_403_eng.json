@@ -1,0 +1,5 @@
+{
+    "_meta": { "page": "error_403" },
+    "errors.403.title": "No permission",
+    "errors.403.body": "You do not have the required permissions to access this page."
+}

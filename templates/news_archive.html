@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Archive{% endblock %}
+{% block page_id %}news_archive{% endblock %}
+{% block title %><span data-i18n="news_archive.title">Archiv</span>{% endblock %}
 
 {% block content %}
 
-<h1>Archiv (48h+)</h1>
+<h1 data-i18n="news_archive.heading">Archiv (48h+)</h1>
 
 <a href="/news" class="btn" style="margin-bottom: 20px;">
-    ← Zurück zu aktuellen News
+    <span data-i18n="news_archive.back">← Zurück zu aktuellen News</span>
 </a>
 
 <div style="display:flex; flex-direction:column; gap:12px;">

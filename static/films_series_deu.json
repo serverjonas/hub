@@ -1,0 +1,14 @@
+{
+    "_meta": { "page": "films_series" },
+    "films_series.title": "Serien",
+    "films_series.heading": "Serien",
+    "films_series.upload_episode": "Episode hochladen",
+    "films_series.intro": "Alle deine Serien",
+    "films_series.empty": "Noch keine Serien vorhanden.",
+    "films_series.empty.hint": "Beim Upload einfach „Serie\" wählen und Serienname angeben.",
+    "films_series.upload_now": "Jetzt hochladen",
+    "films.season.one": "Staffel",
+    "films.season.other": "Staffeln",
+    "films.episode.one": "Episode",
+    "films.episode.other": "Episoden"
+}

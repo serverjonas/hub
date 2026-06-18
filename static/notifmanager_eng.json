@@ -1,0 +1,17 @@
+{
+    "_meta": { "page": "notifmanager" },
+    "notifadmin.title": "Notification Manager",
+    "notifadmin.heading": "Notification Manager",
+    "notifadmin.success": "The notification was sent successfully!",
+    "notifadmin.label.target": "Recipient",
+    "notifadmin.label.type": "Type",
+    "notifadmin.label.message": "Message",
+    "notifadmin.target.all": "All users",
+    "notifadmin.target.single": "Individual users",
+    "notifadmin.type.system": "System (default)",
+    "notifadmin.type.info": "Information",
+    "notifadmin.type.warning": "Warning",
+    "notifadmin.type.important": "Important / alert",
+    "notifadmin.placeholder.message": "Your message here...",
+    "notifadmin.submit": "Send notification"
+}

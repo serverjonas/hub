@@ -1,0 +1,8 @@
+{
+    "_meta": { "page": "ban" },
+    "ban.title": "Gesperrt",
+    "ban.badge": "Account gesperrt",
+    "ban.heading": "Du wurdest vom Serverjonas network ausgeschlossen.",
+    "ban.body": "Dein Account wurde von einem Moderator oder Administrator gesperrt.",
+    "ban.reason_label": "Grund"
+}

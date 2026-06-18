@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Benachrichtigungs-Manager &middot; Serverjonas{% endblock %}
+{% block page_id %}notifmanager{% endblock %}
+{% block title %}<span data-i18n="notifadmin.title">Benachrichtigungs-Manager</span> &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
 /* ─── Notification Manager Styles ─── */
@@ -84,24 +85,22 @@
 {% block content %}
 <div class="admin-header">
     <a href="/admin" style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-weight: 600; margin-bottom: 16px; font-size: 14px;">
-        <i data-lucide="chevron-left" style="width: 16px;"></i> Dashboard
+        <i data-lucide="chevron-left" style="width: 16px;"></i> <span data-i18n="admin.dashboard">Dashboard</span>
     </a>
-    <h1>Benachrichtigungs-Manager</h1>
+    <h1 data-i18n="notifadmin.heading">Benachrichtigungs-Manager</h1>
 </div>
 
 {% if request.args.get('success') %}
-<div class="alert-success">
-    Die Benachrichtigung wurde erfolgreich versendet!
-</div>
+<div class="alert-success" data-i18n="notifadmin.success">Die Benachrichtigung wurde erfolgreich versendet!</div>
 {% endif %}
 
 <div class="form-container">
     <form action="/admin/notifications/send" method="POST">
         <div class="form-group">
-            <label for="target" class="form-label">Empfänger</label>
+            <label for="target" class="form-label" data-i18n="notifadmin.label.target">Empfänger</label>
             <select class="form-select" id="target" name="target" required>
-                <option value="all">Alle Benutzer</option>
-                <optgroup label="Einzelne Benutzer">
+                <option value="all" data-i18n="notifadmin.target.all">Alle Benutzer</option>
+                <optgroup label="Einzelne Benutzer" data-i18n-label="notifadmin.target.single">
                     {% for user_id, user_name in users %}
                     <option value="{{ user_id }}">{{ user_name }} (ID: {{ user_id }})</option>
                     {% endfor %}
@@ -110,21 +109,21 @@
         </div>
 
         <div class="form-group">
-            <label for="type" class="form-label">Typ</label>
+            <label for="type" class="form-label" data-i18n="notifadmin.label.type">Typ</label>
             <select class="form-select" id="type" name="type">
-                <option value="system">System (Standard)</option>
-                <option value="info">Information</option>
-                <option value="warning">Warnung</option>
-                <option value="important">Wichtig / Alarm</option>
+                <option value="system" data-i18n="notifadmin.type.system">System (Standard)</option>
+                <option value="info" data-i18n="notifadmin.type.info">Information</option>
+                <option value="warning" data-i18n="notifadmin.type.warning">Warnung</option>
+                <option value="important" data-i18n="notifadmin.type.important">Wichtig / Alarm</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="message" class="form-label">Nachricht</label>
-            <textarea class="form-control" id="message" name="message" rows="5" placeholder="Deine Nachricht hier..." required></textarea>
+            <label for="message" class="form-label" data-i18n="notifadmin.label.message">Nachricht</label>
+            <textarea class="form-control" id="message" name="message" rows="5" data-i18n-placeholder="notifadmin.placeholder.message" placeholder="Deine Nachricht hier..." required></textarea>
         </div>
 
-        <button type="submit" class="btn-submit">Benachrichtigung senden</button>
+        <button type="submit" class="btn-submit"><span data-i18n="notifadmin.submit">Benachrichtigung senden</span></button>
     </form>
 </div>
 {% endblock %}

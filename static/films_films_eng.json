@@ -1,0 +1,12 @@
+{
+    "_meta": { "page": "films_films" },
+    "films_films.title": "Films",
+    "films_films.heading": "Films",
+    "films_films.upload": "Upload",
+    "films_films.status.ready": "Ready",
+    "films_films.status.converting": "Converting...",
+    "films_films.status.queued": "Queue",
+    "films_films.status.error": "Error",
+    "films_films.empty": "No films in the library yet.",
+    "films_films.empty.cta": "Upload first film"
+}

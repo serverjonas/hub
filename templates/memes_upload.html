@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Meme Upload &middot; Serverjonas{% endblock %}
+{% block page_id %}memes_upload{% endblock %}
+{% block title %><span data-i18n="memes.upload.title">Meme Upload</span> &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
 .upload-container {
@@ -51,8 +52,8 @@
 {% block content %}
 <div class="upload-container">
     <div style="margin-bottom: 32px; text-align: center;">
-        <h1 style="font-size: 32px; margin-bottom: 8px;">Meme hochladen</h1>
-        <p style="color: var(--text-dim);">Teile deinen Humor mit der Community.</p>
+        <h1 style="font-size: 32px; margin-bottom: 8px;" data-i18n="memes.upload.heading">Meme hochladen</h1>
+        <p style="color: var(--text-dim);" data-i18n="memes.upload.subtitle">Teile deinen Humor mit der Community.</p>
     </div>
 
     <div class="upload-card">
@@ -64,12 +65,12 @@
 
         <form method="POST" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="title">Titel (optional)</label>
-                <input type="text" name="title" id="title" class="form-control" placeholder="Ein treffender Titel...">
+                <label for="title" data-i18n="memes.upload.label.title">Titel (optional)</label>
+                <input type="text" name="title" id="title" class="form-control" data-i18n-placeholder="memes.upload.placeholder.title" placeholder="Ein treffender Titel...">
             </div>
 
             <div class="form-group">
-                <label>Datei auswählen (Bild/Video)</label>
+                <label data-i18n="memes.upload.label.file">Datei auswählen (Bild/Video)</label>
                 <div class="file-dropzone" id="dropzone" onclick="document.getElementById('file').click()">
                     <i data-lucide="image" id="file-icon" style="width: 32px; height: 32px; color: var(--text-dim); margin-bottom: 12px;"></i>
                     <p style="font-size: 14px; color: var(--text-dim);" id="file-label">PNG, JPG, MP4, WebM...</p>
@@ -78,15 +79,15 @@
             </div>
 
             <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 12px;">
-                Hochladen
+                <span data-i18n="memes.upload.submit">Hochladen</span>
                 <i data-lucide="upload" style="width: 18px;"></i>
             </button>
         </form>
-        
+
         <div style="margin-top: 24px; text-align: center;">
             <a href="/memes/" style="color: var(--text-dim); text-decoration: none; font-size: 14px;">
                 <i data-lucide="arrow-left" style="width: 14px; height: 14px; vertical-align: middle;"></i>
-                Zurück zum Feed
+                <span data-i18n="memes.upload.back">Zurück zum Feed</span>
             </a>
         </div>
     </div>
@@ -101,7 +102,7 @@
         if (input.files && input.files.length > 0) {
             const fileName = input.files[0].name;
             const fileType = input.files[0].type;
-            
+
             label.textContent = fileName;
             label.style.color = 'var(--text-main)';
             dropzone.classList.add('has-file');

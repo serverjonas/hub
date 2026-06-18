@@ -1,0 +1,14 @@
+{
+    "_meta": { "page": "films_upload" },
+    "films.upload_label": "Upload",
+    "films_upload.title": "Upload media",
+    "films_upload.subtitle": "Add new films or series to the library.",
+    "films_upload.type.film": "Film",
+    "films_upload.type.series": "Series",
+    "films_upload.label.title": "Title",
+    "films_upload.label.series_name": "Series name",
+    "films_upload.label.episode": "Episode",
+    "films_upload.label.file": "File",
+    "films_upload.choose_file": "Choose file",
+    "films_upload.submit": "Start upload"
+}

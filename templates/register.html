@@ -1,5 +1,6 @@
-{% extends "base.html" %} {% block title %}Registrieren &middot; Serverjonas{%
-endblock %} {% block extra_style %} .auth-wrapper { display: flex; align-items:
+{% extends "base.html" %}
+{% block page_id %}register{% endblock %}
+{% block title %}<span data-i18n="register.title">Registrieren</span> &middot; Serverjonas{% endblock %} {% block extra_style %} .auth-wrapper { display: flex; align-items:
 center; justify-content: center; min-height: calc(100vh - 260px); padding: 20px
 0; } .auth-container { max-width: 440px; width: 100%; background:
 var(--surface); border: 1px solid var(--border); border-radius:
@@ -39,8 +40,8 @@ text-decoration: underline; } {% endblock %} {% block content %}
                     style="width: 24px; height: 24px"
                 ></i>
             </div>
-            <h1>Account erstellen</h1>
-            <p>Werde Teil der exklusiven Community.</p>
+            <h1 data-i18n="register.heading">Account erstellen</h1>
+            <p data-i18n="register.subtitle">Werde Teil der exklusiven Community.</p>
         </div>
 
         {% if message %}
@@ -56,7 +57,7 @@ text-decoration: underline; } {% endblock %} {% block content %}
 
         <form method="post">
             <div class="form-group">
-                <label for="username">Benutzername</label>
+                <label for="username" data-i18n="login.label.username">Benutzername</label>
                 <div class="input-wrapper">
                     <!--<i data-lucide="user"></i>-->
                     <input
@@ -64,6 +65,7 @@ text-decoration: underline; } {% endblock %} {% block content %}
                         name="username"
                         id="username"
                         class="form-control"
+                        data-i18n-placeholder="register.placeholder.username"
                         placeholder="Benutzername"
                         required
                     />
@@ -71,7 +73,7 @@ text-decoration: underline; } {% endblock %} {% block content %}
             </div>
 
             <div class="form-group">
-                <label for="password">Passwort</label>
+                <label for="password" data-i18n="login.label.password">Passwort</label>
                 <div class="input-wrapper">
                     <!--<i data-lucide="lock"></i>-->
                     <input
@@ -86,7 +88,7 @@ text-decoration: underline; } {% endblock %} {% block content %}
             </div>
 
             <div class="form-group">
-                <label for="server_key">Server-Key</label>
+                <label for="server_key" data-i18n="register.label.server_key">Server-Key</label>
                 <div class="input-wrapper">
                     <!--<i data-lucide="key"></i>-->
                     <input
@@ -94,6 +96,7 @@ text-decoration: underline; } {% endblock %} {% block content %}
                         name="server_key"
                         id="server_key"
                         class="form-control"
+                        data-i18n-placeholder="register.placeholder.server_key"
                         placeholder="Key eingeben"
                         required
                     />
@@ -101,7 +104,7 @@ text-decoration: underline; } {% endblock %} {% block content %}
             </div>
 
             <button type="submit" class="btn btn-primary btn-submit">
-                Account erstellen
+                <span data-i18n="register.submit">Account erstellen</span>
                 <i
                     data-lucide="arrow-right"
                     style="width: 18px; height: 18px"
@@ -110,7 +113,7 @@ text-decoration: underline; } {% endblock %} {% block content %}
         </form>
 
         <div class="auth-footer">
-            Bereits einen Account? <a href="/login">Hier anmelden</a>
+            <span data-i18n="register.has_account">Bereits einen Account?</span> <a href="/login" data-i18n="register.login_link">Hier anmelden</a>
         </div>
     </div>
 </div>

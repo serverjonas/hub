@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Media &middot; Serverjonas{% endblock %}
+{% block page_id %}status{% endblock %}
+{% block title %}<span data-i18n="nav.status">Status</span> &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
 .header {
@@ -32,13 +33,13 @@
 
 {% block content %}
 <div class="header">
-    <h1>Status</h1>
+    <h1 data-i18n="nav.status">Status</h1>
     <br>
     <div class="online-badge">
         <span class="online-badge-dot"></span>
-        <h2>Alle Systeme verfügbar</h2>
+        <h2 data-i18n="status.all_systems">Alle Systeme verfügbar</h2>
     </div>
     <br>
-    <p style="color: var(--text-dim);">Daten verfügbar auf /status/json</p>
+    <p style="color: var(--text-dim);" data-i18n="status.json_hint">Daten verfügbar auf /status/json</p>
 </div>
 {% endblock %}

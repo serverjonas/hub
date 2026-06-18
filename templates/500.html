@@ -1,8 +1,8 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html><html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>System Failure</title>
+  <title data-i18n="errors.500.fatal_title">System Failure</title>
   <style>
     body {
       margin: 0;
@@ -32,40 +32,47 @@
     }
   </style>
 </head>
-<body>
-  <div class="box" id="content"></div>  <script>
-    const lang = localStorage.getItem("lang") || "en";
-
-    const messages = {
-      eng: `
-<div class="critical">[CRITICAL SYSTEM FAILURE]</div>
-Core application instability detected.<br><br>
-This message is shown on all routes because normal operation cannot be guaranteed.<br><br>
-If you are seeing this:
-<ul>
-  <li>the system is partially or fully degraded</li>
-  <li>routing is unreliable</li>
-  <li>recovery attempts may already be in progress</li>
-</ul>
-DO NOT rely on any functionality.<br>
-Contact the administrator immediately.
-      `,
-
-      deu: `
-<div class="critical">[KRITISCHER SYSTEMAUSFALL]</div>
-Instabilität der Hauptanwendung erkannt.<br><br>
-Diese Meldung wird auf allen Routen angezeigt, da der normale Betrieb nicht mehr garantiert werden kann.<br><br>
-Falls du das siehst:
-<ul>
-  <li>das System ist teilweise oder vollständig beeinträchtigt</li>
-  <li>Routing ist nicht zuverlässig</li>
-  <li>Wiederherstellungsversuche laufen möglicherweise bereits</li>
-</ul>
-VERLASS DICH AUF KEINE FUNKTION.<br>
-Kontaktiere sofort den Administrator.
-      `
+<body data-page="500">
+  <script>
+    (function(){
+        var LANG_MAP = { deu: "de", eng: "en" };
+        var lang = localStorage.getItem("serverjonas_lang");
+        document.documentElement.setAttribute("lang", LANG_MAP[lang] || "de");
+    })();
+  </script>
+  <div class="box" id="content"></div>
+  <script>
+    const T = {
+        kritisch: { deu: "[KRITISCHER SYSTEMAUSFALL]", eng: "[CRITICAL SYSTEM FAILURE]" },
+        instabil: { deu: "Instabilität der Hauptanwendung erkannt.", eng: "Core application instability detected." },
+        hinweis: { deu: "Diese Meldung wird auf allen Routen angezeigt, da der normale Betrieb nicht mehr garantiert werden kann.", eng: "This message is shown on all routes because normal operation cannot be guaranteed." },
+        falls: { deu: "Falls du das siehst:", eng: "If you are seeing this:" },
+        s1: { deu: "das System ist teilweise oder vollständig beeinträchtigt", eng: "the system is partially or fully degraded" },
+        s2: { deu: "Routing ist nicht zuverlässig", eng: "routing is unreliable" },
+        s3: { deu: "Wiederherstellungsversuche laufen möglicherweise bereits", eng: "recovery attempts may already be in progress" },
+        verlass: { deu: "VERLASS DICH AUF KEINE FUNKTION.", eng: "DO NOT rely on any functionality." },
+        kontakt: { deu: "Kontaktiere sofort den Administrator.", eng: "Contact the administrator immediately." }
     };
 
-    document.getElementById("content").innerHTML = messages[lang] || messages.eng;
-  </script></body>
+    function tr(key, lang){
+        return (T[key] && T[key][lang]) || T[key]['deu'];
+    }
+
+    const lang = localStorage.getItem("serverjonas_lang") || "deu";
+
+    document.getElementById("content").innerHTML = `
+<div class="critical">${tr("kritisch", lang)}</div>
+${tr("instabil", lang)}<br><br>
+${tr("hinweis", lang)}<br><br>
+${tr("falls", lang)}
+<ul>
+  <li>${tr("s1", lang)}</li>
+  <li>${tr("s2", lang)}</li>
+  <li>${tr("s3", lang)}</li>
+</ul>
+${tr("verlass", lang)}<br>
+${tr("kontakt", lang)}
+    `;
+  </script>
+</body>
 </html>

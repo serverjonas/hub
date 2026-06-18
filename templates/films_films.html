@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Filme &middot; Serverjonas{% endblock %}
+{% block page_id %}films_films{% endblock %}
+{% block title %}<span data-i18n="films_films.title">Filme</span> &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
 .topbar {
@@ -90,10 +91,10 @@
 
 {% block content %}
 <div class="topbar">
-    <h1><i data-lucide="film" style="vertical-align: middle; margin-right: 12px;"></i> Filme</h1>
+    <h1><i data-lucide="film" style="vertical-align: middle; margin-right: 12px;"></i> <span data-i18n="films_films.heading">Filme</span></h1>
     <a href="/films/upload" class="btn btn-primary">
         <i data-lucide="upload"></i>
-        Upload
+        <span data-i18n="films_films.upload">Upload</span>
     </a>
 </div>
 
@@ -106,15 +107,15 @@
         </div>
         <h3>{{ film.title }}</h3>
         <div class="meta">{{ film.uploaded_at | strftime }}</div>
-        
+
         {% if film.status == "ready" %}
-            <span class="badge badge-ready">Bereit</span>
+            <span class="badge badge-ready" data-i18n="films_films.status.ready">Bereit</span>
         {% elif film.status == "converting" %}
-            <span class="badge badge-converting">Konvertiert...</span>
+            <span class="badge badge-converting" data-i18n="films_films.status.converting">Konvertiert...</span>
         {% elif film.status == "queued" %}
-            <span class="badge badge-queued">Warteschlange</span>
+            <span class="badge badge-queued" data-i18n="films_films.status.queued">Warteschlange</span>
         {% else %}
-            <span class="badge badge-error">Fehler</span>
+            <span class="badge badge-error" data-i18n="films_films.status.error">Fehler</span>
         {% endif %}
     </div>
     {% endfor %}
@@ -122,8 +123,8 @@
 {% else %}
 <div class="empty-state">
     <i data-lucide="clapperboard" style="width: 48px; height: 48px; color: var(--text-dim); margin-bottom: 24px;"></i>
-    <p style="color: var(--text-dim); margin-bottom: 24px;">Noch keine Filme in der Mediathek.</p>
-    <a href="/films/upload" class="btn btn-primary">Ersten Film hochladen</a>
+    <p style="color: var(--text-dim); margin-bottom: 24px;" data-i18n="films_films.empty">Noch keine Filme in der Mediathek.</p>
+    <a href="/films/upload" class="btn btn-primary"><span data-i18n="films_films.empty.cta">Ersten Film hochladen</span></a>
 </div>
 {% endif %}
 {% endblock %}

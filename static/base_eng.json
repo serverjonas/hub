@@ -1,0 +1,31 @@
+{
+    "_meta": {
+        "html_lang": "en"
+    },
+    "brand.name": "serverjonas",
+    "meta.description": "serverjonas – your modern community platform for memes, media and friends.",
+    "nav.memes": "Memes",
+    "nav.media": "Media",
+    "nav.friends": "Friends",
+    "nav.admin": "Admin",
+    "nav.cloud": "Cloud",
+    "nav.notifications": "Notifications",
+    "nav.settings": "Settings",
+    "mobile.menu": "Menu",
+    "footer.copyright": "© 2026 serverjonas · Version 5.3",
+    "footer.privacy": "Privacy",
+    "footer.status": "Server status",
+    "footer.news": "News",
+    "lang.switcher.title": "Change language",
+    "lang.deu": "German",
+    "lang.eng": "English",
+    "notif.away.summary": "You received {count} new messages while you were away. Check the news portal.",
+    "notif.toast.format": "{sender}: {message}",
+    "errors.back_hub": "Back to hub",
+    "errors.account": "Account",
+    "errors.access_denied": "Access denied",
+    "errors.contact_admin": "If you believe this is an error, please contact an administrator.",
+    "errors.module_unavailable": "This module is currently unavailable.",
+    "hub.user.loggedin": "Logged in as",
+    "hub.action.login": "Sign in"
+}

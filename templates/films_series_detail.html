@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block page_id %}films_series_detail{% endblock %}
 {% block title %}{{ series_name }} · Serverjonas{% endblock %}
 {% block head %}
 <style>
@@ -65,14 +66,16 @@
 </style>
 {% endblock %}
 {% block content %}
-<a href="{{ url_for('films.series') }}" class="back-link">← Zurück zu Serien</a>
+<a href="{{ url_for('films.series') }}" class="back-link"><span data-i18n="films_series_detail.back">← Zurück zu Serien</span></a>
 
 <h1>📺 {{ series_name }}</h1>
-<p>{{ seasons | length }} Staffel{% if seasons | length != 1 %}n{% endif %}</p>
+<p>{{ seasons | length }}
+{% if seasons | length == 1 %}<span data-i18n="films.season.one">Staffel</span>{% else %}<span data-i18n="films.season.other">Staffeln</span>{% endif %}
+</p>
 
 {% for season_num in seasons | sort %}
 <div class="season-block">
-    <div class="season-title">📂 Staffel {{ season_num }}</div>
+    <div class="season-title">📂 <span data-i18n="films_series_detail.season">Staffel</span> {{ season_num }}</div>
     <div class="episode-list">
         {% for ep in seasons[season_num] %}
         <div class="episode-card" onclick="location.href='{{ url_for('films.film_detail', film_id=ep.film_id) }}'">
@@ -82,13 +85,13 @@
                 <div class="meta">{{ ep.uploaded_at | strftime }}</div>
             </div>
             {% if ep.status == "ready" %}
-                <span class="badge badge-ready">✅ Bereit</span>
+                <span class="badge badge-ready" data-i18n="films_films.status.ready">✅ Bereit</span>
             {% elif ep.status == "converting" %}
-                <span class="badge badge-converting">⚙️ Konvertiert...</span>
+                <span class="badge badge-converting" data-i18n="films_films.status.converting">⚙️ Konvertiert...</span>
             {% elif ep.status == "queued" %}
-                <span class="badge badge-queued">⏳ Warteschlange</span>
+                <span class="badge badge-queued" data-i18n="films_films.status.queued">⏳ Warteschlange</span>
             {% else %}
-                <span class="badge badge-error">❌ Fehler</span>
+                <span class="badge badge-error" data-i18n="films_films.status.error">❌ Fehler</span>
             {% endif %}
         </div>
         {% endfor %}

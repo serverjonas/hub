@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Nutzerverwaltung &middot; Serverjonas{% endblock %}
+{% block page_id %}admin_users_manager{% endblock %}
+{% block title %}<span data-i18n="admin.cards.users">Nutzerverwaltung</span> &middot; Serverjonas{% endblock %}
 
 {% block extra_style %}
 /* ─── Admin Users Styles ─── */
@@ -108,18 +109,18 @@
 {% block content %}
 <div class="admin-header">
     <a href="/admin" style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-weight: 600; margin-bottom: 16px; font-size: 14px;">
-        <i data-lucide="chevron-left" style="width: 16px;"></i> Dashboard
+        <i data-lucide="chevron-left" style="width: 16px;"></i> <span data-i18n="admin.dashboard">Dashboard</span>
     </a>
-    <h1>Nutzerverwaltung</h1>
+    <h1 data-i18n="admin.cards.users">Nutzerverwaltung</h1>
 </div>
 
 <div class="stats-row">
     <div class="stat-item">
-        <span class="stat-label">Registrierte Nutzer</span>
+        <span class="stat-label" data-i18n="admin.stats.registered">Registrierte Nutzer</span>
         <span class="stat-value">{{ user_count }}</span>
     </div>
     <div class="stat-item">
-        <span class="stat-label">Aktive Bans</span>
+        <span class="stat-label" data-i18n="admin.stats.bans">Aktive Bans</span>
         <span class="stat-value" style="color: #ef4444;">{{ bans }}</span>
     </div>
 </div>
@@ -128,12 +129,12 @@
     <table class="user-table">
         <thead>
             <tr>
-                <th>Benutzer</th>
-                <th>Admin</th>
+                <th data-i18n="admin.table.user">Benutzer</th>
+                <th data-i18n="admin.table.admin">Admin</th>
                 <th>VIP</th>
                 <th>Mod</th>
-                <th>Sessions</th>
-                <th>Aktionen</th>
+                <th data-i18n="admin.table.sessions">Sessions</th>
+                <th data-i18n="admin.table.actions">Aktionen</th>
             </tr>
         </thead>
         <tbody>
@@ -142,13 +143,12 @@
                 <td>
                     <div style="font-weight: 700;">{{ u.name }}</div>
                     <div style="font-size: 11px; color: var(--text-dim);">ID: {{ u.id }}</div>
-                </td>
                 <td>
                     <form action="/admin/users/set-role" method="POST">
                         <input type="hidden" name="user_id" value="{{ u.id }}">
                         <input type="hidden" name="role" value="admin">
                         <input type="hidden" name="value" value="{{ '0' if u.admin else '1' }}">
-                        <button type="submit" class="role-toggle {{ 'active' if u.admin else '' }}">Admin</button>
+                        <button type="submit" class="role-toggle {{ 'active' if u.admin else '' }}" data-i18n="admin.table.admin">Admin</button>
                     </form>
                 </td>
                 <td>
@@ -169,14 +169,14 @@
                 </td>
                 <td>
                     <span class="badge {{ 'badge-active' if u.active_sessions > 0 else 'badge-none' }}">
-                        {{ u.active_sessions }} Aktiv
+                        {{ u.active_sessions }} <span data-i18n="admin.active_label">Aktiv</span>
                     </span>
                 </td>
                 <td>
                     <form action="/admin/users/delete-sessions" method="POST">
                         <input type="hidden" name="user_id" value="{{ u.id }}">
                         <button type="submit" class="role-toggle" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.2);">
-                            Logout
+                            <span data-i18n="admin.action.logout">Logout</span>
                         </button>
                     </form>
                 </td>

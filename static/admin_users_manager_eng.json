@@ -1,0 +1,9 @@
+{
+    "_meta": { "page": "admin_users_manager" },
+    "admin.table.user": "User",
+    "admin.table.admin": "Admin",
+    "admin.table.sessions": "Sessions",
+    "admin.table.actions": "Actions",
+    "admin.active_label": "Active",
+    "admin.action.logout": "Logout"
+}
