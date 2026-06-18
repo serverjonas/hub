@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "login" },
-    "login.title": "Login",
+    "_meta": {
+        "page": "login"
+    },
+    "login.title": "Sign in · serverjonas",
     "login.heading": "Welcome back",
     "login.subtitle": "Sign in to access Serverjonas.",
     "login.label.username": "Username",

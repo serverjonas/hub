@@ -1,5 +1,7 @@
 {
-    "_meta": { "page": "adminban" },
+    "_meta": {
+        "page": "adminban"
+    },
     "admin.table.user": "User",
     "admin.table.roles": "Roles",
     "admin.table.status": "Status",
@@ -11,5 +13,6 @@
     "banadmin.ban": "Ban",
     "banadmin.banned": "BANNED",
     "banadmin.until": "until",
-    "banadmin.active": "Active"
+    "banadmin.active": "Active",
+    "admin.cards.bans": "Ban management · serverjonas"
 }

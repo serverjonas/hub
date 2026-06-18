@@ -1,5 +1,8 @@
 {
-    "_meta": { "page": "error_501" },
+    "_meta": {
+        "page": "error_501"
+    },
     "errors.501.title": "Not implemented",
-    "errors.501.body": "The requested page is not yet available."
+    "errors.501.body": "The requested page is not yet available.",
+    "error.501.title": "501 · Not implemented · serverjonas"
 }

@@ -1,5 +1,7 @@
 {
-    "_meta": { "page": "notifmanager" },
+    "_meta": {
+        "page": "notifmanager"
+    },
     "notifadmin.title": "Notification Manager",
     "notifadmin.heading": "Notification Manager",
     "notifadmin.success": "The notification was sent successfully!",
@@ -13,5 +15,6 @@
     "notifadmin.type.warning": "Warning",
     "notifadmin.type.important": "Important / alert",
     "notifadmin.placeholder.message": "Your message here...",
-    "notifadmin.submit": "Send notification"
+    "notifadmin.submit": "Send notification",
+    "notifmanager.title": "Notification manager · serverjonas"
 }

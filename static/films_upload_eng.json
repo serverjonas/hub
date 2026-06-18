@@ -1,5 +1,7 @@
 {
-    "_meta": { "page": "films_upload" },
+    "_meta": {
+        "page": "films_upload"
+    },
     "films.upload_label": "Upload",
     "films_upload.title": "Upload media",
     "films_upload.subtitle": "Add new films or series to the library.",
@@ -10,5 +12,6 @@
     "films_upload.label.episode": "Episode",
     "films_upload.label.file": "File",
     "films_upload.choose_file": "Choose file",
-    "films_upload.submit": "Start upload"
+    "films_upload.submit": "Start upload",
+    "films.upload.title": "Upload · serverjonas"
 }

@@ -1,6 +1,9 @@
 {
-    "_meta": { "page": "error_418" },
+    "_meta": {
+        "page": "error_418"
+    },
     "errors.418.title": "I'm a Teapot",
     "errors.418.body": "Ups! Dein Request kann hier nicht verarbeitet werden – dieser Server ist eine Teekanne und keine Kaffeemaschine.",
-    "errors.418.learn_more": "Was ist das?"
+    "errors.418.learn_more": "Was ist das?",
+    "error.418.title": "418 · Ich bin eine Teekanne · serverjonas"
 }

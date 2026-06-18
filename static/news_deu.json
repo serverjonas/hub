@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "news" },
-    "news.title": "News",
+    "_meta": {
+        "page": "news"
+    },
+    "news.title": "News · serverjonas",
     "news.heading": "News",
     "news.show_old": "Alte Nachrichten anzeigen (48h+)"
 }

@@ -1,6 +1,9 @@
 {
-    "_meta": { "page": "error_418" },
+    "_meta": {
+        "page": "error_418"
+    },
     "errors.418.title": "I'm a Teapot",
     "errors.418.body": "Oops! Your request cannot be processed here – this server is a teapot, not a coffee machine.",
-    "errors.418.learn_more": "What is this?"
+    "errors.418.learn_more": "What is this?",
+    "error.418.title": "418 · I'm a teapot · serverjonas"
 }

@@ -1,5 +1,7 @@
 {
-    "_meta": { "page": "admin_nav" },
+    "_meta": {
+        "page": "admin_nav"
+    },
     "admin.title": "Admin Panel",
     "admin.dashboard": "Admin Dashboard",
     "admin.stats.users": "Users",
@@ -12,5 +14,6 @@
     "admin.cards.bans": "Ban management",
     "admin.cards.bans.desc": "Control sanctions and exclusions.",
     "admin.cards.notifs": "Notification manager",
-    "admin.cards.notifs.desc": "Create and manage notifications."
+    "admin.cards.notifs.desc": "Create and manage notifications.",
+    "admin.nav.title": "Admin Panel · serverjonas"
 }

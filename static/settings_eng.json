@@ -1,5 +1,7 @@
 {
-    "_meta": { "page": "settings" },
+    "_meta": {
+        "page": "settings"
+    },
     "settings.subtitle": "Customise your Serverjonas experience.",
     "settings.theme.title": "Appearance",
     "settings.theme.desc": "Choose a colour scheme you like.",
@@ -26,5 +28,6 @@
     "settings.toast.fill_all": "Please fill in all fields",
     "settings.toast.pw_short": "Password must be at least 8 characters long",
     "settings.toast.pw_mismatch": "Passwords do not match",
-    "settings.toast.pw_todo": "Password change is not yet implemented"
+    "settings.toast.pw_todo": "Password change is not yet implemented",
+    "settings.page_title": "Settings · serverjonas"
 }

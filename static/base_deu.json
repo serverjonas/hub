@@ -26,5 +26,6 @@
     "errors.contact_admin": "Falls du glaubst, dass dies ein Fehler ist, wende dich bitte an einen Administrator.",
     "errors.module_unavailable": "Dieses Modul ist derzeit nicht verfügbar.",
     "hub.user.loggedin": "Angemeldet als",
-    "hub.action.login": "Anmelden"
+    "hub.action.login": "Anmelden",
+    "page_title": "serverjonas"
 }

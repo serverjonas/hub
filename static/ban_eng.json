@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "ban" },
-    "ban.title": "Banned",
+    "_meta": {
+        "page": "ban"
+    },
+    "ban.title": "Banned · serverjonas",
     "ban.badge": "Account banned",
     "ban.heading": "You have been excluded from the Serverjonas network.",
     "ban.body": "Your account has been locked by a moderator or administrator.",

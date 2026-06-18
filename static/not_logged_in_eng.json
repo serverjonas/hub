@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "not_logged_in" },
-    "loggedin.title": "Not logged in",
+    "_meta": {
+        "page": "not_logged_in"
+    },
+    "loggedin.title": "Not logged in · serverjonas",
     "loggedin.important": "Important",
     "loggedin.heading": "Login required",
     "loggedin.body": "You must be logged in to access this page.",

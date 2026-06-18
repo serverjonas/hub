@@ -26,5 +26,6 @@
     "errors.contact_admin": "If you believe this is an error, please contact an administrator.",
     "errors.module_unavailable": "This module is currently unavailable.",
     "hub.user.loggedin": "Logged in as",
-    "hub.action.login": "Sign in"
+    "hub.action.login": "Sign in",
+    "page_title": "serverjonas"
 }

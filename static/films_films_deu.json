@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "films_films" },
-    "films_films.title": "Filme",
+    "_meta": {
+        "page": "films_films"
+    },
+    "films_films.title": "Filme · serverjonas",
     "films_films.heading": "Filme",
     "films_films.upload": "Upload",
     "films_films.status.ready": "Bereit",

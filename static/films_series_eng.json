@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "films_series" },
-    "films_series.title": "Series",
+    "_meta": {
+        "page": "films_series"
+    },
+    "films_series.title": "Series · serverjonas",
     "films_series.heading": "Series",
     "films_series.upload_episode": "Upload episode",
     "films_series.intro": "All your series",

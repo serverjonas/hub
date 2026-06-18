@@ -1,5 +1,8 @@
 {
-    "_meta": { "page": "error_404" },
+    "_meta": {
+        "page": "error_404"
+    },
     "errors.404.title": "Page not found",
-    "errors.404.body": "The requested page does not exist or has been moved."
+    "errors.404.body": "The requested page does not exist or has been moved.",
+    "error.404.title": "404 · Page not found · serverjonas"
 }

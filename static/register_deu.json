@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "register" },
-    "register.title": "Registrieren",
+    "_meta": {
+        "page": "register"
+    },
+    "register.title": "Registrieren · serverjonas",
     "register.heading": "Account erstellen",
     "register.subtitle": "Werde Teil der exklusiven Community.",
     "register.label.server_key": "Server-Key",

@@ -1,5 +1,8 @@
 {
-    "_meta": { "page": "error_404" },
+    "_meta": {
+        "page": "error_404"
+    },
     "errors.404.title": "Seite nicht gefunden",
-    "errors.404.body": "Die gewünschte Seite existiert nicht oder wurde verschoben."
+    "errors.404.body": "Die gewünschte Seite existiert nicht oder wurde verschoben.",
+    "error.404.title": "404 · Seite nicht gefunden · serverjonas"
 }

@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "memes_upload" },
-    "memes.upload.title": "Meme Upload",
+    "_meta": {
+        "page": "memes_upload"
+    },
+    "memes.upload.title": "Upload meme · serverjonas",
     "memes.upload.heading": "Upload meme",
     "memes.upload.subtitle": "Share your humour with the community.",
     "memes.upload.label.title": "Title (optional)",

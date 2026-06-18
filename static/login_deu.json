@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "login" },
-    "login.title": "Anmelden",
+    "_meta": {
+        "page": "login"
+    },
+    "login.title": "Anmelden · serverjonas",
     "login.heading": "Willkommen zurück",
     "login.subtitle": "Melde dich an, um auf Serverjonas zuzugreifen.",
     "login.label.username": "Benutzername",

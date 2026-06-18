@@ -1,9 +1,12 @@
 {
-    "_meta": { "page": "admin_users_manager" },
+    "_meta": {
+        "page": "admin_users_manager"
+    },
     "admin.table.user": "Benutzer",
     "admin.table.admin": "Admin",
     "admin.table.sessions": "Sessions",
     "admin.table.actions": "Aktionen",
     "admin.active_label": "Aktiv",
-    "admin.action.logout": "Logout"
+    "admin.action.logout": "Logout",
+    "admin.cards.users": "Nutzerverwaltung · serverjonas"
 }

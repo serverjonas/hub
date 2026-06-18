@@ -1,5 +1,7 @@
 {
-    "_meta": { "page": "notifmanager" },
+    "_meta": {
+        "page": "notifmanager"
+    },
     "notifadmin.title": "Benachrichtigungs-Manager",
     "notifadmin.heading": "Benachrichtigungs-Manager",
     "notifadmin.success": "Die Benachrichtigung wurde erfolgreich versendet!",
@@ -13,5 +15,6 @@
     "notifadmin.type.warning": "Warnung",
     "notifadmin.type.important": "Wichtig / Alarm",
     "notifadmin.placeholder.message": "Deine Nachricht hier...",
-    "notifadmin.submit": "Benachrichtigung senden"
+    "notifadmin.submit": "Benachrichtigung senden",
+    "notifmanager.title": "Benachrichtigungen · serverjonas"
 }

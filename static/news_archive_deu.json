@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "news_archive" },
-    "news_archive.title": "Archiv",
+    "_meta": {
+        "page": "news_archive"
+    },
+    "news_archive.title": "Archiv · serverjonas",
     "news_archive.heading": "Archiv (48h+)",
     "news_archive.back": "← Zurück zu aktuellen News"
 }

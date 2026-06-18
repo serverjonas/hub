@@ -1,6 +1,8 @@
 {
-    "_meta": { "page": "meme_view" },
-    "memes.view.title": "Meme Viewer",
+    "_meta": {
+        "page": "meme_view"
+    },
+    "memes.view.title": "Meme Viewer · serverjonas",
     "memes.view.next": "Next meme",
     "memes.view.empty": "No memes yet.",
     "memes.view.upload_title": "Upload meme"
