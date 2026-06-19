@@ -24,13 +24,13 @@ log = logging.getLogger("email")
 
 
 def _mail_from():
-    return os.environ.get("MAIL_FROM", "no-reply@serverjonas.local")
+    return os.environ.get("MAIL_FROM", "support@serverjonas.de")
 
 
 def _public_base_url():
     """Liefert die \u00f6ffentliche Basis-URL der App aus PUBLIC_BASE_URL oder f\u00e4llt
     auf eine sinnvolle Default-Adresse zur\u00fcck, sofern nicht konfiguriert."""
-    return os.environ.get("PUBLIC_BASE_URL", "http://localhost:5000")
+    return os.environ.get("PUBLIC_BASE_URL", "https://serverjonas.de")
 
 
 def _safe_env():
