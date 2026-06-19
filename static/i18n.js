@@ -73,9 +73,20 @@
         ["data-i18n-value", "attr:value"],
     ];
 
+    function parseVars(el) {
+        const raw = el.getAttribute("data-i18n-vars");
+        if (!raw) return null;
+        try {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === "object") return parsed;
+        } catch (_) { /* don’t break the page on malformed JSON */ }
+        return null;
+    }
+
     function applyOne(el, attr, kind, key, t) {
-        const value = t[key];
-        if (value === undefined || value === null) return;
+        const raw = t[key];
+        if (raw === undefined || raw === null) return;
+        const value = interpolate(raw, parseVars(el));
         if (kind === "text") el.textContent = value;
         else if (kind === "html") el.innerHTML = value;
         else el.setAttribute(attr.split(":")[1], value);

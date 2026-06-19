@@ -1,10 +1,214 @@
-from flask import Blueprint, render_template, request, redirect
-from toolbox.user import get_current_user
+import re
+
+from flask import (
+    Blueprint,
+    abort,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+
+from toolbox.email import (
+    build_verify_url,
+    send_email,
+    verification_email_body,
+)
+from toolbox.user import (
+    consume_email_verification,
+    create_email_verification,
+    email_resend_cooldown_remaining,
+    get_current_user,
+    get_user_email_status,
+    is_email_verified,
+    mark_user_email_active,
+    mask_email,
+    record_email_sent,
+    set_user_email,
+)
+
 
 bp = Blueprint("hub", __name__)
+
+
+EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$")
+GATE_SKIP_PATHS = {"/hub/email", "/hub/email/resend", "/hub/email/verify"}
+
+
+# ─── Flash-Mechanismus (eigene Session-Liste) ────────────────────────────────
+
+
+def _push_flash(kind, key, vars_=None):
+    """Hängt eine Flash-Nachricht an die Session. Lokalisierung passiert clientseitig
+    über data-i18n + data-i18n-vars (siehe static/i18n.js)."""
+    flashes = session.get("_email_gate_flashes", [])
+    flashes.append({"kind": kind, "key": key, "vars": vars_ or {}})
+    session["_email_gate_flashes"] = flashes
+
+
+def _pop_flashes():
+    flashes = session.pop("_email_gate_flashes", [])
+    return flashes
+
+
+def _login_required():
+    user = get_current_user()
+    if user is None:
+        # rendert templates/not_logged_in.html über den app.py-Handler
+        abort(401)
+    return user
+
+
+def _send_verification(email_addr, username, token):
+    """Kapselt den msmtp-Versand für die Verifizierungs-Mail."""
+    return send_email(
+        to_address=email_addr,
+        subject="Bestätige deine E-Mail – serverjonas",
+        text_body=verification_email_body(
+            username,
+            build_verify_url(token),
+            ttl_hours=24,
+        ),
+    )
+
+
+# ─── Gate ──────────────────────────────────────────────────────────────────
+
+
+@bp.before_request
+def gate_unverified_email():
+    """Lenkt nicht-verifizierte User (nur bei GET) auf /hub/email um."""
+    if request.method != "GET":
+        return
+
+    if request.path in GATE_SKIP_PATHS:
+        return
+
+    if request.path.startswith("/hub/email/"):
+        return
+
+    user = get_current_user()
+    if user is None:
+        return  # Login-Check übernimmt app.py
+
+    if not is_email_verified(user["id"]):
+        return redirect(url_for("hub.email_setup"))
+
 
 @bp.route("/")
 def hub():
     user_array = get_current_user()
     user = user_array["name"] if user_array else None
-    return render_template("hub.html", user=user)
+    return render_template("hub.html", user=user, flashes=_pop_flashes())
+
+
+# ─── E-Mail-Setup & Verifizierung ────────────────────────────────────────────
+
+
+@bp.route("/email", methods=["GET", "POST"])
+def email_setup():
+    user = _login_required()
+
+    email_value, active = get_user_email_status(user["id"])
+    verified = is_email_verified(user["id"])
+    cooldown = email_resend_cooldown_remaining(user["id"])
+    show_pending = bool(email_value) and not verified
+
+    if request.method == "POST":
+        action = request.form.get("action", "submit_email")
+
+        if action == "clear":
+            set_user_email(user["id"], None)
+            return redirect(url_for("hub.email_setup"))
+
+        if verified:
+            # Bereits verifiziert – kein erneuter Versand über dieses Formular.
+            return redirect(url_for("hub.email_setup"))
+
+        new_email = (request.form.get("email") or "").strip().lower()
+
+        if not EMAIL_REGEX.fullmatch(new_email):
+            _push_flash("error", "email_gate.error.invalid")
+            return redirect(url_for("hub.email_setup"))
+
+        if cooldown > 0:
+            _push_flash("error", "email_gate.error.cooldown", {"seconds": cooldown})
+            return redirect(url_for("hub.email_setup"))
+
+        set_user_email(user["id"], new_email)
+        token, _expires = create_email_verification(user["id"], new_email)
+
+        ok, err = _send_verification(new_email, user["name"], token)
+        if ok:
+            record_email_sent(user["id"])
+            _push_flash("success", "email_gate.success.sent", {"email": new_email})
+        else:
+            # Roll back das offene Token, damit der User es ohne Cooldown erneut
+            # versuchen kann.
+            consume_email_verification(token)
+            _push_flash("error", "email_gate.error.send_failed",
+                        {"detail": err or ""})
+
+        return redirect(url_for("hub.email_setup"))
+
+    return render_template(
+        "email_gate.html",
+        user=user["name"],
+        email=email_value,
+        masked_email=mask_email(email_value) if email_value else "",
+        verified=verified,
+        cooldown_left=cooldown,
+        show_pending=show_pending,
+        flashes=_pop_flashes(),
+    )
+
+
+@bp.route("/email/resend", methods=["POST"])
+def email_resend():
+    user = _login_required()
+    email_value, _ = get_user_email_status(user["id"])
+
+    if is_email_verified(user["id"]) or not email_value:
+        return redirect(url_for("hub.email_setup"))
+
+    cooldown = email_resend_cooldown_remaining(user["id"])
+    if cooldown > 0:
+        _push_flash("error", "email_gate.error.cooldown", {"seconds": cooldown})
+        return redirect(url_for("hub.email_setup"))
+
+    token, _ = create_email_verification(user["id"], email_value)
+    ok, err = _send_verification(email_value, user["name"], token)
+    if ok:
+        record_email_sent(user["id"])
+        _push_flash("success", "email_gate.success.resent", {"email": email_value})
+    else:
+        consume_email_verification(token)
+        _push_flash("error", "email_gate.error.send_failed",
+                    {"detail": err or ""})
+
+    return redirect(url_for("hub.email_setup"))
+
+
+@bp.route("/email/verify", methods=["GET"])
+def email_verify():
+    user = _login_required()
+    token = (request.args.get("token") or "").strip()
+
+    if not token:
+        _push_flash("error", "email_gate.error.token_invalid")
+        return redirect(url_for("hub.email_setup"))
+
+    result = consume_email_verification(token)
+    if not result:
+        _push_flash("error", "email_gate.error.token_invalid")
+        return redirect(url_for("hub.email_setup"))
+
+    user_id, verified_email = result
+    if user_id != user["id"]:
+        _push_flash("error", "email_gate.error.wrong_user")
+        return redirect(url_for("hub.email_setup"))
+
+    mark_user_email_active(user_id)
+    _push_flash("success", "email_gate.success.verified", {"email": verified_email})
+    return redirect(url_for("hub.hub"))

@@ -1,21 +1,39 @@
-import sqlite3
 import os
+import sqlite3
 
 DB_PATH = "./users.db"
+
+
+def _existing_columns(cur, table):
+    cur.execute(f"PRAGMA table_info({table})")
+    return {row[1] for row in cur.fetchall()}
+
+
+def _ensure_column(cur, table, column, definition):
+    """Adds a column to an existing table if it isn't already present."""
+    if column in _existing_columns(cur, table):
+        return
+    cur.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+    print(f"  ➕ {table}.{column} ({definition})")
+
 
 conn = sqlite3.connect(DB_PATH)
 cur = conn.cursor()
 
-cur.executescript("""
+cur.executescript(
+    """
 
     -- Benutzer
     CREATE TABLE IF NOT EXISTS users (
-        user_id       INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_name     TEXT    NOT NULL UNIQUE,
-        password_hash TEXT    NOT NULL,
-        admin         INTEGER NOT NULL DEFAULT 0,
-        vip           INTEGER NOT NULL DEFAULT 0,
-        mod           INTEGER NOT NULL DEFAULT 0
+        user_id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_name          TEXT    NOT NULL UNIQUE,
+        password_hash      TEXT    NOT NULL,
+        admin              INTEGER NOT NULL DEFAULT 0,
+        vip                INTEGER NOT NULL DEFAULT 0,
+        mod                INTEGER NOT NULL DEFAULT 0,
+        email              TEXT,
+        email_active       INTEGER NOT NULL DEFAULT 0,
+        last_email_sent_at INTEGER
     );
 
     -- Login-Sessions
@@ -64,7 +82,23 @@ cur.executescript("""
         FOREIGN KEY (friend_id) REFERENCES users(user_id)
     );
 
-""")
+    -- E-Mail-Verifizierungs-Tokens
+    CREATE TABLE IF NOT EXISTS email_verifications (
+        token      TEXT    PRIMARY KEY,
+        user_id    INTEGER NOT NULL,
+        email      TEXT    NOT NULL,
+        expires_at INTEGER NOT NULL,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+    );
+
+"""
+)
+
+# Idempotente Migrationen für bereits bestehende Datenbanken
+_ensure_column(cur, "users", "email", "TEXT")
+_ensure_column(cur, "users", "email_active", "INTEGER NOT NULL DEFAULT 0")
+_ensure_column(cur, "users", "last_email_sent_at", "INTEGER")
 
 conn.commit()
 conn.close()

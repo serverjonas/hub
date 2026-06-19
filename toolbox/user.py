@@ -174,3 +174,144 @@ def get_friends(user_id):
     rows = cur.fetchall()
     conn.close()
     return [row[0] for row in rows]
+
+
+# ─── E-Mail-Verifizierung ────────────────────────────────────────────────
+import secrets
+
+EMAIL_RESEND_COOLDOWN = 60            # Sekunden
+EMAIL_TOKEN_TTL = 60 * 60 * 24        # 24 Stunden
+
+
+def get_user_email_status(user_id):
+    """Returns (email, active) for a user or (None, False) when missing."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT email, email_active FROM users WHERE user_id = ?",
+        (user_id,),
+    )
+    row = cur.fetchone()
+    conn.close()
+    if row is None:
+        return None, False
+    email, active = row[0], bool(row[1])
+    return (email or None), active
+
+
+def is_email_verified(user_id):
+    """True wenn eine E-Mail hinterlegt UND aktiviert ist."""
+    email, active = get_user_email_status(user_id)
+    return bool(email) and active
+
+
+def set_user_email(user_id, email):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE users SET email = ?, email_active = 0 WHERE user_id = ?",
+        (email, user_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def mark_user_email_active(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE users SET email_active = 1 WHERE user_id = ?",
+        (user_id,),
+    )
+    conn.commit()
+    conn.close()
+
+
+def record_email_sent(user_id):
+    """Setzt den Cooldown-Zeitstempel."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE users SET last_email_sent_at = ? WHERE user_id = ?",
+        (int(time.time()), user_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def email_resend_cooldown_remaining(user_id):
+    """Gibt die verbleibenden Sekunden bis zum nächsten Versand zurück (0 wenn ok)."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT last_email_sent_at FROM users WHERE user_id = ?",
+        (user_id,),
+    )
+    row = cur.fetchone()
+    conn.close()
+    if not row or not row[0]:
+        return 0
+    elapsed = int(time.time()) - int(row[0])
+    return max(0, EMAIL_RESEND_COOLDOWN - elapsed)
+
+
+def create_email_verification(user_id, email):
+    """Erzeugt ein neues Token; alle bisherigen offenen Tokens werden gelöscht."""
+    now = int(time.time())
+    expires = now + EMAIL_TOKEN_TTL
+    token = secrets.token_urlsafe(32)
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "DELETE FROM email_verifications WHERE user_id = ?",
+        (user_id,),
+    )
+    cur.execute(
+        """
+        INSERT INTO email_verifications (token, user_id, email, expires_at, created_at)
+        VALUES (?, ?, ?, ?, ?)
+    """,
+        (token, user_id, email, expires, now),
+    )
+    conn.commit()
+    conn.close()
+    return token, expires
+
+
+def consume_email_verification(token):
+    """Liefert (user_id, email) wenn gültig; sonst None. Tokens werden gelöscht."""
+    if not token:
+        return None
+    now = int(time.time())
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT user_id, email, expires_at
+        FROM email_verifications
+        WHERE token = ?
+    """,
+        (token,),
+    )
+    row = cur.fetchone()
+    if row is None:
+        conn.close()
+        return None
+    user_id, email, expires_at = row
+    cur.execute("DELETE FROM email_verifications WHERE token = ?", (token,))
+    conn.commit()
+    conn.close()
+    if expires_at < now:
+        return None
+    return user_id, email
+
+
+def mask_email(email):
+    """Maskiert die lokale Hälfte einer E-Mail: 'j***@example.com'."""
+    if not email or "@" not in email:
+        return email or ""
+    local, _, domain = email.partition("@")
+    if not local:
+        return f"***@{domain}"
+    return f"{local[0]}***@{domain}"
