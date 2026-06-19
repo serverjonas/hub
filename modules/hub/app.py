@@ -41,15 +41,26 @@ GATE_SKIP_PATHS = {"/hub/email", "/hub/email/resend", "/hub/email/verify"}
 
 def _push_flash(kind, key, vars_=None):
     """Hängt eine Flash-Nachricht an die Session. Lokalisierung passiert clientseitig
-    über data-i18n + data-i18n-vars (siehe static/i18n.js)."""
-    flashes = session.get("_email_gate_flashes", [])
-    flashes.append({"kind": kind, "key": key, "vars": vars_ or {}})
-    session["_email_gate_flashes"] = flashes
+    über data-i18n + data-i18n-vars (siehe static/i18n.js).
+
+    Wird ohne `SECRET_KEY` in `.env` zu einem No-Op; in dem Fall werden Flashes
+    einfach verworfen, damit die Seite nicht crasht.
+    """
+    try:
+        flashes = session.get("_email_gate_flashes", [])
+        flashes.append({"kind": kind, "key": key, "vars": vars_ or {}})
+        session["_email_gate_flashes"] = flashes
+    except RuntimeError:
+        # Session ist nicht verfügbar (kein secret_key gesetzt).
+        pass
 
 
 def _pop_flashes():
-    flashes = session.pop("_email_gate_flashes", [])
-    return flashes
+    """Liest und entfernt pending Flashes. Liefert [] wenn keine Session vorhanden."""
+    try:
+        return session.pop("_email_gate_flashes", [])
+    except RuntimeError:
+        return []
 
 
 def _login_required():
