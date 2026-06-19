@@ -14,7 +14,8 @@ from flask import (
     send_from_directory
 )
 from PIL import Image
-from toolbox.toolbox import DB_PATH 
+from toolbox.toolbox import DB_PATH
+from toolbox.files import check_storage, get_storage_info
 from toolbox.user import get_current_user, get_name
 
 MEMES_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data", "memes")
@@ -128,15 +129,20 @@ def upload():
     if not user:
         return redirect("/login")
 
+    storage = get_storage_info(user["id"])
     message = None
+    message_type = "info"
+
     if request.method == "POST":
         file = request.files.get("file")
         if not file:
             message = "❌ Keine Datei ausgewählt."
+            message_type = "error"
         else:
             orig_ext = os.path.splitext(file.filename)[1].lower()
             if orig_ext not in [".png", ".jpg", ".jpeg", ".gif", ".mp4", ".webm"]:
                 message = "❌ Nicht unterstütztes Format."
+                message_type = "error"
             else:
                 timestamp = int(time.time())
                 filename = f"{user['id']}-{timestamp}{orig_ext}"
@@ -151,6 +157,31 @@ def upload():
                         img = Image.open(file)
                         img.save(filepath)
 
+                    # Tatsächliche Dateigröße nach dem Schreiben prüfen
+                    actual_size = os.path.getsize(filepath)
+
+                    # Storage-Check gegen das neue Limit (gerade geschriebene Datei ausschließen)
+                    ok, info = check_storage(user["id"], actual_size, exclude_paths=[filepath])
+                    if not ok:
+                        # Datei wieder löschen, da Limit überschritten
+                        try:
+                            os.remove(filepath)
+                        except FileNotFoundError:
+                            pass
+                        message = (
+                            f"❌ Speicherlimit überschritten. "
+                            f"Belegt: {info['used_human']} / Limit: {info['limit_human']}. "
+                            f"Lösche ältere Memes, um Platz zu schaffen."
+                        )
+                        message_type = "error"
+                        # DB-Eintrag wird nicht angelegt, weil Datei gelöscht ist
+                        return render_template(
+                            "memes_upload.html",
+                            message=message,
+                            user=user["name"],
+                            storage=info,
+                        )
+
                     title = request.form.get("title", "Ein lustiges Meme")
                     conn = sqlite3.connect(MEMES_DB_PATH)
                     cur = conn.cursor()
@@ -161,7 +192,11 @@ def upload():
                     conn.commit()
                     conn.close()
                     message = "✅ Meme erfolgreich hochgeladen!"
+                    message_type = "success"
+                    # Nach erfolgreichem Upload Storage neu berechnen
+                    storage = get_storage_info(user["id"])
                 except Exception as e:
                     message = f"❌ Fehler: {e}"
+                    message_type = "error"
 
-    return render_template("memes_upload.html", message=message, user=user["name"])
+    return render_template("memes_upload.html", message=message, user=user["name"], storage=storage)

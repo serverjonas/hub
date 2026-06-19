@@ -5,6 +5,27 @@
 
 <h1>☁️ <span data-i18n="nav.cloud">Cloud</span></h1>
 
+<!-- Speicher-Auslastung -->
+{% if storage %}
+<div class="storage-bar" style="margin: 16px 0; padding: 12px 16px; border-radius: 12px; background: var(--surface, #1c1c1c); border: 1px solid var(--border, #333);">
+  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-dim, #aaa); margin-bottom: 8px;">
+    <span>💾 Speicher</span>
+    <span>
+      {{ storage.used_human }} / {{ storage.limit_human }}
+      <span style="opacity:0.7;">({{ storage.percent }}%)</span>
+    </span>
+  </div>
+  <div style="height: 8px; background: var(--input, #222); border-radius: 999px; overflow: hidden;">
+    <div style="
+      height: 100%;
+      width: {{ storage.percent if storage.percent <= 100 else 100 }}%;
+      background: {% if storage.exceeded %}#ef4444{% elif storage.percent > 85 %}#f59e0b{% else %}#10b981{% endif %};
+      transition: width 0.4s ease;
+    "></div>
+  </div>
+</div>
+{% endif %}
+
 <!-- EIN Upload-Feld statt zwei -->
 <form id="uploadForm">
   <input type="file" name="files" multiple id="fileInput">
@@ -56,6 +77,20 @@ fileInput.addEventListener("change", () => {
 
   const tmpl = (window.t && window.t('cloud.selected_template')) || '📦 Ausgewählt: {files}';
   fileInfo.innerText = tmpl.replace(/\{files\}/g, files.map(f => f.name).join(", "));
+
+  // Vorab-Check gegen das Server-Limit (wenn storage-Variablen vorhanden)
+{% if storage %}
+  const limitBytes = {{ storage.limit }};
+  const usedBytes = {{ storage.used }};
+  const incomingBytes = files.reduce((s, f) => s + (f.size || 0), 0);
+  if (usedBytes + incomingBytes > limitBytes) {
+    const over = (usedBytes + incomingBytes) - limitBytes;
+    const overStr = over > 1024 * 1024 * 1024
+      ? (over / 1024 / 1024 / 1024).toFixed(2) + ' GB'
+      : (over / 1024 / 1024).toFixed(1) + ' MB';
+    fileInfo.innerText += `  ⚠️ ca. ${overStr} zu viel für dein Limit`;
+  }
+{% endif %}
 });
 
 form.onsubmit = async (e) => {
@@ -75,8 +110,18 @@ form.onsubmit = async (e) => {
     });
 
     if (!res.ok) {
-      console.error(await res.text());
-      const msg = (window.t && window.t('cloud.upload_failed')) || 'Upload fehlgeschlagen';
+      let msg;
+      try {
+        const err = await res.json();
+        if (err && err.error === "storage_limit_exceeded") {
+          msg = `Speicherlimit überschritten: belegt ${err.used_human} / Limit ${err.limit_human} (verfügbar: ${err.remaining_human}).`;
+        } else {
+          msg = (window.t && window.t('cloud.upload_failed')) || 'Upload fehlgeschlagen';
+        }
+      } catch {
+        msg = (window.t && window.t('cloud.upload_failed')) || 'Upload fehlgeschlagen';
+      }
+      console.error(msg);
       alert(msg);
       return;
     }

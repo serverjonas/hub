@@ -21,6 +21,7 @@ from flask import (
 )
 
 from toolbox.user import get_current_user
+from toolbox.files import check_storage, get_storage_info
 
 FILMS_DATA_DIR = os.path.join(
     os.path.dirname(__file__), "..", "..", "data", "films", "data"
@@ -41,7 +42,7 @@ def strftime_filter(value):
     return datetime.fromtimestamp(int(value)).strftime("%d.%m.%Y %H:%M")
 
 
-# ── Hilfsfunktionen ────────────────────────────────────────────────────────────
+# ── Hilfsfunktionen ────────────────────────────────────────────────────────
 
 
 def user_dir(username: str) -> str:
@@ -112,7 +113,7 @@ def list_series(username: str) -> dict:
     return series_dict
 
 
-# ── FFmpeg-Konvertierung ───────────────────────────────────────────────────────
+# ── FFmpeg-Konvertierung ───────────────────────────────────────────────────
 
 
 def convert_film(username: str, film_id: str, original_path: str):
@@ -158,7 +159,7 @@ def convert_film(username: str, film_id: str, original_path: str):
     write_meta(username, film_id, meta)
 
 
-# ── Routen ─────────────────────────────────────────────────────────────────────
+# ── Routen ─────────────────────────────────────────────────────────────────
 
 
 @bp.route("/", methods=["GET"])
@@ -166,7 +167,8 @@ def index():
     user = get_current_user()
     if not user:
         return render_template("not_logged_in.html")
-    return render_template("films_index.html", user=user["name"])
+    storage = get_storage_info(user["id"])
+    return render_template("films_index.html", user=user["name"], storage=storage)
 
 
 @bp.route("/films", methods=["GET"])
@@ -175,7 +177,8 @@ def films():
     if not user:
         return render_template("not_logged_in.html")
     films = list_only_films(user["id"])
-    return render_template("films_films.html", user=user["name"], films=films)
+    storage = get_storage_info(user["id"])
+    return render_template("films_films.html", user=user["name"], films=films, storage=storage)
 
 
 @bp.route("/series", methods=["GET"])
@@ -184,7 +187,8 @@ def series():
     if not user:
         return render_template("not_logged_in.html")
     series_data = list_series(user["id"])
-    return render_template("films_series.html", user=user["name"], series=series_data)
+    storage = get_storage_info(user["id"])
+    return render_template("films_series.html", user=user["name"], series=series_data, storage=storage)
 
 
 @bp.route("/series/<series_name>", methods=["GET"])
@@ -195,11 +199,13 @@ def series_detail(series_name):
     series_data = list_series(user["id"])
     if series_name not in series_data:
         abort(404)
+    storage = get_storage_info(user["id"])
     return render_template(
         "films_series_detail.html",
         user=user["name"],
         series_name=series_name,
         seasons=series_data[series_name]["seasons"],
+        storage=storage,
     )
 
 
@@ -211,6 +217,7 @@ def upload():
 
     message = None
     message_type = "info"
+    storage = get_storage_info(user["id"])
 
     if request.method == "POST":
         file = request.files.get("file")
@@ -231,7 +238,31 @@ def upload():
             ext = os.path.splitext(file.filename)[1].lower() or ".mp4"
             original_filename = f"original{ext}"
             original_path = os.path.join(fdir, original_filename)
+
             file.save(original_path)
+
+            # Storage-Check auf Basis der eigentlichen Dateigröße
+            # (das soeben angelegte Filmverzeichnis ausschließen,
+            # damit der gerade geschriebene Film nicht doppelt zählt)
+            actual_size = os.path.getsize(original_path)
+            ok, info = check_storage(user["id"], actual_size, exclude_paths=[fdir])
+            if not ok:
+                try:
+                    shutil.rmtree(fdir)
+                except FileNotFoundError:
+                    pass
+                message = (
+                    f"Speicherlimit überschritten. Belegt: {info['used_human']} / "
+                    f"Limit: {info['limit_human']}. Lösche ältere Filme, um Platz zu schaffen."
+                )
+                message_type = "error"
+                return render_template(
+                    "films_upload.html",
+                    user=user["name"],
+                    message=message,
+                    message_type=message_type,
+                    storage=info,
+                )
 
             meta = {
                 "film_id": film_id,
@@ -264,6 +295,7 @@ def upload():
         user=user["name"],
         message=message,
         message_type=message_type,
+        storage=storage,
     )
 
 @bp.route("/upload/init", methods=["POST"])
@@ -280,7 +312,39 @@ def upload_init():
     os.makedirs(upload_dir, exist_ok=True)
 
     with open(os.path.join(upload_dir, "meta.json"), "w") as f:
-        json.dump(data, f)
+        # erwartete Größe (falls vom Frontend mitgeschickt) speichern
+        meta = dict(data or {})
+        if "expected_size" in meta:
+            try:
+                meta["expected_size"] = int(meta["expected_size"])
+            except (TypeError, ValueError):
+                meta.pop("expected_size", None)
+        json.dump(meta, f)
+
+    # Optional: optionale Vorab-Prüfung gegen erwartete Endgröße
+    # (Frontends sollten `expected_size` in Bytes mitsenden).
+    info = None
+    expected_size = (data or {}).get("expected_size")
+    if expected_size:
+        try:
+            expected_size = int(expected_size)
+        except (TypeError, ValueError):
+            expected_size = None
+    if expected_size:
+        ok, info = check_storage(user["id"], expected_size)
+        if not ok:
+            # angefangenen Upload wieder aufräumen
+            shutil.rmtree(upload_dir, ignore_errors=True)
+            return jsonify({
+                "error": "storage_limit_exceeded",
+                "used_human": info["used_human"],
+                "limit_human": info["limit_human"],
+                "remaining_human": info["remaining_human"],
+                "message": (
+                    f"Speicherlimit überschritten. Belegt: {info['used_human']} / "
+                    f"Limit: {info['limit_human']}."
+                ),
+            }), 413
 
     return jsonify({
         "upload_id": upload_id
@@ -378,6 +442,29 @@ def upload_finish():
 
                     out.write(buf)
 
+    # Storage-Check nach dem Zusammensetzen
+    # (das soeben angelegte Filmverzeichnis ausschließen,
+    # damit der zusammengesetzte Film nicht doppelt zählt)
+    actual_size = os.path.getsize(original_path)
+    ok, info = check_storage(user["id"], actual_size, exclude_paths=[fdir])
+    if not ok:
+        # alles aufräumen, kein Film wurde angelegt
+        try:
+            shutil.rmtree(fdir)
+        except FileNotFoundError:
+            pass
+        shutil.rmtree(upload_dir, ignore_errors=True)
+        return jsonify({
+            "error": "storage_limit_exceeded",
+            "used_human": info["used_human"],
+            "limit_human": info["limit_human"],
+            "remaining_human": info["remaining_human"],
+            "message": (
+                f"Speicherlimit überschritten. Belegt: {info['used_human']} / "
+                f"Limit: {info['limit_human']}."
+            ),
+        }), 413
+
     meta = {
         "film_id": film_id,
         "title": upload_meta["title"],
@@ -452,8 +539,9 @@ def film_detail(film_id):
                 if next_season_eps:
                     next_episode = next_season_eps[0]
 
+    storage = get_storage_info(user["id"])
     return render_template(
-        "films_detail.html", user=user["name"], film=meta, next_episode=next_episode
+        "films_detail.html", user=user["name"], film=meta, next_episode=next_episode, storage=storage
     )
 
 

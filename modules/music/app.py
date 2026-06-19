@@ -7,11 +7,10 @@ import zipfile
 
 import requests
 from flask import Blueprint, abort, jsonify, render_template, request, send_file
-from mutagen.easyid3 import EasyID3
-from mutagen.mp3 import MP3
 
 from toolbox.user import get_current_user
 from toolbox.toolbox import DATA_DIR
+from toolbox.files import _folder_size, check_storage, get_storage_info
 
 bp = Blueprint("music", __name__, template_folder="templates")
 
@@ -202,7 +201,6 @@ def scan(root):
     for r, _, f in os.walk(root):
         for i in f:
             full = os.path.join(r, i)
-            print("DEBUG FILE:", full)
 
             if i.lower().endswith((".mp3", ".m4a", ".flac", ".wav", ".ogg")):
                 out.append(full)
@@ -235,11 +233,19 @@ def handle_upload(user_id, files, zip_file):
         os.makedirs(os.path.dirname(p), exist_ok=True)
         f.save(p)
 
+    # Größe des Uploads prüfen (tmp-Verzeichnis ausschließen, damit nicht doppelt gezählt)
+    incoming_size = _folder_size(tmp)
+    ok, info = check_storage(user_id, incoming_size, exclude_paths=[tmp])
+    if not ok:
+        shutil.rmtree(tmp, ignore_errors=True)
+        return False, info
+
     # PROCESS
     for mp3 in scan(tmp):
         process_file(mp3, library)
 
     shutil.rmtree(tmp, ignore_errors=True)
+    return True, info
 
 
 # -------------------------
@@ -256,7 +262,8 @@ def home():
     _, lib = user_paths(user["id"])
     artists = sorted(os.listdir(lib)) if os.path.exists(lib) else []
 
-    return render_template("artists.html", artists=artists)
+    storage = get_storage_info(user["id"])
+    return render_template("artists.html", artists=artists, storage=storage)
 
 
 @bp.route("/artist/<artist>")
@@ -299,6 +306,17 @@ def upload():
     files = request.files.getlist("files")
     zipf = request.files.get("zip")
 
-    handle_upload(user["id"], files, zipf)
+    ok, info = handle_upload(user["id"], files, zipf)
+    if not ok:
+        return jsonify({
+            "error": "storage_limit_exceeded",
+            "used_human": info["used_human"],
+            "limit_human": info["limit_human"],
+            "remaining_human": info["remaining_human"],
+            "message": (
+                f"Speicherlimit überschritten. Belegt: {info['used_human']} / "
+                f"Limit: {info['limit_human']}."
+            ),
+        }), 413
 
     return jsonify({"status": "ok"})
