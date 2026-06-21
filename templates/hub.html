@@ -131,7 +131,7 @@
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 24px;
     margin-bottom: 80px;
 }
@@ -195,6 +195,10 @@
 .card-icon-wrap.friends {
     background: linear-gradient(135deg, #D4F5E9, #B8EDDA);
     color: #2D9F6F;
+}
+.card-icon-wrap.chat {
+    background: linear-gradient(135deg, #FFE8D6, #FFD6BA);
+    color: #D97706;
 }
 
 .card:hover .card-icon-wrap {
@@ -441,6 +445,17 @@
         </div>
         <h3 data-i18n="nav.friends">Freunde</h3>
         <p data-i18n="hub.cards.friends.desc">Vernetze dich mit der Community und bleibe in Kontakt.</p>
+        <div class="card-arrow">
+            <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+        </div>
+    </a>
+
+    <a href="/chat" class="card animate-in delay-5">
+        <div class="card-icon-wrap chat">
+            <i data-lucide="message-circle" style="width: 30px; height: 30px;"></i>
+        </div>
+        <h3 data-i18n="nav.chat">Chat</h3>
+        <p data-i18n="hub.cards.chat.desc">Schreibe direkt mit deinen Freunden – schnell, privat und in Echtzeit.</p>
         <div class="card-arrow">
             <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
         </div>

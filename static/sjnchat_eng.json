@@ -1,0 +1,32 @@
+{
+    "_meta": {
+        "page": "sjnchat"
+    },
+    "chat.title": "SJNchat",
+    "chat.search.placeholder": "Search friends...",
+    "chat.empty": "You have no conversations yet.",
+    "chat.empty.friend": "Add friends first to start chatting.",
+    "chat.preview.you": "You:",
+    "chat.status.online": "online",
+    "chat.action.back": "Back",
+    "chat.action.friends": "Friends",
+    "chat.action.send": "Send",
+    "chat.composer.placeholder": "Write a message…",
+    "chat.composer.placeholder.banned": "You can't reply at the moment...",
+    "chat.composer.banned": "You are banned and can't send messages.",
+    "chat.start.title": "Say hi!",
+    "chat.start.body": "Send the first message to {name}. Messages are private and only visible to the two of you.",
+    "chat.nofriends.title": "No friends yet",
+    "chat.nofriends.body": "SJNchat only works with your friends. Add some friends first to start chatting here.",
+    "chat.nofriends.cta": "Manage friends",
+    "chat.welcome.title": "Welcome to SJNchat",
+    "chat.welcome.body": "Pick a friend from the list to start a conversation – or invite new friends to join.",
+    "chat.error.banned": "You are banned and can't send.",
+    "chat.error.too_long": "Message is too long.",
+    "chat.error.empty": "Empty messages are not allowed.",
+    "chat.error.generic": "Sending failed, please try again.",
+    "chat.error.network": "Network error – try again.",
+    "chat.day.today": "Today",
+    "chat.day.yesterday": "Yesterday",
+    "chat.time.yesterday": "Yesterday"
+}

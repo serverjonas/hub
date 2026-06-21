@@ -126,3 +126,9 @@ active = true
 pfad = "settings"
 url = "/settings"
 active = true
+
+[chat]
+pfad = "chat"
+url = "/chat"
+description = "SJNchat – direktnachrichten mit freunden"
+active = true
