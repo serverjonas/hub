@@ -99,22 +99,6 @@ def admin_index():
             uid, uname, is_admin_u, is_vip_u, is_mod_u, ban_reason, ban_expires = row
             _append_user_row(users, uid, uname, is_admin_u, is_vip_u, is_mod_u,
                              ban_reason, ban_expires, now)
-        banned = ban_reason is not None and (ban_expires is None or ban_expires > now)
-        users.append(
-            {
-                "id": uid,
-                "name": uname,
-                "admin": bool(is_admin_u),
-                "vip": bool(is_vip_u),
-                "mod": bool(is_mod_u),
-                "banned": banned,
-                "ban_reason": ban_reason,
-                "ban_expires": ban_expires,
-                "banned_by": banned_by,
-                "banned_by_name": banned_by_name,
-                "banned_by_is_mod": None,  # gefüllt unten
-            }
-        )
 
     # Pro gebanntem Nutzer: war der Banner ein Mod? (für UI-Hinweis "Stop Ban")
     banner_ids = {u["banned_by"] for u in users if u["banned"] and u["banned_by"]}
@@ -146,6 +130,11 @@ def admin_index():
         cooldown_remaining=cooldown_remaining,
         bans=bans_count,
         user_count=user_count,
+        roles={
+            "admin": bool(infos.get("admin")),
+            "vip":   bool(infos.get("vip")),
+            "mod":   bool(infos.get("mod")),
+        },
     )
 
 
