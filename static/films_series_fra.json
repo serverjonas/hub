@@ -1,0 +1,16 @@
+{
+    "_meta": {
+        "page": "films_series"
+    },
+    "films_series.title": "Séries · serverjonas",
+    "films_series.heading": "Séries",
+    "films_series.upload_episode": "Téléverser un épisode",
+    "films_series.intro": "Toutes tes séries",
+    "films_series.empty": "Aucune série pour le moment.",
+    "films_series.empty.hint": "Lors du téléversement, choisis « Série » et indique le nom de la série.",
+    "films_series.upload_now": "Téléverser maintenant",
+    "films.season.one": "Saison",
+    "films.season.other": "Saisons",
+    "films.episode.one": "Épisode",
+    "films.episode.other": "Épisodes"
+}

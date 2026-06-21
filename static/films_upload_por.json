@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "films_upload"
+    },
+    "films.upload_label": "Carregar",
+    "films_upload.title": "Carregar media",
+    "films_upload.subtitle": "Adiciona novos filmes ou séries à biblioteca.",
+    "films_upload.type.film": "Filme",
+    "films_upload.type.series": "Série",
+    "films_upload.label.title": "Título",
+    "films_upload.label.series_name": "Nome da série",
+    "films_upload.label.episode": "Episódio",
+    "films_upload.label.file": "Ficheiro",
+    "films_upload.choose_file": "Escolher ficheiro",
+    "films_upload.submit": "Iniciar carregamento",
+    "films.upload.title": "Carregar · serverjonas"
+}

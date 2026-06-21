@@ -1,0 +1,14 @@
+{
+    "_meta": {
+        "page": "films_films"
+    },
+    "films_films.title": "Filmes · serverjonas",
+    "films_films.heading": "Filmes",
+    "films_films.upload": "Carregar",
+    "films_films.status.ready": "Pronto",
+    "films_films.status.converting": "A converter...",
+    "films_films.status.queued": "Em fila",
+    "films_films.status.error": "Erro",
+    "films_films.empty": "Ainda não há filmes na biblioteca.",
+    "films_films.empty.cta": "Carregar o primeiro filme"
+}

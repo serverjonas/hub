@@ -1,0 +1,16 @@
+{
+    "_meta": {
+        "page": "films_series"
+    },
+    "films_series.title": "Series · serverjonas",
+    "films_series.heading": "Series",
+    "films_series.upload_episode": "Subir episodio",
+    "films_series.intro": "Todas tus series",
+    "films_series.empty": "Aún no hay series.",
+    "films_series.empty.hint": "Al subir, elige «Serie» e indica el nombre de la serie.",
+    "films_series.upload_now": "Subir ahora",
+    "films.season.one": "Temporada",
+    "films.season.other": "Temporadas",
+    "films.episode.one": "Episodio",
+    "films.episode.other": "Episodios"
+}

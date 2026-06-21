@@ -1,0 +1,33 @@
+{
+    "_meta": {
+        "page": "settings"
+    },
+    "settings.subtitle": "Pas je ervaring op Serverjonas aan.",
+    "settings.theme.title": "Uiterlijk",
+    "settings.theme.desc": "Kies een kleurenschema dat je bevalt.",
+    "settings.theme.light": "Licht",
+    "settings.theme.dark": "Donker",
+    "settings.language.title": "Taal",
+    "settings.language.desc": "Kies de interfacetaal.",
+    "settings.account.title": "Account",
+    "settings.account.loggedin": "Ingelogd als",
+    "settings.account.username": "Gebruikersnaam",
+    "settings.account.active": "Actief",
+    "settings.security.title": "Beveiliging",
+    "settings.security.desc": "Beheer je wachtwoord en beveiligingsopties.",
+    "settings.security.sessions": "Actieve sessies",
+    "settings.security.sessions.hint": "Meld je af op alle andere apparaten.",
+    "settings.security.logout_all": "Alles afmelden",
+    "settings.security.not_logged_in": "Log in om wachtwoord en beveiliging te beheren.",
+    "settings.about.title": "Over Serverjonas",
+    "settings.about.desc": "Informatie over het platform.",
+    "settings.about.version": "Versie",
+    "settings.about.platform": "Platform",
+    "settings.toast.theme_changed": "Uiterlijk bijgewerkt",
+    "settings.toast.lang_changed": "Taal bijgewerkt",
+    "settings.toast.fill_all": "Vul alle velden in",
+    "settings.toast.pw_short": "Wachtwoord moet minstens 8 tekens zijn",
+    "settings.toast.pw_mismatch": "Wachtwoorden komen niet overeen",
+    "settings.toast.pw_todo": "Wachtwoord wijzigen is nog niet geïmplementeerd",
+    "settings.page_title": "Instellingen · serverjonas"
+}

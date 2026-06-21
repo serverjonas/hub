@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "login"
+    },
+    "login.title": "Accedi · serverjonas",
+    "login.heading": "Bentornato",
+    "login.subtitle": "Accedi per entrare in Serverjonas.",
+    "login.label.username": "Nome utente",
+    "login.label.password": "Password",
+    "login.placeholder.username": "Il tuo nome utente",
+    "login.pw_show": "Mostra password",
+    "login.pw_hide": "Nascondi password",
+    "login.submit": "Accedi",
+    "login.or": "oppure",
+    "login.no_account": "Non hai ancora un account?",
+    "login.register_link": "Registrati ora"
+}

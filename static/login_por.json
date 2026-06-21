@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "login"
+    },
+    "login.title": "Entrar · serverjonas",
+    "login.heading": "Bem-vindo de volta",
+    "login.subtitle": "Entra para aceder ao Serverjonas.",
+    "login.label.username": "Nome de utilizador",
+    "login.label.password": "Palavra-passe",
+    "login.placeholder.username": "O teu nome de utilizador",
+    "login.pw_show": "Mostrar palavra-passe",
+    "login.pw_hide": "Esconder palavra-passe",
+    "login.submit": "Entrar",
+    "login.or": "ou",
+    "login.no_account": "Ainda não tens conta?",
+    "login.register_link": "Regista-te agora"
+}

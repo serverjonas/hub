@@ -1,0 +1,14 @@
+{
+    "_meta": {
+        "page": "films_films"
+    },
+    "films_films.title": "Фильмы · serverjonas",
+    "films_films.heading": "Фильмы",
+    "films_films.upload": "Загрузить",
+    "films_films.status.ready": "Готово",
+    "films_films.status.converting": "Конвертация...",
+    "films_films.status.queued": "В очереди",
+    "films_films.status.error": "Ошибка",
+    "films_films.empty": "В библиотеке ещё нет фильмов.",
+    "films_films.empty.cta": "Загрузить первый фильм"
+}

@@ -1,0 +1,13 @@
+{
+    "_meta": { "page": "films_detail" },
+    "films_detail.back.films": "Все фильмы",
+    "films_detail.video.fallback": "Твой браузер не поддерживает HTML5-видео.",
+    "films_detail.status.converting": "Идёт конвертация...",
+    "films_detail.status.queued": "В очереди...",
+    "films_detail.status.error": "Ошибка обработки",
+    "films_detail.auto_refresh": "Страница обновляется автоматически.",
+    "films_detail.uploaded_at": "Загружено",
+    "films_detail.next_episode": "Следующий эпизод",
+    "films_detail.delete": "Удалить",
+    "films_detail.delete.confirm": "Точно удалить?"
+}

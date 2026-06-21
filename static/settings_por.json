@@ -1,0 +1,33 @@
+{
+    "_meta": {
+        "page": "settings"
+    },
+    "settings.subtitle": "Personaliza a tua experiência em Serverjonas.",
+    "settings.theme.title": "Aparência",
+    "settings.theme.desc": "Escolhe um esquema de cores que gostes.",
+    "settings.theme.light": "Claro",
+    "settings.theme.dark": "Escuro",
+    "settings.language.title": "Idioma",
+    "settings.language.desc": "Escolhe o idioma da interface.",
+    "settings.account.title": "Conta",
+    "settings.account.loggedin": "Sessão iniciada como",
+    "settings.account.username": "Nome de utilizador",
+    "settings.account.active": "Ativa",
+    "settings.security.title": "Segurança",
+    "settings.security.desc": "Gere a tua palavra-passe e opções de segurança.",
+    "settings.security.sessions": "Sessões ativas",
+    "settings.security.sessions.hint": "Termina sessão em todos os outros dispositivos.",
+    "settings.security.logout_all": "Terminar todas",
+    "settings.security.not_logged_in": "Inicia sessão para gerir palavra-passe e segurança.",
+    "settings.about.title": "Sobre o Serverjonas",
+    "settings.about.desc": "Informações sobre a plataforma.",
+    "settings.about.version": "Versão",
+    "settings.about.platform": "Plataforma",
+    "settings.toast.theme_changed": "Aparência atualizada",
+    "settings.toast.lang_changed": "Idioma atualizado",
+    "settings.toast.fill_all": "Preenche todos os campos",
+    "settings.toast.pw_short": "A palavra-passe tem de ter pelo menos 8 caracteres",
+    "settings.toast.pw_mismatch": "As palavras-passe não coincidem",
+    "settings.toast.pw_todo": "A alteração da palavra-passe ainda não está implementada",
+    "settings.page_title": "Definições · serverjonas"
+}

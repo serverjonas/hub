@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "films_upload"
+    },
+    "films.upload_label": "Prześlij",
+    "films_upload.title": "Prześlij media",
+    "films_upload.subtitle": "Dodaj nowe filmy lub seriale do biblioteki.",
+    "films_upload.type.film": "Film",
+    "films_upload.type.series": "Serial",
+    "films_upload.label.title": "Tytuł",
+    "films_upload.label.series_name": "Nazwa serialu",
+    "films_upload.label.episode": "Odcinek",
+    "films_upload.label.file": "Plik",
+    "films_upload.choose_file": "Wybierz plik",
+    "films_upload.submit": "Rozpocznij wysyłanie",
+    "films.upload.title": "Prześlij · serverjonas"
+}

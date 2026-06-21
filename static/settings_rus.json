@@ -1,0 +1,33 @@
+{
+    "_meta": {
+        "page": "settings"
+    },
+    "settings.subtitle": "Настрой свой опыт на Serverjonas.",
+    "settings.theme.title": "Оформление",
+    "settings.theme.desc": "Выбери цветовую схему, которая нравится.",
+    "settings.theme.light": "Светлая",
+    "settings.theme.dark": "Тёмная",
+    "settings.language.title": "Язык",
+    "settings.language.desc": "Выбери язык интерфейса.",
+    "settings.account.title": "Аккаунт",
+    "settings.account.loggedin": "Вход как",
+    "settings.account.username": "Имя пользователя",
+    "settings.account.active": "Активен",
+    "settings.security.title": "Безопасность",
+    "settings.security.desc": "Управляй паролем и параметрами безопасности.",
+    "settings.security.sessions": "Активные сессии",
+    "settings.security.sessions.hint": "Выйди со всех других устройств.",
+    "settings.security.logout_all": "Выйти отовсюду",
+    "settings.security.not_logged_in": "Войди, чтобы управлять паролем и безопасностью.",
+    "settings.about.title": "О Serverjonas",
+    "settings.about.desc": "Информация о платформе.",
+    "settings.about.version": "Версия",
+    "settings.about.platform": "Платформа",
+    "settings.toast.theme_changed": "Оформление обновлено",
+    "settings.toast.lang_changed": "Язык обновлён",
+    "settings.toast.fill_all": "Заполни все поля",
+    "settings.toast.pw_short": "Пароль должен быть не менее 8 символов",
+    "settings.toast.pw_mismatch": "Пароли не совпадают",
+    "settings.toast.pw_todo": "Смена пароля ещё не реализована",
+    "settings.page_title": "Настройки · serverjonas"
+}

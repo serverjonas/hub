@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "films_upload"
+    },
+    "films.upload_label": "Carica",
+    "films_upload.title": "Carica media",
+    "films_upload.subtitle": "Aggiungi nuovi film o serie alla libreria.",
+    "films_upload.type.film": "Film",
+    "films_upload.type.series": "Serie",
+    "films_upload.label.title": "Titolo",
+    "films_upload.label.series_name": "Nome della serie",
+    "films_upload.label.episode": "Episodio",
+    "films_upload.label.file": "File",
+    "films_upload.choose_file": "Scegli file",
+    "films_upload.submit": "Avvia caricamento",
+    "films.upload.title": "Carica · serverjonas"
+}

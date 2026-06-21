@@ -1,0 +1,16 @@
+{
+    "_meta": {
+        "page": "films_series"
+    },
+    "films_series.title": "Сериалы · serverjonas",
+    "films_series.heading": "Сериалы",
+    "films_series.upload_episode": "Загрузить эпизод",
+    "films_series.intro": "Все твои сериалы",
+    "films_series.empty": "Сериалов пока нет.",
+    "films_series.empty.hint": "При загрузке выбери «Сериал» и укажи название.",
+    "films_series.upload_now": "Загрузить сейчас",
+    "films.season.one": "Сезон",
+    "films.season.other": "Сезоны",
+    "films.episode.one": "Эпизод",
+    "films.episode.other": "Эпизоды"
+}

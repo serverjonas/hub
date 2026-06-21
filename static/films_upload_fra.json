@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "films_upload"
+    },
+    "films.upload_label": "Téléverser",
+    "films_upload.title": "Téléverser des médias",
+    "films_upload.subtitle": "Ajoute de nouveaux films ou séries à la médiathèque.",
+    "films_upload.type.film": "Film",
+    "films_upload.type.series": "Série",
+    "films_upload.label.title": "Titre",
+    "films_upload.label.series_name": "Nom de la série",
+    "films_upload.label.episode": "Épisode",
+    "films_upload.label.file": "Fichier",
+    "films_upload.choose_file": "Choisir un fichier",
+    "films_upload.submit": "Lancer le téléversement",
+    "films.upload.title": "Téléverser · serverjonas"
+}

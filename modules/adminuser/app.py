@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, abort
+from urllib.parse import urlparse, urljoin
+
+from flask import Blueprint, render_template, request, redirect, url_for, abort
 import sqlite3
 import time
 import sys
@@ -17,6 +19,27 @@ from toolbox.user import (
 )
 
 bp = Blueprint("usermanager", __name__, template_folder="templates")
+
+
+# ─── Helpers ────────────────────────────────────────────────────────────────
+def _is_safe_url(target):
+    """Erlaubt nur Same-Origin Redirects (gegen open-redirect & fremde Domains)."""
+    if not target:
+        return False
+    try:
+        ref = urlparse(request.host_url)
+        test = urlparse(urljoin(request.host_url, target))
+        return test.scheme in ("http", "https") and ref.netloc == test.netloc
+    except Exception:
+        return False
+
+
+def _safe_redirect(default_endpoint, **values):
+    """Redirect auf ein optionales ?next=…-Ziel oder den Default-Endpoint."""
+    target = request.values.get("next") or request.referrer
+    if target and _is_safe_url(target):
+        return redirect(target)
+    return redirect(url_for(default_endpoint, **values))
 
 
 def get_active_bans():
@@ -94,6 +117,7 @@ def user_index():
         "admin_users_manager.html",
         users=users,
         user=user["name"],
+        current_user_id=user["id"],
         is_admin=is_admin_u,
         is_mod=is_mod_u,
         pending_suggestions=pending,
@@ -160,7 +184,7 @@ def review_suggestion():
         abort(400)
 
     review_permission_suggestion(suggestion_id, current_user["id"], decision)
-    return redirect(request.referrer or "/admin/users")
+    return _safe_redirect("usermanager.user_index")
 
 
 @bp.route("/suggestions")
@@ -177,6 +201,7 @@ def suggestions():
     return render_template(
         "admin_suggestions.html",
         user=current_user["name"],
+        current_user_id=current_user["id"],
         items=items,
         just_created=just_created,
     )
@@ -196,4 +221,4 @@ def delete_sessions():
     cur.execute("DELETE FROM sessions WHERE user_id = ?", (target_id,))
     con.commit()
     con.close()
-    return redirect("/admin/users")
+    return _safe_redirect("usermanager.user_index")

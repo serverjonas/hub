@@ -1,0 +1,14 @@
+{
+    "_meta": {
+        "page": "register"
+    },
+    "register.title": "Registrarse · serverjonas",
+    "register.heading": "Crear cuenta",
+    "register.subtitle": "Únete a esta comunidad exclusiva.",
+    "register.label.server_key": "Clave del servidor",
+    "register.placeholder.username": "Nombre de usuario",
+    "register.placeholder.server_key": "Introduce la clave",
+    "register.submit": "Crear cuenta",
+    "register.has_account": "¿Ya tienes cuenta?",
+    "register.login_link": "Inicia sesión aquí"
+}

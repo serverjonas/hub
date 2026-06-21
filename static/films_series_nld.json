@@ -1,0 +1,16 @@
+{
+    "_meta": {
+        "page": "films_series"
+    },
+    "films_series.title": "Series · serverjonas",
+    "films_series.heading": "Series",
+    "films_series.upload_episode": "Aflevering uploaden",
+    "films_series.intro": "Al je series",
+    "films_series.empty": "Nog geen series.",
+    "films_series.empty.hint": "Kies bij het uploaden „Serie\" en geef de serienaam op.",
+    "films_series.upload_now": "Nu uploaden",
+    "films.season.one": "Seizoen",
+    "films.season.other": "Seizoenen",
+    "films.episode.one": "Aflevering",
+    "films.episode.other": "Afleveringen"
+}

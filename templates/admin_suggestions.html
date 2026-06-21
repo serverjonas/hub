@@ -154,17 +154,19 @@
             {% endif %}
         </div>
         <div class="suggest-actions">
-            <form action="/admin/users/review-suggestion" method="POST" style="display: inline;">
+            <form action="{{ url_for('usermanager.review_suggestion') }}" method="POST" style="display: inline;">
                 <input type="hidden" name="suggestion_id" value="{{ s.id }}">
                 <input type="hidden" name="decision" value="approved">
+                <input type="hidden" name="next" value="{{ request.full_path }}">
                 <button type="submit" class="btn-action btn-approve">
                     <i data-lucide="check" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
                     <span data-i18n="admin.suggestions.approve">Genehmigen</span>
                 </button>
             </form>
-            <form action="/admin/users/review-suggestion" method="POST" style="display: inline;">
+            <form action="{{ url_for('usermanager.review_suggestion') }}" method="POST" style="display: inline;">
                 <input type="hidden" name="suggestion_id" value="{{ s.id }}">
                 <input type="hidden" name="decision" value="rejected">
+                <input type="hidden" name="next" value="{{ request.full_path }}">
                 <button type="submit" class="btn-action btn-reject">
                     <i data-lucide="x" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
                     <span data-i18n="admin.suggestions.reject">Ablehnen</span>

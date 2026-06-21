@@ -1,0 +1,14 @@
+{
+    "_meta": {
+        "page": "films_index"
+    },
+    "films_index.title": "Mediacentrum",
+    "films_index.subtitle": "Films, series en muziek in de hoogste kwaliteit.",
+    "films_index.filmes.title": "Films",
+    "films_index.filmes.desc": "Jouw collectie speelfilms.",
+    "films_index.series.title": "Series",
+    "films_index.series.desc": "Seizoenen en afleveringen van je favoriete series.",
+    "films_index.upload.title": "Uploaden",
+    "films_index.upload.desc": "Voeg nieuwe media toe aan de bibliotheek.",
+    "films.index.title": "Media · serverjonas"
+}

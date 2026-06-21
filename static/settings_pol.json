@@ -1,0 +1,33 @@
+{
+    "_meta": {
+        "page": "settings"
+    },
+    "settings.subtitle": "Dostosuj swoje wrażenia na Serverjonas.",
+    "settings.theme.title": "Wygląd",
+    "settings.theme.desc": "Wybierz schemat kolorów, który Ci odpowiada.",
+    "settings.theme.light": "Jasny",
+    "settings.theme.dark": "Ciemny",
+    "settings.language.title": "Język",
+    "settings.language.desc": "Wybierz język interfejsu.",
+    "settings.account.title": "Konto",
+    "settings.account.loggedin": "Zalogowany jako",
+    "settings.account.username": "Nazwa użytkownika",
+    "settings.account.active": "Aktywne",
+    "settings.security.title": "Bezpieczeństwo",
+    "settings.security.desc": "Zarządzaj hasłem i opcjami bezpieczeństwa.",
+    "settings.security.sessions": "Aktywne sesje",
+    "settings.security.sessions.hint": "Wyloguj się ze wszystkich innych urządzeń.",
+    "settings.security.logout_all": "Wyloguj ze wszystkich",
+    "settings.security.not_logged_in": "Zaloguj się, aby zarządzać hasłem i bezpieczeństwem.",
+    "settings.about.title": "O Serverjonas",
+    "settings.about.desc": "Informacje o platformie.",
+    "settings.about.version": "Wersja",
+    "settings.about.platform": "Platforma",
+    "settings.toast.theme_changed": "Wygląd zaktualizowany",
+    "settings.toast.lang_changed": "Język zaktualizowany",
+    "settings.toast.fill_all": "Wypełnij wszystkie pola",
+    "settings.toast.pw_short": "Hasło musi mieć co najmniej 8 znaków",
+    "settings.toast.pw_mismatch": "Hasła nie pasują",
+    "settings.toast.pw_todo": "Zmiana hasła nie jest jeszcze wdrożona",
+    "settings.page_title": "Ustawienia · serverjonas"
+}

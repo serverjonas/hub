@@ -6,26 +6,48 @@
 (function () {
     const STORAGE_KEY = "serverjonas_lang";
     const DEFAULT_LANG = "deu";
-    const SUPPORTED_LANGS = ["deu", "eng"];
-    const LANG_MAP = { deu: "de", eng: "en" };
+
+    // Code (ISO 639-2) → {htmlLang, label, nativeLabel, flag}.
+    // flag is shown in the dropdown, label is used for screen-reader i18n.
+    const SUPPORTED = [
+        { code: "deu", htmlLang: "de", label: "German",       native: "Deutsch",       flag: "🇩🇪" },
+        { code: "eng", htmlLang: "en", label: "English",      native: "English",       flag: "🇬🇧" },
+        { code: "spa", htmlLang: "es", label: "Spanish",      native: "Español",       flag: "🇪🇸" },
+        { code: "fra", htmlLang: "fr", label: "French",       native: "Français",      flag: "🇫🇷" },
+        { code: "ita", htmlLang: "it", label: "Italian",      native: "Italiano",      flag: "🇮🇹" },
+        { code: "nld", htmlLang: "nl", label: "Dutch",        native: "Nederlands",    flag: "🇳🇱" },
+        { code: "por", htmlLang: "pt", label: "Portuguese",   native: "Português",     flag: "🇵🇹" },
+        { code: "pol", htmlLang: "pl", label: "Polish",       native: "Polski",        flag: "🇵🇱" },
+        { code: "rus", htmlLang: "ru", label: "Russian",      native: "Русский",       flag: "🇷🇺" },
+    ];
+    const SUPPORTED_CODES = SUPPORTED.map((l) => l.code);
+    const LANG_MAP = Object.fromEntries(SUPPORTED.map((l) => [l.code, l.htmlLang]));
 
     let currentLang = DEFAULT_LANG;
     let translations = {};
-    let fallback = {}; // German strings, used when a key is missing in target lang
+    let fallback = {}; // German/English strings, used when a key is missing in target lang
     let inflightToken = 0; // guards against concurrent setLanguage calls resolving out of order
+
+    /* ─── Public helpers (exported early) ─── */
+    window.i18nLanguages = SUPPORTED;
+    window.i18nSupported = SUPPORTED_CODES;
+    window.i18nNative = (code) => {
+        const entry = SUPPORTED.find((l) => l.code === code);
+        return entry ? entry.native : code;
+    };
 
     /* ─── Language detection ─── */
     function detectLanguage() {
         try {
             const url = new URL(window.location.href);
             const param = url.searchParams.get("lang");
-            if (param && SUPPORTED_LANGS.includes(param)) {
+            if (param && SUPPORTED_CODES.includes(param)) {
                 localStorage.setItem(STORAGE_KEY, param);
                 return param;
             }
         } catch (_) {}
         const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored && SUPPORTED_LANGS.includes(stored)) return stored;
+        if (stored && SUPPORTED_CODES.includes(stored)) return stored;
         return DEFAULT_LANG;
     }
 
@@ -41,18 +63,27 @@
         }
     }
 
+    // Fallback chain (last wins): base_deu, page_deu, base_eng, page_<lang>, base_<lang>
+    // → German never breaks anything; English fills missing keys; target language overrides last.
     async function loadTranslations(lang) {
         const page = (document.body && document.body.dataset.page) || "base";
         const needPage = page && page !== "base";
-        const [baseDef, pageDef, baseLang, pageLang] = await Promise.all([
+        const requests = [
             fetchJSON("base_deu.json"),
             needPage ? fetchJSON(page + "_deu.json") : Promise.resolve({}),
-            fetchJSON("base_" + lang + ".json"),
-            needPage ? fetchJSON(page + "_" + lang + ".json") : Promise.resolve({}),
-        ]);
-        fallback = Object.assign({}, baseDef, pageDef);
-        // Target language wins; German fills in missing keys.
-        return Object.assign({}, fallback, baseLang, pageLang);
+            fetchJSON("base_eng.json"),
+            needPage ? fetchJSON(page + "_eng.json") : Promise.resolve({}),
+        ];
+        // Always try base_<lang>; only request page_<lang> when it likely exists.
+        requests.push(fetchJSON("base_" + lang + ".json"));
+        if (needPage) requests.push(fetchJSON(page + "_" + lang + ".json"));
+
+        // querySelectorAll on the way: need to know which page we're on
+        const results = await Promise.all(requests);
+
+        const [_baseDef, pageDef, _baseEng, pageEng, baseLang, pageLang] = results;
+        const fallbackChain = Object.assign({}, _baseDef, pageDef, _baseEng, pageEng);
+        return Object.assign({}, fallbackChain, baseLang || {}, pageLang || {});
     }
 
     /* ─── Variable interpolation ─── */
@@ -79,7 +110,7 @@
         try {
             const parsed = JSON.parse(raw);
             if (parsed && typeof parsed === "object") return parsed;
-        } catch (_) { /* don’t break the page on malformed JSON */ }
+        } catch (_) { /* don't break the page on malformed JSON */ }
         return null;
     }
 
@@ -94,10 +125,8 @@
     }
 
     function applyTranslations(t) {
-        document.documentElement.setAttribute(
-            "lang",
-            LANG_MAP[currentLang] || LANG_MAP[DEFAULT_LANG]
-        );
+        const htmlLang = LANG_MAP[currentLang] || LANG_MAP[DEFAULT_LANG];
+        document.documentElement.setAttribute("lang", htmlLang);
         ATTRS.forEach(function ([attr, kind]) {
             document.querySelectorAll("[" + attr + "]").forEach(function (el) {
                 applyOne(el, attr, kind, el.getAttribute(attr), t);
@@ -108,6 +137,7 @@
             el.classList.toggle("i18n-active", el.getAttribute("data-lang") === currentLang);
         });
         document.body.setAttribute("data-i18n-ready", "1");
+        document.body.setAttribute("data-lang-code", currentLang);
         document.dispatchEvent(
             new CustomEvent("i18n:applied", { detail: { lang: currentLang } })
         );
@@ -116,9 +146,11 @@
     /* ─── Public API ─── */
     async function setLanguage(lang, opts) {
         opts = opts || {};
-        if (!SUPPORTED_LANGS.includes(lang)) return;
+        if (!SUPPORTED_CODES.includes(lang)) return;
         const token = ++inflightToken;
-        if (opts.persist !== false) localStorage.setItem(STORAGE_KEY, lang);
+        if (opts.persist !== false) {
+            try { localStorage.setItem(STORAGE_KEY, lang); } catch (_) {}
+        }
         const newTranslations = await loadTranslations(lang);
         // Discard late responses so the most recent click wins.
         if (token !== inflightToken) return;
@@ -140,7 +172,8 @@
     window.i18n = {
         setLanguage: function (lang) { return setLanguage(lang); },
         getLanguage: function () { return currentLang; },
-        supported: SUPPORTED_LANGS,
+        supported: SUPPORTED_CODES,
+        languages: SUPPORTED,
         reapply: function () { applyTranslations(translations); },
     };
 

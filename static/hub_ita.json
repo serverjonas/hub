@@ -1,0 +1,17 @@
+{
+    "_meta": { "page": "hub" },
+    "hub.hero.welcome": "Benvenuto su",
+    "hub.hero.subtitle": "Il tuo spazio per meme, film, serie e vere amicizie. Scopri tutto ciò che la nostra community ha da offrire.",
+    "hub.user.loggedin": "Accesso come",
+    "hub.action.login": "Accedi",
+    "hub.action.register": "Registrati",
+    "hub.section.title": "Scopri la community",
+    "hub.section.subtitle": "Tutto in un unico posto – la tua casa digitale.",
+    "hub.cards.memes.desc": "La migliore raccolta curata di cultura di internet. Condividi e scopri.",
+    "hub.cards.media.desc": "Streaming di film e serie – nella massima qualità, in qualsiasi momento.",
+    "hub.cards.friends.desc": "Connettiti con la community e resta in contatto.",
+    "hub.cards.chat.desc": "Scrivi direttamente con i tuoi amici – privato, veloce e in tempo reale.",
+    "hub.cta.title": "Pronto a cominciare?",
+    "hub.cta.body": "Entra nella nostra piattaforma e vivi la community come dovrebbe essere.",
+    "hub.cta.button": "Scopri ora"
+}

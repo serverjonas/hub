@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "login"
+    },
+    "login.title": "Inloggen · serverjonas",
+    "login.heading": "Welkom terug",
+    "login.subtitle": "Log in om toegang te krijgen tot Serverjonas.",
+    "login.label.username": "Gebruikersnaam",
+    "login.label.password": "Wachtwoord",
+    "login.placeholder.username": "Jouw gebruikersnaam",
+    "login.pw_show": "Wachtwoord tonen",
+    "login.pw_hide": "Wachtwoord verbergen",
+    "login.submit": "Inloggen",
+    "login.or": "of",
+    "login.no_account": "Nog geen account?",
+    "login.register_link": "Meld je nu aan"
+}

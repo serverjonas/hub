@@ -1,0 +1,14 @@
+{
+    "_meta": {
+        "page": "films_index"
+    },
+    "films_index.title": "Медиа-центр",
+    "films_index.subtitle": "Фильмы, сериалы и музыка в максимальном качестве.",
+    "films_index.filmes.title": "Фильмы",
+    "films_index.filmes.desc": "Твоя коллекция полнометражных фильмов.",
+    "films_index.series.title": "Сериалы",
+    "films_index.series.desc": "Сезоны и эпизоды любимых шоу.",
+    "films_index.upload.title": "Загрузить",
+    "films_index.upload.desc": "Добавь новые медиа в библиотеку.",
+    "films.index.title": "Медиа · serverjonas"
+}

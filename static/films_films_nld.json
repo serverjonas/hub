@@ -1,0 +1,14 @@
+{
+    "_meta": {
+        "page": "films_films"
+    },
+    "films_films.title": "Films · serverjonas",
+    "films_films.heading": "Films",
+    "films_films.upload": "Uploaden",
+    "films_films.status.ready": "Klaar",
+    "films_films.status.converting": "Converteren...",
+    "films_films.status.queued": "Wachtrij",
+    "films_films.status.error": "Fout",
+    "films_films.empty": "Nog geen films in de mediabibliotheek.",
+    "films_films.empty.cta": "Eerste film uploaden"
+}

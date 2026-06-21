@@ -1,0 +1,16 @@
+{
+    "_meta": {
+        "page": "films_series"
+    },
+    "films_series.title": "Seriale · serverjonas",
+    "films_series.heading": "Seriale",
+    "films_series.upload_episode": "Prześlij odcinek",
+    "films_series.intro": "Wszystkie Twoje seriale",
+    "films_series.empty": "Brak jeszcze seriali.",
+    "films_series.empty.hint": "Przy wysyłaniu wybierz „Serial\" i podaj nazwę serialu.",
+    "films_series.upload_now": "Prześlij teraz",
+    "films.season.one": "Sezon",
+    "films.season.other": "Sezony",
+    "films.episode.one": "Odcinek",
+    "films.episode.other": "Odcinki"
+}

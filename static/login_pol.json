@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "login"
+    },
+    "login.title": "Logowanie · serverjonas",
+    "login.heading": "Witaj ponownie",
+    "login.subtitle": "Zaloguj się, aby uzyskać dostęp do Serverjonas.",
+    "login.label.username": "Nazwa użytkownika",
+    "login.label.password": "Hasło",
+    "login.placeholder.username": "Twoja nazwa użytkownika",
+    "login.pw_show": "Pokaż hasło",
+    "login.pw_hide": "Ukryj hasło",
+    "login.submit": "Zaloguj się",
+    "login.or": "lub",
+    "login.no_account": "Nie masz jeszcze konta?",
+    "login.register_link": "Zarejestruj się teraz"
+}

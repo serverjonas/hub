@@ -1,0 +1,13 @@
+{
+    "_meta": { "page": "films_detail" },
+    "films_detail.back.films": "Todas las películas",
+    "films_detail.video.fallback": "Tu navegador no soporta vídeo HTML5.",
+    "films_detail.status.converting": "Convirtiendo...",
+    "films_detail.status.queued": "En cola...",
+    "films_detail.status.error": "Error al procesar",
+    "films_detail.auto_refresh": "La página se actualiza automáticamente.",
+    "films_detail.uploaded_at": "Subido el",
+    "films_detail.next_episode": "Próximo episodio",
+    "films_detail.delete": "Eliminar",
+    "films_detail.delete.confirm": "¿Eliminar de verdad?"
+}

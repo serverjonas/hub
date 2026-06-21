@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "films_upload"
+    },
+    "films.upload_label": "Загрузить",
+    "films_upload.title": "Загрузить медиа",
+    "films_upload.subtitle": "Добавь новые фильмы или сериалы в библиотеку.",
+    "films_upload.type.film": "Фильм",
+    "films_upload.type.series": "Сериал",
+    "films_upload.label.title": "Название",
+    "films_upload.label.series_name": "Название сериала",
+    "films_upload.label.episode": "Эпизод",
+    "films_upload.label.file": "Файл",
+    "films_upload.choose_file": "Выбрать файл",
+    "films_upload.submit": "Начать загрузку",
+    "films.upload.title": "Загрузить · serverjonas"
+}

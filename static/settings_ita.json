@@ -1,0 +1,33 @@
+{
+    "_meta": {
+        "page": "settings"
+    },
+    "settings.subtitle": "Personalizza la tua esperienza su Serverjonas.",
+    "settings.theme.title": "Aspetto",
+    "settings.theme.desc": "Scegli uno schema di colori che ti piace.",
+    "settings.theme.light": "Chiaro",
+    "settings.theme.dark": "Scuro",
+    "settings.language.title": "Lingua",
+    "settings.language.desc": "Scegli la lingua dell'interfaccia.",
+    "settings.account.title": "Account",
+    "settings.account.loggedin": "Connesso come",
+    "settings.account.username": "Nome utente",
+    "settings.account.active": "Attivo",
+    "settings.security.title": "Sicurezza",
+    "settings.security.desc": "Gestisci password e opzioni di sicurezza.",
+    "settings.security.sessions": "Sessioni attive",
+    "settings.security.sessions.hint": "Disconnettiti da tutti gli altri dispositivi.",
+    "settings.security.logout_all": "Disconnetti tutto",
+    "settings.security.not_logged_in": "Accedi per gestire password e sicurezza.",
+    "settings.about.title": "Informazioni su Serverjonas",
+    "settings.about.desc": "Informazioni sulla piattaforma.",
+    "settings.about.version": "Versione",
+    "settings.about.platform": "Piattaforma",
+    "settings.toast.theme_changed": "Aspetto aggiornato",
+    "settings.toast.lang_changed": "Lingua aggiornata",
+    "settings.toast.fill_all": "Compila tutti i campi",
+    "settings.toast.pw_short": "La password deve essere di almeno 8 caratteri",
+    "settings.toast.pw_mismatch": "Le password non corrispondono",
+    "settings.toast.pw_todo": "Il cambio password non è ancora implementato",
+    "settings.page_title": "Impostazioni · serverjonas"
+}

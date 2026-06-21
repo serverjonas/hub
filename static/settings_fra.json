@@ -1,0 +1,33 @@
+{
+    "_meta": {
+        "page": "settings"
+    },
+    "settings.subtitle": "Personnalise ton expérience sur Serverjonas.",
+    "settings.theme.title": "Apparence",
+    "settings.theme.desc": "Choisis un jeu de couleurs qui te plaît.",
+    "settings.theme.light": "Clair",
+    "settings.theme.dark": "Sombre",
+    "settings.language.title": "Langue",
+    "settings.language.desc": "Choisis la langue de l'interface.",
+    "settings.account.title": "Compte",
+    "settings.account.loggedin": "Connecté en tant que",
+    "settings.account.username": "Nom d'utilisateur",
+    "settings.account.active": "Actif",
+    "settings.security.title": "Sécurité",
+    "settings.security.desc": "Gère ton mot de passe et tes options de sécurité.",
+    "settings.security.sessions": "Sessions actives",
+    "settings.security.sessions.hint": "Déconnecte-toi de tous les autres appareils.",
+    "settings.security.logout_all": "Tout déconnecter",
+    "settings.security.not_logged_in": "Connecte-toi pour gérer mot de passe et sécurité.",
+    "settings.about.title": "À propos de Serverjonas",
+    "settings.about.desc": "Informations sur la plateforme.",
+    "settings.about.version": "Version",
+    "settings.about.platform": "Plateforme",
+    "settings.toast.theme_changed": "Apparence mise à jour",
+    "settings.toast.lang_changed": "Langue mise à jour",
+    "settings.toast.fill_all": "Merci de remplir tous les champs",
+    "settings.toast.pw_short": "Le mot de passe doit comporter au moins 8 caractères",
+    "settings.toast.pw_mismatch": "Les mots de passe ne correspondent pas",
+    "settings.toast.pw_todo": "Le changement de mot de passe n'est pas encore implémenté",
+    "settings.page_title": "Paramètres · serverjonas"
+}

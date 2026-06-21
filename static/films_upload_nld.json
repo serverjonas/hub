@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "films_upload"
+    },
+    "films.upload_label": "Uploaden",
+    "films_upload.title": "Media uploaden",
+    "films_upload.subtitle": "Voeg nieuwe films of series toe aan de mediabibliotheek.",
+    "films_upload.type.film": "Film",
+    "films_upload.type.series": "Serie",
+    "films_upload.label.title": "Titel",
+    "films_upload.label.series_name": "Serienaam",
+    "films_upload.label.episode": "Aflevering",
+    "films_upload.label.file": "Bestand",
+    "films_upload.choose_file": "Kies bestand",
+    "films_upload.submit": "Upload starten",
+    "films.upload.title": "Upload · serverjonas"
+}

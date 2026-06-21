@@ -1,0 +1,17 @@
+{
+    "_meta": { "page": "hub" },
+    "hub.hero.welcome": "Welkom bij",
+    "hub.hero.subtitle": "Jouw plek voor memes, films, series en echte vriendschappen. Ontdek alles wat onze community te bieden heeft.",
+    "hub.user.loggedin": "Ingelogd als",
+    "hub.action.login": "Inloggen",
+    "hub.action.register": "Registreren",
+    "hub.section.title": "Ontdek de community",
+    "hub.section.subtitle": "Alles op één plek – jouw digitale thuis.",
+    "hub.cards.memes.desc": "De beste samengestelde collectie internetcultuur. Deel en ontdek.",
+    "hub.cards.media.desc": "Stream films en series – in de hoogste kwaliteit, altijd.",
+    "hub.cards.friends.desc": "Maak contact met de community en blijf verbonden.",
+    "hub.cards.chat.desc": "Chat direct met je vrienden – privé, snel en in realtime.",
+    "hub.cta.title": "Klaar om te starten?",
+    "hub.cta.body": "Word lid van ons platform en beleef community zoals het hoort.",
+    "hub.cta.button": "Ontdek nu"
+}

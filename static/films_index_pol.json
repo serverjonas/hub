@@ -1,0 +1,14 @@
+{
+    "_meta": {
+        "page": "films_index"
+    },
+    "films_index.title": "Centrum mediów",
+    "films_index.subtitle": "Filmy, seriale i muzyka w najwyższej jakości.",
+    "films_index.filmes.title": "Filmy",
+    "films_index.filmes.desc": "Twoja kolekcja pełnometrażowych filmów.",
+    "films_index.series.title": "Seriale",
+    "films_index.series.desc": "Sezony i odcinki Twoich ulubionych seriali.",
+    "films_index.upload.title": "Prześlij",
+    "films_index.upload.desc": "Dodaj nowe media do biblioteki.",
+    "films.index.title": "Media · serverjonas"
+}

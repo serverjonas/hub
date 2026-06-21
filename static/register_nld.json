@@ -1,0 +1,14 @@
+{
+    "_meta": {
+        "page": "register"
+    },
+    "register.title": "Registreren · serverjonas",
+    "register.heading": "Account aanmaken",
+    "register.subtitle": "Word lid van deze exclusieve community.",
+    "register.label.server_key": "Serversleutel",
+    "register.placeholder.username": "Gebruikersnaam",
+    "register.placeholder.server_key": "Voer sleutel in",
+    "register.submit": "Account aanmaken",
+    "register.has_account": "Heb je al een account?",
+    "register.login_link": "Hier inloggen"
+}

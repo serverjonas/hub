@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "login"
+    },
+    "login.title": "Iniciar sesión · serverjonas",
+    "login.heading": "Bienvenido de vuelta",
+    "login.subtitle": "Inicia sesión para acceder a Serverjonas.",
+    "login.label.username": "Nombre de usuario",
+    "login.label.password": "Contraseña",
+    "login.placeholder.username": "Tu nombre de usuario",
+    "login.pw_show": "Mostrar contraseña",
+    "login.pw_hide": "Ocultar contraseña",
+    "login.submit": "Iniciar sesión",
+    "login.or": "o",
+    "login.no_account": "¿Aún no tienes cuenta?",
+    "login.register_link": "Regístrate ahora"
+}

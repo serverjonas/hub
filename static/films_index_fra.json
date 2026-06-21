@@ -1,0 +1,14 @@
+{
+    "_meta": {
+        "page": "films_index"
+    },
+    "films_index.title": "Centre des médias",
+    "films_index.subtitle": "Films, séries et musique dans la meilleure qualité.",
+    "films_index.filmes.title": "Films",
+    "films_index.filmes.desc": "Ta collection de longs métrages.",
+    "films_index.series.title": "Séries",
+    "films_index.series.desc": "Saisons et épisodes de tes séries préférées.",
+    "films_index.upload.title": "Téléverser",
+    "films_index.upload.desc": "Ajoute de nouveaux médias à la bibliothèque.",
+    "films.index.title": "Médias · serverjonas"
+}

@@ -233,17 +233,19 @@
                 <div class="sg-comment">{{ s.comment }}</div>
                 {% endif %}
             </div>
-            <form action="/admin/users/review-suggestion" method="POST" style="display: inline;">
+            <form action="{{ url_for('usermanager.review_suggestion') }}" method="POST" style="display: inline;">
                 <input type="hidden" name="suggestion_id" value="{{ s.id }}">
                 <input type="hidden" name="decision" value="approved">
+                <input type="hidden" name="next" value="{{ request.full_path }}">
                 <button type="submit" class="btn-action btn-approve">
                     <i data-lucide="check" style="width: 12px; height: 12px; vertical-align: -1px;"></i>
                     <span data-i18n="admin.suggestions.approve">Genehmigen</span>
                 </button>
             </form>
-            <form action="/admin/users/review-suggestion" method="POST" style="display: inline;">
+            <form action="{{ url_for('usermanager.review_suggestion') }}" method="POST" style="display: inline;">
                 <input type="hidden" name="suggestion_id" value="{{ s.id }}">
                 <input type="hidden" name="decision" value="rejected">
+                <input type="hidden" name="next" value="{{ request.full_path }}">
                 <button type="submit" class="btn-action btn-reject">
                     <i data-lucide="x" style="width: 12px; height: 12px; vertical-align: -1px;"></i>
                     <span data-i18n="admin.suggestions.reject">Ablehnen</span>
@@ -284,7 +286,7 @@
                 {% set suggest_mode = is_mod and not is_admin %}
 
                 <td>
-                    <form action="/admin/users/set-role" method="POST">
+                    <form action="{{ url_for('usermanager.set_role') }}" method="POST">
                         <input type="hidden" name="user_id" value="{{ u.id }}">
                         <input type="hidden" name="role" value="admin">
                         <input type="hidden" name="value" value="{{ '0' if u.admin else '1' }}">
@@ -300,7 +302,7 @@
                     </form>
                 </td>
                 <td>
-                    <form action="/admin/users/set-role" method="POST">
+                    <form action="{{ url_for('usermanager.set_role') }}" method="POST">
                         <input type="hidden" name="user_id" value="{{ u.id }}">
                         <input type="hidden" name="role" value="vip">
                         <input type="hidden" name="value" value="{{ '0' if u.vip else '1' }}">
@@ -314,7 +316,7 @@
                     </form>
                 </td>
                 <td>
-                    <form action="/admin/users/set-role" method="POST">
+                    <form action="{{ url_for('usermanager.set_role') }}" method="POST">
                         <input type="hidden" name="user_id" value="{{ u.id }}">
                         <input type="hidden" name="role" value="mod">
                         <input type="hidden" name="value" value="{{ '0' if u.mod else '1' }}">
@@ -334,7 +336,7 @@
                 </td>
                 <td>
                     {% if is_admin %}
-                    <form action="/admin/users/delete-sessions" method="POST">
+                    <form action="{{ url_for('usermanager.delete_sessions') }}" method="POST">
                         <input type="hidden" name="user_id" value="{{ u.id }}">
                         <button type="submit" class="role-toggle" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.2);">
                             <span data-i18n="admin.action.logout">Logout</span>

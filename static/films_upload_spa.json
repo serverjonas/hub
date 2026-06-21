@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "films_upload"
+    },
+    "films.upload_label": "Subir",
+    "films_upload.title": "Subir medios",
+    "films_upload.subtitle": "Añade nuevas películas o series a la biblioteca.",
+    "films_upload.type.film": "Película",
+    "films_upload.type.series": "Serie",
+    "films_upload.label.title": "Título",
+    "films_upload.label.series_name": "Nombre de la serie",
+    "films_upload.label.episode": "Episodio",
+    "films_upload.label.file": "Archivo",
+    "films_upload.choose_file": "Elegir archivo",
+    "films_upload.submit": "Iniciar subida",
+    "films.upload.title": "Subir · serverjonas"
+}

@@ -1,0 +1,13 @@
+{
+    "_meta": { "page": "films_detail" },
+    "films_detail.back.films": "Alle films",
+    "films_detail.video.fallback": "Je browser ondersteunt geen HTML5-video.",
+    "films_detail.status.converting": "Bezig met converteren...",
+    "films_detail.status.queued": "In de wachtrij...",
+    "films_detail.status.error": "Verwerking mislukt",
+    "films_detail.auto_refresh": "Deze pagina ververst automatisch.",
+    "films_detail.uploaded_at": "Geüpload op",
+    "films_detail.next_episode": "Volgende aflevering",
+    "films_detail.delete": "Verwijderen",
+    "films_detail.delete.confirm": "Echt verwijderen?"
+}

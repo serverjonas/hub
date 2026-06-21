@@ -1,0 +1,17 @@
+{
+    "_meta": {
+        "page": "login"
+    },
+    "login.title": "Вход · serverjonas",
+    "login.heading": "С возвращением",
+    "login.subtitle": "Войди, чтобы получить доступ к Serverjonas.",
+    "login.label.username": "Имя пользователя",
+    "login.label.password": "Пароль",
+    "login.placeholder.username": "Твоё имя пользователя",
+    "login.pw_show": "Показать пароль",
+    "login.pw_hide": "Скрыть пароль",
+    "login.submit": "Войти",
+    "login.or": "или",
+    "login.no_account": "Ещё нет аккаунта?",
+    "login.register_link": "Зарегистрируйся сейчас"
+}
