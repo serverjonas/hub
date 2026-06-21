@@ -52,36 +52,41 @@ def _user_count() -> int:
 
 
 def _mod_pending_suggestions(mod_id):
-    """Vorschläge, die der aktuelle Mod selbst eingereicht hat."""
+    """Vorschläge, die der aktuelle Mod selbst eingereicht hat.
+
+    Tolerant gegenüber noch nicht migrierter DB → leere Liste.
+    """
     con = sqlite3.connect(DB_PATH)
-    cur = con.cursor()
-    cur.execute(
-        """
-        SELECT s.id, s.target_user_id, s.role, s.value, s.comment, s.created_at,
-               t.user_name
-        FROM permission_suggestions s
-        JOIN users t ON t.user_id = s.target_user_id
-        WHERE s.mod_id = ? AND s.status = 'pending'
-        ORDER BY s.created_at DESC
-        """,
-        (mod_id,),
-    )
-    rows = cur.fetchall()
-    con.close()
-    return [
-        {
-            "id":              r[0],
-            "target_user_id":  r[1],
-            "role":            r[2],
-            "value":           bool(r[3]),
-            "comment":         r[4],
-            "created_at":      r[5],
-            "target_name":     r[6],
-        }
-        for r in rows
-    ]
-
-
+    try:
+        cur = con.cursor()
+        cur.execute(
+            """
+            SELECT s.id, s.target_user_id, s.role, s.value, s.comment, s.created_at,
+                   t.user_name
+            FROM permission_suggestions s
+            JOIN users t ON t.user_id = s.target_user_id
+            WHERE s.mod_id = ? AND s.status = 'pending'
+            ORDER BY s.created_at DESC
+            """,
+            (mod_id,),
+        )
+        rows = cur.fetchall()
+        con.close()
+        return [
+            {
+                "id":              r[0],
+                "target_user_id":  r[1],
+                "role":            r[2],
+                "value":           bool(r[3]),
+                "comment":         r[4],
+                "created_at":      r[5],
+                "target_name":     r[6],
+            }
+            for r in rows
+        ]
+    except sqlite3.OperationalError:
+        con.close()
+        return []
 @bp.route("/")
 def mod_dashboard():
     user = get_current_user()

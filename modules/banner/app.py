@@ -2,12 +2,11 @@ import os
 import sqlite3
 import sys
 import time
-from datetime import datetime
+import logging
 
 from flask import Blueprint, abort, redirect, render_template, request
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-import os
 
 from toolbox.user import (
     DB_PATH,
@@ -18,6 +17,8 @@ from toolbox.user import (
     record_mod_cooldown,
     require_admin_or_mod,
 )
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint("adminban", __name__, template_folder="templates")
 
@@ -54,23 +55,50 @@ def admin_index():
 
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
-    cur.execute(
-        """
-        SELECT u.user_id, u.user_name, u.admin, u.vip, u.mod,
-               b.reason, b.expires_at, b.banned_by,
-               bv.user_name
-        FROM users u
-        LEFT JOIN ban b  ON u.user_id = b.user_id
-        LEFT JOIN users bv ON bv.user_id = b.banned_by
-        ORDER BY u.user_id ASC
-        """
-    )
-    rows = cur.fetchall()
+    try:
+        cur.execute(
+            """
+            SELECT u.user_id, u.user_name, u.admin, u.vip, u.mod,
+                   b.reason, b.expires_at, b.banned_by,
+                   bv.user_name
+            FROM users u
+            LEFT JOIN ban b  ON u.user_id = b.user_id
+            LEFT JOIN users bv ON bv.user_id = b.banned_by
+            ORDER BY u.user_id ASC
+            """
+        )
+        rows = cur.fetchall()
+        has_banned_by = True
+    except sqlite3.OperationalError:
+        # DB noch nicht migriert: ohne banned_by-Spalte weiterlesen.
+        logger.warning(
+            "ban.banned_by fehlt noch – fallback ohne Banner-Info (init_db.py laufen lassen)."
+        )
+        cur.execute(
+            """
+            SELECT u.user_id, u.user_name, u.admin, u.vip, u.mod,
+                   b.reason, b.expires_at
+            FROM users u
+            LEFT JOIN ban b ON u.user_id = b.user_id
+            ORDER BY u.user_id ASC
+            """
+        )
+        rows = cur.fetchall()
+        has_banned_by = False
     con.close()
 
     users = []
-    for row in rows:
-        uid, uname, is_admin_u, is_vip_u, is_mod_u, ban_reason, ban_expires, banned_by, banned_by_name = row
+    if has_banned_by:
+        for row in rows:
+            uid, uname, is_admin_u, is_vip_u, is_mod_u, ban_reason, ban_expires, banned_by, banned_by_name = row
+            _append_user_row(users, uid, uname, is_admin_u, is_vip_u, is_mod_u,
+                             ban_reason, ban_expires, now,
+                             banned_by=banned_by, banned_by_name=banned_by_name)
+    else:
+        for row in rows:
+            uid, uname, is_admin_u, is_vip_u, is_mod_u, ban_reason, ban_expires = row
+            _append_user_row(users, uid, uname, is_admin_u, is_vip_u, is_mod_u,
+                             ban_reason, ban_expires, now)
         banned = ban_reason is not None and (ban_expires is None or ban_expires > now)
         users.append(
             {
@@ -121,6 +149,29 @@ def admin_index():
     )
 
 
+def _append_user_row(users, uid, uname, is_admin_u, is_vip_u, is_mod_u,
+                     ban_reason, ban_expires, now,
+                     banned_by=None, banned_by_name=None):
+    """Hilfs-Funktion für admin_index – normalisiert die Zeilen aus beiden
+    SELECT-Pfaden (mit/ohne ``ban.banned_by``) auf ein einheitliches Dict."""
+    banned = ban_reason is not None and (ban_expires is None or ban_expires > now)
+    users.append(
+        {
+            "id": uid,
+            "name": uname,
+            "admin": bool(is_admin_u),
+            "vip": bool(is_vip_u),
+            "mod": bool(is_mod_u),
+            "banned": banned,
+            "ban_reason": ban_reason,
+            "ban_expires": ban_expires,
+            "banned_by": banned_by,
+            "banned_by_name": banned_by_name,
+            "banned_by_is_mod": None,  # gefüllt unten
+        }
+    )
+
+
 @bp.route("/ban", methods=["POST"])
 def ban_user():
     target_id = request.form.get("user_id", type=int)
@@ -160,10 +211,20 @@ def ban_user():
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
     cur.execute("DELETE FROM ban WHERE user_id = ?", (target_id,))
-    cur.execute(
-        "INSERT INTO ban (user_id, reason, expires_at, banned_by) VALUES (?, ?, ?, ?)",
-        (target_id, reason, expires_at, current_user["id"]),
-    )
+    try:
+        cur.execute(
+            "INSERT INTO ban (user_id, reason, expires_at, banned_by) VALUES (?, ?, ?, ?)",
+            (target_id, reason, expires_at, current_user["id"]),
+        )
+    except sqlite3.OperationalError:
+        # DB noch nicht migriert (kein banned_by-Feld) – Fallback ohne Spalte.
+        logger.warning(
+            "ban.banned_by fehlt – INSERT ohne Banner-Spalte. init_db.py laufen lassen."
+        )
+        cur.execute(
+            "INSERT INTO ban (user_id, reason, expires_at) VALUES (?, ?, ?)",
+            (target_id, reason, expires_at),
+        )
     con.commit()
     con.close()
 
@@ -188,9 +249,16 @@ def unban_user():
 
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
-    cur.execute("SELECT banned_by FROM ban WHERE user_id = ?", (target_id,))
-    row = cur.fetchone()
-    original_banner = row[0] if row else None
+    try:
+        cur.execute("SELECT banned_by FROM ban WHERE user_id = ?", (target_id,))
+        row = cur.fetchone()
+        original_banner = row[0] if row else None
+    except sqlite3.OperationalError:
+        # DB noch nicht migriert (kein banned_by-Feld) → kein Cooldown-Trigger.
+        logger.warning(
+            "ban.banned_by fehlt beim Unban – Cooldown-Logik wird übersprungen."
+        )
+        original_banner = None
 
     cur.execute("DELETE FROM ban WHERE user_id = ?", (target_id,))
     con.commit()

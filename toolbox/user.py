@@ -1,9 +1,13 @@
 import os
 import sqlite3
 import time
+import logging
+from typing import Optional
 from flask import request, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from toolbox.files import *
+
+logger = logging.getLogger(__name__)
 
 def check_pw(username, password):
     conn = sqlite3.connect(DB_PATH)
@@ -348,20 +352,29 @@ def require_admin_or_mod():
 
 
 def get_mod_cooldown(mod_id):
-    """Gibt (expires_at, reason) des aktuellen Cooldowns zurück oder (None, None)."""
+    """Gibt (expires_at, reason) des aktuellen Cooldowns zurück oder (None, None).
+
+    Tolerant gegenüber einer noch nicht migrierten DB (mod_cooldowns fehlt
+    ggf. noch → gibt (None, None) zurück, statt 500 zu werfen).
+    """
     if not mod_id:
         return None, None
     conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT expires_at, reason FROM mod_cooldowns WHERE mod_id = ?",
-        (mod_id,),
-    )
-    row = cur.fetchone()
-    conn.close()
-    if not row:
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT expires_at, reason FROM mod_cooldowns WHERE mod_id = ?",
+            (mod_id,),
+        )
+        row = cur.fetchone()
+        conn.close()
+        if not row:
+            return None, None
+        return row[0], (row[1] or "")
+    except sqlite3.OperationalError:
+        # Tabelle fehlt → Migration noch nicht ausgeführt.
+        conn.close()
         return None, None
-    return row[0], (row[1] or "")
 
 
 def has_active_cooldown(mod_id) -> bool:
@@ -378,26 +391,39 @@ def get_cooldown_remaining(mod_id) -> int:
     return max(0, expires_at - int(time.time()))
 
 
-def record_mod_cooldown(mod_id, reason: str = "") -> int:
-    """Setzt/reaktiviert den 7-Tage-Cooldown für einen Mod."""
+def record_mod_cooldown(mod_id, reason: str = "") -> Optional[int]:
+    """Setzt/reaktiviert den 7-Tage-Cooldown für einen Mod.
+
+    Gibt den expires_at-Zeitstempel zurück, wenn der Cooldown persistiert
+    wurde; sonst ``None`` (z.B. wenn die ``mod_cooldowns``-Tabelle noch nicht
+    migriert ist).
+    """
     now = int(time.time())
     expires_at = now + MOD_COOLDOWN_SECONDS
     conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute(
-        """
-        INSERT INTO mod_cooldowns (mod_id, starts_at, expires_at, reason)
-        VALUES (?, ?, ?, ?)
-        ON CONFLICT(mod_id) DO UPDATE SET
-            starts_at  = excluded.starts_at,
-            expires_at = excluded.expires_at,
-            reason     = excluded.reason
-        """,
-        (mod_id, now, expires_at, reason or ""),
-    )
-    conn.commit()
-    conn.close()
-    return expires_at
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO mod_cooldowns (mod_id, starts_at, expires_at, reason)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(mod_id) DO UPDATE SET
+                starts_at  = excluded.starts_at,
+                expires_at = excluded.expires_at,
+                reason     = excluded.reason
+            """,
+            (mod_id, now, expires_at, reason or ""),
+        )
+        conn.commit()
+        conn.close()
+        return expires_at
+    except sqlite3.OperationalError as exc:
+        conn.close()
+        logger.warning(
+            "Konnte Mod-Cooldown für mod_id=%s nicht speichern (DB pre-migration?): %s",
+            mod_id, exc,
+        )
+        return None
 
 
 def create_permission_suggestion(mod_id, target_user_id, role, value, comment=""):
@@ -408,6 +434,8 @@ def create_permission_suggestion(mod_id, target_user_id, role, value, comment=""
 
     Verläss auf den teilindizierten UNIQUE-Index uniq_pending_suggestion für
     Race-Schutz bei gleichzeitigen POSTs.
+
+    Tolerant gegenüber fehlender permission_suggestions-Tabelle (Pre-Migration).
     """
     if role not in VALID_SUGGESTION_ROLES:
         raise ValueError("invalid role")
@@ -415,8 +443,8 @@ def create_permission_suggestion(mod_id, target_user_id, role, value, comment=""
         raise ValueError("invalid value")
     now = int(time.time())
     conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
     try:
+        cur = conn.cursor()
         cur.execute(
             """
             DELETE FROM permission_suggestions
@@ -434,88 +462,105 @@ def create_permission_suggestion(mod_id, target_user_id, role, value, comment=""
         )
         conn.commit()
     except sqlite3.IntegrityError:
-        # Concurrent POST hat bereits einen pending-Eintrag erzeugt; nichts tun.
+        # Race: anderer POST hat bereits einen pending-Eintrag erzeugt.
+        conn.rollback()
+    except sqlite3.OperationalError:
+        # Pre-Migration: Tabelle fehlt → no-op statt 500.
         conn.rollback()
     finally:
         conn.close()
 
 
 def list_pending_suggestions():
-    """Hängt alle offenen Vorschläge inklusive Mod- und Target-Namen ab."""
+    """Hängt alle offenen Vorschläge inklusive Mod- und Target-Namen ab.
+
+    Tolerant gegenüber fehlender permission_suggestions-Tabelle (Pre-Migration).
+    """
     conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT s.id, s.mod_id, s.target_user_id, s.role, s.value,
-               s.comment, s.created_at,
-               m.user_name   AS mod_name,
-               t.user_name   AS target_name,
-               t.admin, t.vip, t.mod
-        FROM permission_suggestions s
-        JOIN users m ON m.user_id = s.mod_id
-        JOIN users t ON t.user_id = s.target_user_id
-        WHERE s.status = 'pending'
-        ORDER BY s.created_at ASC
-        """
-    )
-    rows = cur.fetchall()
-    conn.close()
-    return [
-        {
-            "id":              r[0],
-            "mod_id":          r[1],
-            "target_user_id":  r[2],
-            "role":            r[3],
-            "value":           bool(r[4]),
-            "comment":         r[5],
-            "created_at":      r[6],
-            "mod_name":        r[7],
-            "target_name":     r[8],
-            "target_admin":    bool(r[9]),
-            "target_vip":      bool(r[10]),
-            "target_mod":      bool(r[11]),
-        }
-        for r in rows
-    ]
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """
+            SELECT s.id, s.mod_id, s.target_user_id, s.role, s.value,
+                   s.comment, s.created_at,
+                   m.user_name   AS mod_name,
+                   t.user_name   AS target_name,
+                   t.admin, t.vip, t.mod
+            FROM permission_suggestions s
+            JOIN users m ON m.user_id = s.mod_id
+            JOIN users t ON t.user_id = s.target_user_id
+            WHERE s.status = 'pending'
+            ORDER BY s.created_at ASC
+            """
+        )
+        rows = cur.fetchall()
+        conn.close()
+        return [
+            {
+                "id":              r[0],
+                "mod_id":          r[1],
+                "target_user_id":  r[2],
+                "role":            r[3],
+                "value":           bool(r[4]),
+                "comment":         r[5],
+                "created_at":      r[6],
+                "mod_name":        r[7],
+                "target_name":     r[8],
+                "target_admin":    bool(r[9]),
+                "target_vip":      bool(r[10]),
+                "target_mod":      bool(r[11]),
+            }
+            for r in rows
+        ]
+    except sqlite3.OperationalError:
+        conn.close()
+        return []
 
 
 def review_permission_suggestion(suggestion_id, admin_id, decision):
     """
     `decision` ist 'approved' oder 'rejected'. Bei 'approved' wird die Rolle
     sofort auf den Ziel-User angewendet.
+
+    Tolerant gegenüber fehlender permission_suggestions-Tabelle: gibt dann
+    einfach False zurück, statt zu crashen.
     """
     if decision not in ("approved", "rejected"):
         raise ValueError("invalid decision")
 
     conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
+    try:
+        cur = conn.cursor()
 
-    cur.execute(
-        "SELECT target_user_id, role, value, status FROM permission_suggestions WHERE id = ?",
-        (suggestion_id,),
-    )
-    row = cur.fetchone()
-    if row is None or row[3] != "pending":
+        cur.execute(
+            "SELECT target_user_id, role, value, status FROM permission_suggestions WHERE id = ?",
+            (suggestion_id,),
+        )
+        row = cur.fetchone()
+        if row is None or row[3] != "pending":
+            conn.close()
+            return False
+
+        target_user_id, role, value = row[0], row[1], row[2]
+        now = int(time.time())
+
+        if decision == "approved":
+            cur.execute(
+                f"UPDATE users SET {role} = ? WHERE user_id = ?",
+                (value, target_user_id),
+            )
+
+        cur.execute(
+            """
+            UPDATE permission_suggestions
+            SET status = ?, reviewed_by = ?, reviewed_at = ?
+            WHERE id = ?
+            """,
+            (decision, admin_id, now, suggestion_id),
+        )
+        conn.commit()
+        conn.close()
+        return True
+    except sqlite3.OperationalError:
         conn.close()
         return False
-
-    target_user_id, role, value = row[0], row[1], row[2]
-    now = int(time.time())
-
-    if decision == "approved":
-        cur.execute(
-            f"UPDATE users SET {role} = ? WHERE user_id = ?",
-            (value, target_user_id),
-        )
-
-    cur.execute(
-        """
-        UPDATE permission_suggestions
-        SET status = ?, reviewed_by = ?, reviewed_at = ?
-        WHERE id = ?
-        """,
-        (decision, admin_id, now, suggestion_id),
-    )
-    conn.commit()
-    conn.close()
-    return True
