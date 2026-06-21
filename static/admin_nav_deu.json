@@ -15,5 +15,7 @@
     "admin.cards.bans.desc": "Sanktionen und Ausschlusslisten kontrollieren.",
     "admin.cards.notifs": "Benachrichtigungs-Manager",
     "admin.cards.notifs.desc": "Benachrichtigungen erstellen und verwalten.",
+    "admin.cards.logs": "Audit Logs",
+    "admin.cards.logs.desc": "Serveraktivitäten einsehen und filtern.",
     "admin.nav.title": "Admin Panel · serverjonas"
 }

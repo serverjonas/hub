@@ -1,0 +1,979 @@
+{% extends "base.html" %}
+
+{% block page_id %}admin_logs{% endblock %}
+{% block title_i18n %}logs.heading{% endblock %}
+{% block title %}Audit Logs · serverjonas{% endblock %}
+
+{% block extra_style %}
+:root {
+    --status-ok: #22c55e;
+    --status-info: #38bdf8;
+    --status-warn: #f59e0b;
+    --status-err: #ef4444;
+}
+
+/* ─── Header ─── */
+.admin-header {
+    margin-bottom: 32px;
+}
+
+.admin-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 4px;
+}
+
+.admin-header .subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: 4px;
+    max-width: 720px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 16px;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.back-link:hover {
+    gap: 10px;
+}
+
+/* ─── Stats row ─── */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.stat-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-value {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 4px;
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ─── Two-column layout ─── */
+.layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+@media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; }
+}
+
+/* ─── File list panel ─── */
+.side-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 90px;
+    max-height: calc(100vh - 110px);
+    display: flex;
+    flex-direction: column;
+}
+
+.side-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+}
+
+.file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.file-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--bg-warm);
+    text-align: left;
+    color: var(--text-main);
+    width: 100%;
+    font-family: inherit;
+}
+
+.file-card:hover {
+    border-color: var(--accent);
+    background: var(--accent-lighter);
+    transform: translateX(2px);
+}
+
+.file-card.active {
+    border-color: var(--accent);
+    background: var(--accent-lighter);
+    box-shadow: var(--shadow-sm);
+}
+
+.file-card .file-icon {
+    flex-shrink: 0;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+}
+
+.file-card .file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-card .file-name {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-card .file-meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.file-card .file-meta .dot-sep {
+    width: 3px;
+    height: 3px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+/* ─── Viewer panel ─── */
+.viewer-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    min-width: 0;
+}
+
+/* ─── Toolbar / filters ─── */
+.viewer-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 8px 14px;
+    transition: var(--transition);
+}
+
+.filter-group:hover { border-color: var(--border-strong); }
+
+.filter-group:focus-within {
+    border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.filter-group .filter-icon {
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.filter-group input,
+.filter-group select {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 13px;
+    min-width: 0;
+}
+
+.filter-group input.ip   { width: 130px; }
+.filter-group input.route { width: 200px; }
+.filter-group input.search { width: 200px; }
+.filter-group select.status { cursor: pointer; }
+
+.toolbar-spacer { flex: 1; }
+
+.pill-btn {
+    background: var(--bg-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    color: var(--text-main);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-body);
+}
+
+.pill-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.pill-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.pill-btn .pill-count {
+    background: var(--accent-lighter);
+    color: var(--accent);
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 22px;
+    text-align: center;
+}
+
+.pill-btn.active .pill-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+}
+
+/* ─── Status line under toolbar ─── */
+.viewer-status {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+}
+
+.viewer-status strong { color: var(--text-main); }
+
+.viewer-status .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--status-ok);
+    display: inline-block;
+    margin-right: 6px;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+.viewer-status .dot.loading {
+    background: var(--accent);
+    animation: pulse 1.2s ease-in-out infinite;
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+}
+
+/* ─── Truncated banner ─── */
+.truncated-banner {
+    background: rgba(245, 158, 11, 0.12);
+    color: var(--status-warn);
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+/* ─── Log table ─── */
+.log-table-wrap {
+    background: var(--bg-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: auto;
+    max-height: 64vh;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Menlo', ui-monospace, monospace;
+}
+
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    line-height: 1.55;
+}
+
+.log-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.log-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    font-family: var(--font-body);
+    white-space: nowrap;
+}
+
+.log-table td {
+    padding: 7px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 480px;
+}
+
+.log-table tbody tr:last-child td { border-bottom: none; }
+.log-table tbody tr:hover td { background: var(--accent-lighter); }
+
+.cell-line     { color: var(--text-dim); text-align: right; user-select: none; width: 50px; }
+.cell-time     { color: var(--text-secondary); width: 165px; }
+.cell-ip       { width: 165px; }
+.cell-status   { text-align: center; width: 80px; }
+.cell-duration { color: var(--text-dim); text-align: right; width: 80px; }
+.cell-route    { color: var(--text-main); }
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 11px;
+    font-family: var(--font-body);
+}
+
+.status-2xx { background: rgba(34, 197, 94, 0.12);  color: var(--status-ok); }
+.status-3xx { background: rgba(56, 189, 248, 0.14); color: var(--status-info); }
+.status-4xx { background: rgba(245, 158, 11, 0.14); color: var(--status-warn); }
+.status-5xx { background: rgba(239, 68, 68, 0.14);  color: var(--status-err); }
+
+mark.hi-ip    { background: rgba(108, 99, 255, 0.20); color: var(--accent); border-radius: 4px; padding: 0 2px; }
+mark.hi-route { background: rgba(108, 99, 255, 0.20); color: var(--accent); border-radius: 4px; padding: 0 2px; }
+
+/* ─── Raw view (for unknown log formats) ─── */
+.raw-view pre {
+    padding: 16px 20px;
+    margin: 0;
+    color: var(--text-main);
+    white-space: pre;
+    font-size: 12.5px;
+    line-height: 1.6;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Menlo', ui-monospace, monospace;
+}
+
+/* ─── Empty state ─── */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    color: var(--text-dim);
+    text-align: center;
+}
+
+.empty-state i { color: var(--text-dim); margin-bottom: 14px; opacity: 0.6; }
+
+.empty-state h3 {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+}
+
+.empty-state p { font-size: 13px; max-width: 360px; line-height: 1.5; }
+
+.spin { animation: spin 1.2s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <a href="/admin" class="back-link">
+        <i data-lucide="chevron-left" style="width: 16px;"></i>
+        <span data-i18n="admin.dashboard">Dashboard</span>
+    </a>
+    <h1 data-i18n="logs.heading">Audit Logs</h1>
+    <p class="subtitle" data-i18n="logs.subtitle">Serveraktivitäten einsehen und filtern.</p>
+</div>
+
+<div class="stats-row">
+    <div class="stat-item">
+        <span class="stat-label" data-i18n="logs.stats.files">Log-Dateien</span>
+        <span class="stat-value" id="statFiles">—</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-label" data-i18n="logs.stats.entries">Einträge gesamt</span>
+        <span class="stat-value" id="statEntries">—</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-label" data-i18n="logs.stats.errors">Fehler (4xx/5xx)</span>
+        <span class="stat-value" id="statErrors" style="color: var(--status-err);">—</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-label" data-i18n="logs.stats.ips">Eindeutige IPs</span>
+        <span class="stat-value" id="statIps">—</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-label" data-i18n="logs.stats.shown">Angezeigt</span>
+        <span class="stat-value" id="statShown" style="color: var(--accent);">—</span>
+    </div>
+</div>
+
+<div class="layout">
+    <div class="side-panel">
+        <div class="side-title">
+            <i data-lucide="folder-open" style="width: 16px; height: 16px;"></i>
+            <span data-i18n="logs.files.title">Log-Dateien</span>
+        </div>
+        <div id="fileList" class="file-list">
+            <div class="empty-state" id="filesLoading" style="padding: 24px 8px;">
+                <i data-lucide="loader-2" class="spin" style="width: 22px; height: 22px;"></i>
+                <p data-i18n="logs.files.loading" style="font-size: 12px; margin-top: 8px;">Lade Log-Dateien…</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="viewer-panel">
+        <div class="viewer-toolbar">
+            <label class="filter-group">
+                <span class="filter-icon"><i data-lucide="globe" style="width: 14px; height: 14px;"></i></span>
+                <input type="text" id="filterIp" class="ip" data-i18n-placeholder="logs.filter.ip" placeholder="IP-Adresse" autocomplete="off">
+            </label>
+            <label class="filter-group">
+                <span class="filter-icon"><i data-lucide="route" style="width: 14px; height: 14px;"></i></span>
+                <input type="text" id="filterRoute" class="route" data-i18n-placeholder="logs.filter.route" placeholder="Route (z. B. /admin)" autocomplete="off">
+            </label>
+            <label class="filter-group">
+                <span class="filter-icon"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
+                <input type="text" id="filterSearch" class="search" data-i18n-placeholder="logs.filter.search" placeholder="Freitext…" autocomplete="off">
+            </label>
+            <label class="filter-group">
+                <span class="filter-icon"><i data-lucide="activity" style="width: 14px; height: 14px;"></i></span>
+                <select id="filterStatus" class="status">
+                    <option value="" data-i18n="logs.filter.status.all">Alle Status</option>
+                    <option value="2xx" data-i18n="logs.filter.status.2xx">2xx OK</option>
+                    <option value="3xx" data-i18n="logs.filter.status.3xx">3xx Redirect</option>
+                    <option value="4xx" data-i18n="logs.filter.status.4xx">4xx Client</option>
+                    <option value="5xx" data-i18n="logs.filter.status.5xx">5xx Server</option>
+                    <option value="200">200</option>
+                    <option value="302">302</option>
+                    <option value="304">304</option>
+                    <option value="404">404</option>
+                    <option value="500">500</option>
+                </select>
+            </label>
+
+            <div class="toolbar-spacer"></div>
+
+            <button type="button" class="pill-btn active" id="btnReverse">
+                <span class="pill-icon"><i data-lucide="arrow-down-narrow-wide" style="width: 14px; height: 14px;"></i></span>
+                <span data-i18n="logs.action.newest">Neueste zuerst</span>
+            </button>
+            <button type="button" class="pill-btn" id="btnErrors">
+                <span class="pill-icon"><i data-lucide="alert-triangle" style="width: 14px; height: 14px;"></i></span>
+                <span data-i18n="logs.action.errors">Nur Fehler</span>
+                <span class="pill-count" id="btnErrorsCount" style="display:none;">0</span>
+            </button>
+            <button type="button" class="pill-btn" id="btnRefresh">
+                <span class="pill-icon"><i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i></span>
+                <span data-i18n="logs.action.refresh">Neu laden</span>
+            </button>
+        </div>
+
+        <div class="viewer-status">
+            <span><span class="dot" id="statusDot"></span><span id="statusText" data-i18n="logs.status.ready">Bereit</span></span>
+            <span><span data-i18n="logs.status.file">Datei</span>: <strong id="statFileName">—</strong></span>
+            <span><span data-i18n="logs.status.lines" style="margin-left: 4px;">Zeilen</span>: <strong id="statLineCount">0</strong></span>
+        </div>
+
+        <div id="truncatedBanner" class="truncated-banner" style="display:none;">
+            <i data-lucide="alert-triangle" style="width: 16px; height: 16px;"></i>
+            <span data-i18n="logs.status.truncated">Diese Log-Datei ist sehr groß – es werden nur die letzten Einträge angezeigt.</span>
+        </div>
+
+        <div id="viewerContent" class="log-table-wrap">
+            <div class="empty-state">
+                <i data-lucide="file-text" style="width: 36px; height: 36px;"></i>
+                <h3 data-i18n="logs.empty.title">Keine Log-Datei ausgewählt</h3>
+                <p data-i18n="logs.empty.body">Wähle links eine Datei aus, um ihre Einträge anzuzeigen.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    // Activity-log line format: "{ts}; {ip}; {path}; {status}; {duration}s"
+    // The path may contain ';' or spaces, so we parse from the right where the
+    // suffix is more constrained. Length: timestamp is always 19 chars.
+    function parseLine(line) {
+        // Suffix: `; <status>; <duration>s`
+        const idxDur = line.lastIndexOf("; ");
+        if (idxDur === -1) return null;
+        const dur = line.slice(idxDur + 2);
+        if (!/^[\d.]+s$/.test(dur)) return null;
+        const rest1 = line.slice(0, idxDur);
+
+        const idxStatus = rest1.lastIndexOf("; ");
+        if (idxStatus === -1) return null;
+        const statusStr = rest1.slice(idxStatus + 2);
+        if (!/^\d+$/.test(statusStr)) return null;
+        const rest2 = rest1.slice(0, idxStatus);
+
+        const idxPath = rest2.lastIndexOf("; ");
+        if (idxPath === -1) return null;
+        const path = rest2.slice(idxPath + 2);
+        const rest3 = rest2.slice(0, idxPath);
+
+        const idxIp = rest3.lastIndexOf("; ");
+        if (idxIp === -1) return null;
+        const ip = rest3.slice(idxIp + 2);
+        const ts = rest3.slice(0, idxIp);
+
+        // Sanity: timestamp must be exactly 19 chars in `YYYY-MM-DD HH:MM:SS` shape.
+        if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(ts)) return null;
+
+        return {
+            ts:       ts,
+            ip:       ip,
+            path:     path,
+            status:   parseInt(statusStr, 10),
+            duration: dur.slice(0, -1),  // strip trailing "s"
+        };
+    }
+
+    const state = {
+        files:           [],
+        selected:        null,
+        content:         "",
+        parsed:          [],
+        firstLineIndex:  0,
+        filters:         { ip: "", route: "", search: "", status: "", onlyErrors: false },
+        reverse:         true,
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    const fileListEl     = $("fileList");
+    const viewerContent  = $("viewerContent");
+    const statFiles      = $("statFiles");
+    const statEntries    = $("statEntries");
+    const statErrors     = $("statErrors");
+    const statIps        = $("statIps");
+    const statShown      = $("statShown");
+    const statFileName   = $("statFileName");
+    const statLineCount  = $("statLineCount");
+    const statusDot      = $("statusDot");
+    const statusText     = $("statusText");
+    const truncatedEl    = $("truncatedBanner");
+    const btnErrors      = $("btnErrors");
+    const btnErrorsCount = $("btnErrorsCount");
+    const btnReverse     = $("btnReverse");
+    const btnRefresh     = $("btnRefresh");
+
+    function t(key, vars) {
+        return window.t ? window.t(key, vars) : (key || "");
+    }
+
+    function setStatus(text, loading) {
+        statusText.textContent = text;
+        statusDot.classList.toggle("loading", !!loading);
+    }
+
+    function statusClass(s) {
+        if (s >= 500) return "status-5xx";
+        if (s >= 400) return "status-4xx";
+        if (s >= 300) return "status-3xx";
+        return "status-2xx";
+    }
+
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function highlight(text, query, klass) {
+        if (!query) return escapeHtml(text);
+        const idx = String(text).toLowerCase().indexOf(query.toLowerCase());
+        if (idx === -1) return escapeHtml(text);
+        return (
+            escapeHtml(text.slice(0, idx))
+            + "<mark class='" + klass + "'>"
+            + escapeHtml(text.slice(idx, idx + query.length))
+            + "</mark>"
+            + escapeHtml(text.slice(idx + query.length))
+        );
+    }
+
+    // ─── Networking ───
+    async function loadFiles() {
+        setStatus(t("logs.status.loading"), true);
+        try {
+            const res = await fetch("/admin/logs/api/list", { credentials: "same-origin" });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            const data = await res.json();
+            state.files = data.files || [];
+            renderFileList();
+
+            if (!state.selected && state.files.length > 0) {
+                selectFile(state.files[0].name);
+            } else {
+                setStatus(t("logs.status.ready"), false);
+            }
+        } catch (err) {
+            setStatus(t("logs.status.error") + ": " + err.message, false);
+            fileListEl.innerHTML =
+                '<div class="empty-state" style="padding: 24px 8px;">' +
+                    '<i data-lucide="alert-circle" style="width: 24px; height: 24px; color: var(--status-err);"></i>' +
+                    '<p style="font-size: 12px; margin-top: 8px;">' + t("logs.status.error") + '</p>' +
+                '</div>';
+            lucide.createIcons();
+        }
+    }
+
+    async function loadFileContent(name) {
+        setStatus(t("logs.status.loading"), true);
+        // Drop stale responses when the user clicks a different file quickly.
+        window._logsInflight = (window._logsInflight || 0) + 1;
+        const token = window._logsInflight;
+        try {
+            const res = await fetch("/admin/logs/api/file/" + encodeURIComponent(name), {
+                credentials: "same-origin",
+            });
+            if (!res.ok) {
+                if (res.status === 404) throw new Error(t("logs.errors.notfound"));
+                throw new Error("HTTP " + res.status);
+            }
+            const data = await res.json();
+            if (token !== window._logsInflight) return;
+
+            state.selected       = data.name;
+            state.content        = data.content || "";
+            state.firstLineIndex = data.first_line_index || 0;
+            state.parsed = state.content.split("\n")
+                .filter((line) => line.trim().length > 0)
+                .map(parseLine)
+                .filter((x) => x !== null);
+            statFileName.textContent  = data.name;
+            statLineCount.textContent = (data.lines || 0).toLocaleString();
+            truncatedEl.style.display = data.truncated ? "flex" : "none";
+
+            renderFileList();
+            renderViewer();
+            updateStats();
+
+            setStatus(t("logs.status.ready"), false);
+        } catch (err) {
+            if (token !== window._logsInflight) return;
+            setStatus(t("logs.status.error") + ": " + err.message, false);
+            viewerContent.innerHTML =
+                '<div class="empty-state">' +
+                    '<i data-lucide="alert-circle" style="width: 32px; height: 32px; color: var(--status-err);"></i>' +
+                    '<h3>' + t("logs.errors.title") + '</h3>' +
+                    '<p>' + escapeHtml(err.message) + '</p>' +
+                '</div>';
+            lucide.createIcons();
+        }
+    }
+
+    function selectFile(name) { loadFileContent(name); }
+
+    // ─── Rendering ───
+    function renderFileList() {
+        if (!state.files.length) {
+            fileListEl.innerHTML =
+                '<div class="empty-state" style="padding: 24px 8px;">' +
+                    '<i data-lucide="file-x" style="width: 22px; height: 22px;"></i>' +
+                    '<p style="font-size: 12px; margin-top: 8px;">' + t("logs.files.empty") + '</p>' +
+                '</div>';
+            lucide.createIcons();
+            return;
+        }
+
+        fileListEl.innerHTML = state.files.map((f) => {
+            const isActive = f.name === state.selected;
+            return (
+                '<button type="button" class="file-card ' + (isActive ? "active" : "") + '" data-name="' + escapeHtml(f.name) + '">' +
+                    '<span class="file-icon"><i data-lucide="file-text" style="width: 18px; height: 18px;"></i></span>' +
+                    '<span class="file-info">' +
+                        '<span class="file-name">' + escapeHtml(f.name) + '</span>' +
+                        '<span class="file-meta">' +
+                            escapeHtml(f.size_human) +
+                            '<span class="dot-sep"></span>' +
+                            (f.lines || 0).toLocaleString() + ' ' + t("logs.files.lines") +
+                        '</span>' +
+                    '</span>' +
+                '</button>'
+            );
+        }).join("");
+
+        fileListEl.querySelectorAll(".file-card").forEach((el) => {
+            el.addEventListener("click", () => selectFile(el.dataset.name));
+        });
+        lucide.createIcons();
+    }
+
+    function applyFilters(items) {
+        const f = state.filters;
+        const ipQ     = f.ip.trim().toLowerCase();
+        const routeQ  = f.route.trim().toLowerCase();
+        const status  = f.status;
+        const search  = f.search.trim().toLowerCase();
+        const errors  = f.onlyErrors;
+
+        return items.filter(({ e }) => {
+            if (errors && !(e.status >= 400)) return false;
+            if (ipQ    && !(e.ip   || "").toLowerCase().includes(ipQ))    return false;
+            if (routeQ && !(e.path || "").toLowerCase().includes(routeQ)) return false;
+            if (status) {
+                if (/^\d{3}$/.test(status)) {
+                    if (String(e.status) !== status) return false;
+                } else if (/^\dxx$/.test(status)) {
+                    const code = parseInt(status[0], 10);
+                    if (Math.floor(e.status / 100) !== code) return false;
+                }
+            }
+            if (search) {
+                const hay = (e.ts + " " + e.ip + " " + e.path + " " + e.status + " " + e.duration).toLowerCase();
+                if (!hay.includes(search)) return false;
+            }
+            return true;
+        });
+    }
+
+    function renderViewer() {
+        // No file selected → empty state.
+        if (!state.selected) {
+            viewerContent.innerHTML =
+                '<div class="empty-state">' +
+                    '<i data-lucide="file-text" style="width: 36px; height: 36px;"></i>' +
+                    '<h3>' + t("logs.empty.title") + '</h3>' +
+                    '<p>' + t("logs.empty.body") + '</p>' +
+                '</div>';
+            lucide.createIcons();
+            return;
+        }
+
+        // File selected but parser didn't recognise any line → render raw.
+        if (!state.parsed.length) {
+            const rows = state.content.split("\n");
+            const body = rows.map((line, i) => {
+                const number = String(i + 1).padStart(5, " ");
+                const sep = " │ ";
+                return number + sep + escapeHtml(line);
+            }).join("\n");
+            viewerContent.innerHTML = '<div class="raw-view"><pre>' + body + '</pre></div>';
+            return;
+        }
+
+        const filtered = applyFilters(state.parsed.map((e, i) => ({ e, i })));
+        const ordered = state.reverse ? filtered.slice().reverse() : filtered;
+
+        const ipQ    = state.filters.ip.trim();
+        const routeQ = state.filters.route.trim();
+
+        if (!ordered.length) {
+            viewerContent.innerHTML =
+                '<div class="empty-state">' +
+                    '<i data-lucide="search-x" style="width: 36px; height: 36px;"></i>' +
+                    '<h3>' + t("logs.empty.filtered.title") + '</h3>' +
+                    '<p>' + t("logs.empty.filtered.body") + '</p>' +
+                '</div>';
+            lucide.createIcons();
+            return;
+        }
+
+        const head =
+            '<table class="log-table"><thead><tr>' +
+                '<th class="cell-line">#</th>' +
+                '<th class="cell-time">' + t("logs.table.time") + '</th>' +
+                '<th class="cell-ip">' + t("logs.table.ip") + '</th>' +
+                '<th class="cell-status">' + t("logs.table.status") + '</th>' +
+                '<th class="cell-duration">' + t("logs.table.duration") + '</th>' +
+                '<th class="cell-route">' + t("logs.table.route") + '</th>' +
+            '</tr></thead><tbody>';
+
+        const body = ordered.map(({ e, i }) => {
+            const ipHtml     = ipQ    ? highlight(e.ip,   ipQ,    "hi-ip")    : escapeHtml(e.ip);
+            const routeHtml  = routeQ ? highlight(e.path, routeQ, "hi-route") : escapeHtml(e.path);
+            const originalLine = state.firstLineIndex + i + 1;
+            return (
+                '<tr>' +
+                    '<td class="cell-line">'     + originalLine                            + '</td>' +
+                    '<td class="cell-time">'     + escapeHtml(e.ts)                        + '</td>' +
+                    '<td class="cell-ip">'       + ipHtml                                  + '</td>' +
+                    '<td class="cell-status">'   + '<span class="status-pill ' + statusClass(e.status) + '">' + e.status + '</span>' + '</td>' +
+                    '<td class="cell-duration">' + escapeHtml(e.duration) + 's'            + '</td>' +
+                    '<td class="cell-route">'    + routeHtml                               + '</td>' +
+                '</tr>'
+            );
+        }).join("");
+
+        viewerContent.innerHTML = head + body + '</tbody></table>';
+    }
+
+    function updateStats() {
+        statFiles.textContent = state.files.length;
+
+        let errors = 0;
+        const ips = new Set();
+        for (const e of state.parsed) {
+            if (e.status >= 400) errors++;
+            if (e.ip) ips.add(e.ip);
+        }
+        statEntries.textContent = state.parsed.length.toLocaleString();
+        statErrors.textContent  = errors.toLocaleString();
+        statIps.textContent     = ips.size.toLocaleString();
+
+        const filtered = applyFilters(state.parsed.map((e, i) => ({ e, i })));
+        statShown.textContent   = filtered.length.toLocaleString();
+
+        btnErrorsCount.textContent       = errors.toLocaleString();
+        btnErrorsCount.style.display     = errors > 0 ? "inline-block" : "none";
+    }
+
+    function wireFilters() {
+        $("filterIp").addEventListener("input", (ev) => {
+            state.filters.ip = ev.target.value;
+            renderViewer();
+            updateStats();
+        });
+        $("filterRoute").addEventListener("input", (ev) => {
+            state.filters.route = ev.target.value;
+            renderViewer();
+            updateStats();
+        });
+        $("filterSearch").addEventListener("input", (ev) => {
+            state.filters.search = ev.target.value;
+            renderViewer();
+            updateStats();
+        });
+        $("filterStatus").addEventListener("change", (ev) => {
+            state.filters.status = ev.target.value;
+            renderViewer();
+            updateStats();
+        });
+
+        btnErrors.addEventListener("click", () => {
+            state.filters.onlyErrors = !state.filters.onlyErrors;
+            btnErrors.classList.toggle("active", state.filters.onlyErrors);
+            renderViewer();
+            updateStats();
+        });
+
+        btnReverse.addEventListener("click", () => {
+            state.reverse = !state.reverse;
+            btnReverse.classList.toggle("active", state.reverse);
+            renderViewer();
+        });
+
+        btnRefresh.addEventListener("click", () => {
+            if (state.selected) loadFileContent(state.selected);
+            else loadFiles();
+        });
+    }
+
+    function init() {
+        wireFilters();
+        loadFiles();
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
+</script>
+{% endblock %}

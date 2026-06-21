@@ -77,11 +77,6 @@ def admin_sessions():
     abort(501)
 
 
-@bp.route("/logs")
-def admin_logs():
-    abort(501)
-
-
 @bp.route("/announcements")
 def admin_announcements():
     abort(501)

@@ -122,6 +122,12 @@ pfad = "notifmanager"
 url = "/admin/notifications"
 active = true
 
+[adminlogs]
+pfad = "adminlogs"
+url = "/admin/logs"
+description = "Audit-Logs einsehen und filtern"
+active = true
+
 [settings]
 pfad = "settings"
 url = "/settings"
