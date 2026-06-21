@@ -11,7 +11,6 @@ from toolbox.user import (
     get_infos,
     require_admin_or_mod,
     is_mod,
-    is_admin,
     create_permission_suggestion,
     list_pending_suggestions,
     review_permission_suggestion,
