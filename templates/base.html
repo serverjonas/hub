@@ -521,6 +521,9 @@
                     {% if roles.admin %}
                         <a href="/admin" data-i18n="nav.admin">Admin</a>
                     {% endif %}
+                    {% if roles.mod %}
+                        <a href="/mods" data-i18n="nav.mods">Mods</a>
+                    {% endif %}
                     <a href="/cloud" data-i18n="nav.cloud">Cloud</a>
                 </div>
 
@@ -583,6 +586,11 @@
             {% if roles.admin %}
                 <a href="/admin" class="mobile-nav-link">
                     <i data-lucide="terminal" style="width: 20px;"></i> <span data-i18n="nav.admin">Admin</span>
+                </a>
+            {% endif %}
+            {% if roles.mod %}
+                <a href="/mods" class="mobile-nav-link">
+                    <i data-lucide="shield" style="width: 20px;"></i> <span data-i18n="nav.mods">Mods</span>
                 </a>
             {% endif %}
             <a href="/cloud" class="mobile-nav-link">

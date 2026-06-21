@@ -315,3 +315,207 @@ def mask_email(email):
     if not local:
         return f"***@{domain}"
     return f"{local[0]}***@{domain}"
+
+
+# ─── Mod-Panel: Rollen, Cooldowns, Vorschläge ────────────────────────────────
+
+from flask import abort as _abort
+
+
+MOD_COOLDOWN_SECONDS = 7 * 24 * 60 * 60   # 7 Tage
+VALID_SUGGESTION_ROLES = ("admin", "vip", "mod")
+
+
+def is_mod(user_id) -> bool:
+    """True wenn der Nutzer die Mod-Rolle hat."""
+    infos = get_infos(user_id) if user_id else None
+    return bool(infos and infos.get("mod"))
+
+
+def is_admin_or_mod(user_id) -> bool:
+    """True wenn der Nutzer Admin ODER Mod ist."""
+    infos = get_infos(user_id) if user_id else None
+    return bool(infos and (infos.get("admin") or infos.get("mod")))
+
+
+def require_admin_or_mod():
+    """before_request hook: prüft Login und Admin/Mod-Rolle."""
+    user = get_current_user()
+    if user is None:
+        _abort(401)
+    if not is_admin_or_mod(user["id"]):
+        _abort(403)
+
+
+def get_mod_cooldown(mod_id):
+    """Gibt (expires_at, reason) des aktuellen Cooldowns zurück oder (None, None)."""
+    if not mod_id:
+        return None, None
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT expires_at, reason FROM mod_cooldowns WHERE mod_id = ?",
+        (mod_id,),
+    )
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return None, None
+    return row[0], (row[1] or "")
+
+
+def has_active_cooldown(mod_id) -> bool:
+    """True wenn für `mod_id` aktuell ein Ban-Cooldown läuft."""
+    expires_at, _ = get_mod_cooldown(mod_id)
+    return bool(expires_at and expires_at > int(time.time()))
+
+
+def get_cooldown_remaining(mod_id) -> int:
+    """Sekunden bis der Cooldown abläuft. 0 wenn keiner aktiv."""
+    expires_at, _ = get_mod_cooldown(mod_id)
+    if not expires_at:
+        return 0
+    return max(0, expires_at - int(time.time()))
+
+
+def record_mod_cooldown(mod_id, reason: str = "") -> int:
+    """Setzt/reaktiviert den 7-Tage-Cooldown für einen Mod."""
+    now = int(time.time())
+    expires_at = now + MOD_COOLDOWN_SECONDS
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        INSERT INTO mod_cooldowns (mod_id, starts_at, expires_at, reason)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(mod_id) DO UPDATE SET
+            starts_at  = excluded.starts_at,
+            expires_at = excluded.expires_at,
+            reason     = excluded.reason
+        """,
+        (mod_id, now, expires_at, reason or ""),
+    )
+    conn.commit()
+    conn.close()
+    return expires_at
+
+
+def create_permission_suggestion(mod_id, target_user_id, role, value, comment=""):
+    """
+    Erzeugt einen Rollen-Vorschlag. Vorhandene pending-Vorschläge für dieselbe
+    target+role-Kombination werden ersetzt, damit Admins nicht mit konflikt-
+    identischen Einträgen zugespammt werden.
+
+    Verläss auf den teilindizierten UNIQUE-Index uniq_pending_suggestion für
+    Race-Schutz bei gleichzeitigen POSTs.
+    """
+    if role not in VALID_SUGGESTION_ROLES:
+        raise ValueError("invalid role")
+    if value not in (0, 1):
+        raise ValueError("invalid value")
+    now = int(time.time())
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            """
+            DELETE FROM permission_suggestions
+            WHERE target_user_id = ? AND role = ? AND status = 'pending'
+            """,
+            (target_user_id, role),
+        )
+        cur.execute(
+            """
+            INSERT INTO permission_suggestions
+                (mod_id, target_user_id, role, value, status, comment, created_at)
+            VALUES (?, ?, ?, ?, 'pending', ?, ?)
+            """,
+            (mod_id, target_user_id, role, value, comment or "", now),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        # Concurrent POST hat bereits einen pending-Eintrag erzeugt; nichts tun.
+        conn.rollback()
+    finally:
+        conn.close()
+
+
+def list_pending_suggestions():
+    """Hängt alle offenen Vorschläge inklusive Mod- und Target-Namen ab."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT s.id, s.mod_id, s.target_user_id, s.role, s.value,
+               s.comment, s.created_at,
+               m.user_name   AS mod_name,
+               t.user_name   AS target_name,
+               t.admin, t.vip, t.mod
+        FROM permission_suggestions s
+        JOIN users m ON m.user_id = s.mod_id
+        JOIN users t ON t.user_id = s.target_user_id
+        WHERE s.status = 'pending'
+        ORDER BY s.created_at ASC
+        """
+    )
+    rows = cur.fetchall()
+    conn.close()
+    return [
+        {
+            "id":              r[0],
+            "mod_id":          r[1],
+            "target_user_id":  r[2],
+            "role":            r[3],
+            "value":           bool(r[4]),
+            "comment":         r[5],
+            "created_at":      r[6],
+            "mod_name":        r[7],
+            "target_name":     r[8],
+            "target_admin":    bool(r[9]),
+            "target_vip":      bool(r[10]),
+            "target_mod":      bool(r[11]),
+        }
+        for r in rows
+    ]
+
+
+def review_permission_suggestion(suggestion_id, admin_id, decision):
+    """
+    `decision` ist 'approved' oder 'rejected'. Bei 'approved' wird die Rolle
+    sofort auf den Ziel-User angewendet.
+    """
+    if decision not in ("approved", "rejected"):
+        raise ValueError("invalid decision")
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT target_user_id, role, value, status FROM permission_suggestions WHERE id = ?",
+        (suggestion_id,),
+    )
+    row = cur.fetchone()
+    if row is None or row[3] != "pending":
+        conn.close()
+        return False
+
+    target_user_id, role, value = row[0], row[1], row[2]
+    now = int(time.time())
+
+    if decision == "approved":
+        cur.execute(
+            f"UPDATE users SET {role} = ? WHERE user_id = ?",
+            (value, target_user_id),
+        )
+
+    cur.execute(
+        """
+        UPDATE permission_suggestions
+        SET status = ?, reviewed_by = ?, reviewed_at = ?
+        WHERE id = ?
+        """,
+        (decision, admin_id, now, suggestion_id),
+    )
+    conn.commit()
+    conn.close()
+    return True

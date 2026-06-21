@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "modspanel"
+    },
+    "mods.nav.title": "Mod Panel · serverjonas",
+    "mods.dashboard": "Mod Dashboard",
+    "mods.subtitle": "User management, bans and logs for the community.",
+    "mods.cooldown.title": "You are on ban cooldown",
+    "mods.cooldown.body": "You can't ban anyone for 7 days after an admin revoked one of your bans.",
+    "mods.my_suggestions.heading": "My open suggestions",
+    "mods.my_suggestions.hint": "You can suggest changes to user roles. Admins review your suggestions.",
+    "mods.my_suggestions.view_all": "View all",
+    "mods.my_suggestions.empty": "No open suggestions right now.",
+    "mods.suggestions.title": "My suggestions · serverjonas",
+    "mods.suggestions.heading": "My suggestions",
+    "mods.suggestions.target": "User",
+    "mods.suggestions.role": "Role",
+    "mods.suggestions.value": "Value",
+    "mods.suggestions.comment": "Comment",
+    "mods.suggestions.created": "Created",
+    "mods.suggestions.empty": "You have no open suggestions right now.",
+    "mods.users.subtitle": "Role toggles are suggestions — admins review and decide.",
+    "mods.users.desc": "Submit role suggestions.",
+    "mods.bans.desc": "Ban without affecting mods/admins."
+}

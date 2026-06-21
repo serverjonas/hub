@@ -8,5 +8,13 @@
     "admin.table.actions": "Aktionen",
     "admin.active_label": "Aktiv",
     "admin.action.logout": "Logout",
-    "admin.cards.users": "Nutzerverwaltung · serverjonas"
+    "admin.mod_no_logout": "—",
+    "admin.cards.users": "Nutzerverwaltung · serverjonas",
+    "admin.suggestions.heading": "Offene Rollen-Vorschläge",
+    "admin.suggestions.from": "von",
+    "admin.suggestions.approve": "Genehmigen",
+    "admin.suggestions.reject": "Ablehnen",
+    "admin.suggestions.empty": "Aktuell keine offenen Vorschläge.",
+    "admin.suggestions.created": "Vorschlag eingereicht. Wartet auf Admin-Prüfung.",
+    "mods.users.subtitle": "Rollen-Toggles sind Vorschläge – Admins prüfen und entscheiden."
 }

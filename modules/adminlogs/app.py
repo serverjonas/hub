@@ -7,7 +7,7 @@ from flask import Blueprint, abort, jsonify, render_template
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 from toolbox.files import LOGS_DIR
-from toolbox.user import get_current_user, get_infos
+from toolbox.user import get_current_user, get_infos, require_admin_or_mod
 
 bp = Blueprint("adminlogs", __name__, template_folder="templates")
 
@@ -19,15 +19,10 @@ MAX_LINES = 10000                  # last N lines per request
 _VALID_NAME = re.compile(r"^[A-Za-z0-9._-]+\.log$")
 
 
-# ─── Admin-Check für alle Routen unter diesem Blueprint ──────────────────────
+# ─── Admin- oder Mod-Check für alle Routen unter diesem Blueprint ────────────────
 @bp.before_request
-def require_admin():
-    user = get_current_user()
-    if user is None:
-        abort(401)
-    infos = get_infos(user["id"])
-    if infos is None or not infos["admin"]:
-        abort(403)
+def _role_check():
+    require_admin_or_mod()
 
 
 # ─── Helpers ────────────────────────────────────────────────────────────────

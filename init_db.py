@@ -92,6 +92,39 @@ cur.executescript(
         FOREIGN KEY (user_id) REFERENCES users(user_id)
     );
 
+    -- Mod-Ban-Cooldown: ein Mod darf 7 Tage lang niemanden bannen,
+    -- nachdem ein Admin einen seiner Bans aufgehoben hat.
+    CREATE TABLE IF NOT EXISTS mod_cooldowns (
+        mod_id     INTEGER PRIMARY KEY,
+        starts_at  INTEGER NOT NULL,
+        expires_at INTEGER NOT NULL,
+        reason     TEXT    NOT NULL DEFAULT '',
+        FOREIGN KEY (mod_id) REFERENCES users(user_id)
+    );
+
+    -- Rollen-Änderungs-Vorschläge von Mods an Admins.
+    CREATE TABLE IF NOT EXISTS permission_suggestions (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        mod_id          INTEGER NOT NULL,
+        target_user_id  INTEGER NOT NULL,
+        role            TEXT    NOT NULL,
+        value           INTEGER NOT NULL,
+        status          TEXT    NOT NULL DEFAULT 'pending',
+        comment         TEXT    NOT NULL DEFAULT '',
+        created_at      INTEGER NOT NULL,
+        reviewed_by     INTEGER,
+        reviewed_at     INTEGER,
+        FOREIGN KEY (mod_id)         REFERENCES users(user_id),
+        FOREIGN KEY (target_user_id) REFERENCES users(user_id),
+        FOREIGN KEY (reviewed_by)    REFERENCES users(user_id)
+    );
+
+    -- Pro (target, role) darf es höchstens einen offenen Vorschlag geben,
+    -- damit gleichzeitige POSTs keine Duplikate erzeugen.
+    CREATE UNIQUE INDEX IF NOT EXISTS uniq_pending_suggestion
+        ON permission_suggestions(target_user_id, role)
+        WHERE status = 'pending';
+
 """
 )
 
@@ -99,6 +132,9 @@ cur.executescript(
 _ensure_column(cur, "users", "email", "TEXT")
 _ensure_column(cur, "users", "email_active", "INTEGER NOT NULL DEFAULT 0")
 _ensure_column(cur, "users", "last_email_sent_at", "INTEGER")
+
+# Mod-Panel: tracked who placed a ban so admins can apply cooldowns later.
+_ensure_column(cur, "ban", "banned_by", "INTEGER")
 
 conn.commit()
 conn.close()

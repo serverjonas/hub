@@ -122,6 +122,12 @@ pfad = "notifmanager"
 url = "/admin/notifications"
 active = true
 
+[modspanel]
+pfad = "modspanel"
+url = "/mods"
+description = "Moderator-Werkzeuge mit Vorschlags- und Ban-Logik"
+active = true
+
 [adminlogs]
 pfad = "adminlogs"
 url = "/admin/logs"

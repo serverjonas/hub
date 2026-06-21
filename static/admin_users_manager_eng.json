@@ -8,5 +8,13 @@
     "admin.table.actions": "Actions",
     "admin.active_label": "Active",
     "admin.action.logout": "Logout",
-    "admin.cards.users": "User management · serverjonas"
+    "admin.mod_no_logout": "—",
+    "admin.cards.users": "User management · serverjonas",
+    "admin.suggestions.heading": "Open role suggestions",
+    "admin.suggestions.from": "from",
+    "admin.suggestions.approve": "Approve",
+    "admin.suggestions.reject": "Reject",
+    "admin.suggestions.empty": "No open suggestions right now.",
+    "admin.suggestions.created": "Suggestion submitted. Awaiting admin review.",
+    "mods.users.subtitle": "Role toggles are suggestions — admins review and decide."
 }

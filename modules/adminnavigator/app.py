@@ -6,7 +6,7 @@ import time
 from flask import Blueprint, abort, render_template
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from toolbox.user import get_current_user, get_infos
+from toolbox.user import get_current_user, get_infos, list_pending_suggestions
 
 bp = Blueprint("admin", __name__, template_folder="templates")
 import os
@@ -60,10 +60,17 @@ def require_admin():
 @bp.route("/")
 def admin_dashboard():
     user = get_current_user()
-    
+
     bans = get_active_bans()
     user_count = get_user_count()
-    return render_template("admin_nav.html", user=user["name"], bans=bans, user_count=user_count)
+    pending_count = len(list_pending_suggestions())
+    return render_template(
+        "admin_nav.html",
+        user=user["name"],
+        bans=bans,
+        user_count=user_count,
+        pending_count=pending_count,
+    )
 
 
 # ── Platzhalter-Routen – werden später durch eigene Blueprints ersetzt ────────

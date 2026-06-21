@@ -5,23 +5,37 @@
 {% block title %}Ban-Verwaltung · serverjonas{% endblock %}
 
 {% block extra_style %}
-/* ─── Admin Ban Styles ─── */
 .admin-header {
-    margin-bottom: 40px;
+    margin-bottom: 32px;
 }
 
 .admin-header h1 {
     font-size: 32px;
     font-weight: 800;
     letter-spacing: -1.5px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
+
+.cooldown-banner {
+    background: rgba(239, 68, 68, 0.10);
+    border: 1px solid rgba(239, 68, 68, 0.30);
+    color: #ef4444;
+    padding: 14px 18px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+.cooldown-banner strong { color: #ef4444; }
 
 .stats-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-bottom: 48px;
+    margin-bottom: 40px;
 }
 
 .stat-item {
@@ -95,6 +109,7 @@
 .badge-vip { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
 .badge-mod { background: rgba(16, 185, 129, 0.1); color: #10b981; }
 .badge-banned { background: #ef4444; color: white; }
+.badge-protected { background: var(--bg-warm); color: var(--text-dim); border: 1px solid var(--border); }
 
 .ban-reason {
     font-size: 12px;
@@ -106,6 +121,18 @@
 .ban-expires {
     font-size: 11px;
     color: var(--text-dim);
+}
+
+.banned-by {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.banned-by .mod-flag {
+    color: #10b981;
+    font-weight: 700;
 }
 
 .ban-form {
@@ -125,6 +152,7 @@
 }
 
 .ban-input:focus { outline: none; border-color: var(--accent); }
+.ban-input:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-action {
     padding: 6px 16px;
@@ -138,20 +166,43 @@
 
 .btn-ban { background: #ef4444; color: white; }
 .btn-ban:hover { background: #dc2626; transform: translateY(-1px); }
+.btn-ban:disabled { background: #fca5a5; cursor: not-allowed; transform: none; }
 
 .btn-unban { background: #10b981; color: white; }
 .btn-unban:hover { background: #059669; transform: translateY(-1px); }
 
+.btn-stop-cooldown { background: #f59e0b; color: white; }
+.btn-stop-cooldown:hover { background: #d97706; transform: translateY(-1px); }
+
 .hidden { display: none; }
+
+.mod-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-style: italic;
+}
 {% endblock %}
 
 {% block content %}
 <div class="admin-header">
-    <a href="/admin" style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-weight: 600; margin-bottom: 16px; font-size: 14px;">
-        <i data-lucide="chevron-left" style="width: 16px;"></i> <span data-i18n="admin.dashboard">Dashboard</span>
+    <a href="{{ '/admin' if is_admin else '/mods' }}" style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-weight: 600; margin-bottom: 16px; font-size: 14px;">
+        <i data-lucide="chevron-left" style="width: 16px;"></i>
+        <span>{{ 'admin.dashboard' if is_admin else 'mods.dashboard' }}</span>
     </a>
     <h1 data-i18n="admin.cards.bans">Ban-Verwaltung</h1>
 </div>
+
+{% if is_mod and not is_admin and cooldown_remaining > 0 %}
+<div class="cooldown-banner">
+    <i data-lucide="shield-off" style="width: 22px; height: 22px; flex-shrink: 0;"></i>
+    <div>
+        <div><strong data-i18n="mods.cooldown.title">Du bist im Ban-Cooldown</strong></div>
+        <div style="font-size: 13px; font-weight: 400;">
+            <span data-i18n="mods.cooldown.body">Du kannst 7 Tage lang niemanden bannen, nachdem ein Admin einen deiner Bans aufgehoben hat.</span>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <div class="stats-row">
     <div class="stat-item">
@@ -200,34 +251,69 @@
                                 <span data-i18n="banadmin.permanent">Permanent</span>
                             {% endif %}
                         </div>
+                        {% if u.banned_by_name and is_admin %}
+                        <div class="banned-by">
+                            <span data-i18n="banadmin.by">von</span>
+                            {% if u.banned_by == current_user_id %}
+                                <strong>{{ u.banned_by_name }}</strong>
+                                <span style="color: var(--text-dim); font-weight: 400;" data-i18n="banadmin.by.you">(du)</span>
+                            {% else %}
+                                <strong>{{ u.banned_by_name }}</strong>
+                                {% if u.banned_by_is_mod %}
+                                    <span class="mod-flag">[MOD]</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        {% endif %}
                     {% else %}
                         <span style="color: var(--text-dim);" data-i18n="banadmin.active">Aktiv</span>
                     {% endif %}
                 </td>
                 <td>
                     {% if u.id == current_user_id %}
+                        <span class="mod-hint" data-i18n="banadmin.self">— du selbst</span>
                     {% elif u.banned %}
-                        <form action="/admin/ban/unban" method="POST">
-                            <input type="hidden" name="user_id" value="{{ u.id }}">
-                            <button type="submit" class="btn-action btn-unban"><span data-i18n="banadmin.unban">Entbannen</span></button>
-                        </form>
+                        {% if is_admin %}
+                            <form action="/admin/ban/unban" method="POST">
+                                <input type="hidden" name="user_id" value="{{ u.id }}">
+                                <button type="submit" class="btn-action btn-unban"
+                                        title="{% if u.banned_by_is_mod %}Stoppt außerdem den Ban-Cooldown dieses Mods{% endif %}">
+                                    <i data-lucide="shield-check" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
+                                    <span data-i18n="banadmin.unban">Entbannen</span>
+                                    {% if u.banned_by_is_mod %}
+                                    <span class="badge-protected" style="margin-left: 6px; font-size: 10px; padding: 2px 6px;">
+                                        <span data-i18n="banadmin.cooldown_mod">Cooldown für Mod</span>
+                                    </span>
+                                    {% endif %}
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="mod-hint" data-i18n="banadmin.mod_protected">(nur Admins)</span>
+                        {% endif %}
                     {% else %}
+                        {% set protected_target = u.admin or u.mod %}
+                        {% if is_mod and not is_admin and protected_target %}
+                            <span class="badge badge-protected" data-i18n="banadmin.protected">Geschützt</span>
+                        {% else %}
                         <form action="/admin/ban/ban" method="POST" class="ban-form">
                             <input type="hidden" name="user_id" value="{{ u.id }}">
                             <input type="text" name="reason" data-i18n-placeholder="banadmin.reason_placeholder" placeholder="Grund..." class="ban-input" required>
-
                             <div id="days-wrapper-{{ u.id }}">
                                 <input type="number" name="days" min="1" value="7" class="ban-input" style="width: 70px;">
                                 <span style="font-size: 12px; color: var(--text-dim);" data-i18n="banadmin.days">Tage</span>
                             </div>
-
                             <label style="display: flex; align-items: center; gap: 4px; font-size: 12px; cursor: pointer;">
                                 <input type="checkbox" name="permanent" value="1" onchange="document.getElementById('days-wrapper-{{ u.id }}').classList.toggle('hidden', this.checked)">
                                 <span data-i18n="banadmin.permanent">Permanent</span>
                             </label>
-
-                            <button type="submit" class="btn-action btn-ban"><span data-i18n="banadmin.ban">Bannen</span></button>
+                            {% set btn_disabled = (is_mod and not is_admin and cooldown_remaining > 0) %}
+                            <button type="submit" class="btn-action btn-ban" {{ "disabled" if btn_disabled else "" }}
+                                    title="{{ 'Du bist im Cooldown – 7 Tage abwarten.' if btn_disabled else '' }}">
+                                <i data-lucide="ban" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
+                                <span data-i18n="banadmin.ban">Bannen</span>
+                            </button>
                         </form>
+                        {% endif %}
                     {% endif %}
                 </td>
             </tr>
@@ -236,7 +322,5 @@
     </table>
 </div>
 
-<script>
-    lucide.createIcons();
-</script>
+<script>lucide.createIcons();</script>
 {% endblock %}

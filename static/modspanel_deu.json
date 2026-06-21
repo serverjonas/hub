@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "modspanel"
+    },
+    "mods.nav.title": "Mod Panel · serverjonas",
+    "mods.dashboard": "Mod Dashboard",
+    "mods.subtitle": "Nutzerverwaltung, Bans und Logs für die Community.",
+    "mods.cooldown.title": "Du bist im Ban-Cooldown",
+    "mods.cooldown.body": "Du kannst 7 Tage lang niemanden bannen, nachdem ein Admin einen deiner Bans aufgehoben hat.",
+    "mods.my_suggestions.heading": "Meine offenen Vorschläge",
+    "mods.my_suggestions.hint": "Du kannst Änderungen an Nutzerrollen vorschlagen. Admins prüfen deine Vorschläge.",
+    "mods.my_suggestions.view_all": "Alle anzeigen",
+    "mods.my_suggestions.empty": "Aktuell keine offenen Vorschläge.",
+    "mods.suggestions.title": "Meine Vorschläge · serverjonas",
+    "mods.suggestions.heading": "Meine Vorschläge",
+    "mods.suggestions.target": "Nutzer",
+    "mods.suggestions.role": "Rolle",
+    "mods.suggestions.value": "Wert",
+    "mods.suggestions.comment": "Kommentar",
+    "mods.suggestions.created": "Erstellt",
+    "mods.suggestions.empty": "Du hast aktuell keine offenen Vorschläge.",
+    "mods.users.subtitle": "Rollen-Toggles sind Vorschläge – Admins prüfen und entscheiden.",
+    "mods.users.desc": "Rollen-Vorschläge einreichen.",
+    "mods.bans.desc": "Bannen ohne Mods/Admins."
+}

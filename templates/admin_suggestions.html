@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block page_id %}admin_users_manager{% endblock %}
+{% block title_i18n %}admin.cards.suggestions{% endblock %}
+{% block title %}Vorschläge · serverjonas{% endblock %}
+
+{% block extra_style %}
+.admin-header {
+    margin-bottom: 32px;
+}
+
+.admin-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 4px;
+}
+
+.suggest-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.suggest-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: var(--shadow-sm);
+}
+
+.suggest-card .meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.suggest-card .meta .title {
+    font-weight: 700;
+    font-size: 15px;
+    font-family: var(--font-heading);
+}
+
+.suggest-card .meta .subtitle {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+}
+
+.suggest-card .badge-pill {
+    background: var(--accent-lighter);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.suggest-card .comment {
+    background: var(--bg-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+.suggest-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-action {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+}
+
+.btn-approve { background: #10b981; color: white; }
+.btn-approve:hover { background: #059669; transform: translateY(-1px); }
+
+.btn-reject { background: #ef4444; color: white; }
+.btn-reject:hover { background: #dc2626; transform: translateY(-1px); }
+
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-dim);
+}
+
+.just-created-banner {
+    background: var(--accent-lighter);
+    color: var(--accent);
+    padding: 14px 18px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 24px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <a href="/admin" style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-weight: 600; margin-bottom: 16px; font-size: 14px;">
+        <i data-lucide="chevron-left" style="width: 16px;"></i>
+        <span data-i18n="admin.dashboard">Dashboard</span>
+    </a>
+    <a href="/admin/users" style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-weight: 600; margin-bottom: 16px; font-size: 14px; margin-left: 16px;">
+        <i data-lucide="users" style="width: 16px;"></i>
+        <span data-i18n="admin.cards.users">Nutzerverwaltung</span>
+    </a>
+    <h1 data-i18n="admin.cards.suggestions">Rollen-Vorschläge</h1>
+    <p style="color: var(--text-secondary); font-size: 14px;">
+        <span data-i18n="admin.suggestions.subtitle">Mods haben Änderungen an Nutzerrollen vorgeschlagen. Genehmige oder lehne sie ab.</span>
+    </p>
+</div>
+
+{% if just_created %}
+<div class="just-created-banner">
+    <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+    <span data-i18n="admin.suggestions.created">Vorschlag eingereicht. Wartet auf Admin-Prüfung.</span>
+</div>
+{% endif %}
+
+{% if items %}
+<div class="suggest-list">
+    {% for s in items %}
+    <div class="suggest-card">
+        <div class="meta">
+            <div class="title">
+                {{ s.target_name }}
+                <span style="color: var(--text-dim); font-weight: 500;">
+                    ({{ s.role }} → <strong>{{ 'gewähren' if s.value else 'entziehen' }}</strong>)
+                </span>
+            </div>
+            <div class="subtitle">
+                <span data-i18n="admin.suggestions.from">Vorgeschlagen von</span>
+                <strong>{{ s.mod_name }}</strong>
+                · {{ s.created_at }}
+            </div>
+            {% if s.comment %}
+            <div class="comment">{{ s.comment }}</div>
+            {% endif %}
+        </div>
+        <div class="suggest-actions">
+            <form action="/admin/users/review-suggestion" method="POST" style="display: inline;">
+                <input type="hidden" name="suggestion_id" value="{{ s.id }}">
+                <input type="hidden" name="decision" value="approved">
+                <button type="submit" class="btn-action btn-approve">
+                    <i data-lucide="check" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
+                    <span data-i18n="admin.suggestions.approve">Genehmigen</span>
+                </button>
+            </form>
+            <form action="/admin/users/review-suggestion" method="POST" style="display: inline;">
+                <input type="hidden" name="suggestion_id" value="{{ s.id }}">
+                <input type="hidden" name="decision" value="rejected">
+                <button type="submit" class="btn-action btn-reject">
+                    <i data-lucide="x" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
+                    <span data-i18n="admin.suggestions.reject">Ablehnen</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i data-lucide="inbox" style="width: 36px; height: 36px; opacity: 0.6;"></i>
+    <h3 style="font-family: var(--font-heading); font-size: 16px; margin-top: 14px;">
+        <span data-i18n="admin.suggestions.empty.title">Keine offenen Vorschläge</span>
+    </h3>
+</div>
+{% endif %}
+
+<script>lucide.createIcons();</script>
+{% endblock %}

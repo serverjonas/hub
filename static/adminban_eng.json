@@ -6,6 +6,8 @@
     "admin.table.roles": "Roles",
     "admin.table.status": "Status",
     "admin.table.actions": "Actions",
+    "admin.stats.registered": "Registered users",
+    "admin.stats.bans": "Active bans",
     "banadmin.unban": "Unban",
     "banadmin.reason_placeholder": "Reason...",
     "banadmin.days": "Days",
@@ -14,5 +16,11 @@
     "banadmin.banned": "BANNED",
     "banadmin.until": "until",
     "banadmin.active": "Active",
+    "banadmin.by": "by",
+    "banadmin.by.you": "(you)",
+    "banadmin.protected": "Protected",
+    "banadmin.mod_protected": "(admins only)",
+    "banadmin.self": "— yourself",
+    "banadmin.cooldown_mod": "Mod cooldown",
     "admin.cards.bans": "Ban management · serverjonas"
 }
