@@ -34,7 +34,7 @@
     padding: 36px;
     box-shadow: var(--shadow-sm);
     margin-bottom: 24px;
-    animation: fadeInUp 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) b0oth;
+    animation: fadeInUp 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
     overflow: visible;
 }
 
@@ -1092,25 +1092,6 @@
     document.addEventListener("i18n:applied", () => buildLangDropdown());
     buildLangDropdown();
     updateActiveStates();
-
-    // Password form toggle
-    const toggleBtn = document.getElementById('togglePasswordForm');
-    const pwForm = document.getElementById('passwordForm');
-    const cancelBtn = document.getElementById('cancelPassword');
-
-    if (toggleBtn && pwForm) {
-        toggleBtn.addEventListener('click', () => {
-            pwForm.classList.toggle('visible');
-            lucide.createIcons();
-        });
-    }
-
-    if (cancelBtn && pwForm) {
-        cancelBtn.addEventListener('click', () => {
-            pwForm.classList.remove('visible');
-            pwForm.querySelectorAll('input').forEach(i => i.value = '');
-        });
-    }
 
     // Wire the (re-enabled) password form to the real endpoint via fetch.
     const toggleBtn = document.getElementById('togglePasswordForm');

@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_501"
+    },
+    "errors.501.title": "Non implementato",
+    "errors.501.body": "La pagina richiesta non è ancora disponibile.",
+    "error.501.title": "501 · Non implementato · serverjonas"
+}

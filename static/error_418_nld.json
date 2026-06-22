@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "error_418"
+    },
+    "errors.418.title": "Ik ben een theepot",
+    "errors.418.body": "Oeps! Je verzoek kan hier niet verwerkt worden – deze server is een theepot, geen koffiezetapparaat.",
+    "errors.418.learn_more": "Wat is dit?",
+    "error.418.title": "418 · Ik ben een theepot · serverjonas"
+}

@@ -1,0 +1,10 @@
+{
+    "_meta": {
+        "page": "ban"
+    },
+    "ban.title": "Banni · serverjonas",
+    "ban.badge": "Compte banni",
+    "ban.heading": "Vous avez été exclu du réseau Serverjonas.",
+    "ban.body": "Votre compte a été verrouillé par un modérateur ou un administrateur.",
+    "ban.reason_label": "Motif"
+}

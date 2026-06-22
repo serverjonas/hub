@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_500_bad"
+    },
+    "errors.500.title": "Interne fout",
+    "errors.500.body": "Er gaat hier iets mis. De fout ligt bij ons, niet bij jou. Probeer het zo opnieuw.",
+    "error.500_bad.title": "500 · Interne fout · serverjonas"
+}

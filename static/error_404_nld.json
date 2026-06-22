@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_404"
+    },
+    "errors.404.title": "Pagina niet gevonden",
+    "errors.404.body": "De opgevraagde pagina bestaat niet of is verplaatst.",
+    "error.404.title": "404 · Pagina niet gevonden · serverjonas"
+}

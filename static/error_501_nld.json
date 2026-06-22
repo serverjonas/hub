@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_501"
+    },
+    "errors.501.title": "Niet geïmplementeerd",
+    "errors.501.body": "De opgevraagde pagina is nog niet beschikbaar.",
+    "error.501.title": "501 · Niet geïmplementeerd · serverjonas"
+}

@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "error_418"
+    },
+    "errors.418.title": "Jestem czajniczkiem",
+    "errors.418.body": "Ups! Twoje żądanie nie może być przetworzone tutaj — ten serwer jest czajniczkiem, nie ekspresem do kawy.",
+    "errors.418.learn_more": "Co to jest?",
+    "error.418.title": "418 · Jestem czajniczkiem · serverjonas"
+}

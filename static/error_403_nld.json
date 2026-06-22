@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_403"
+    },
+    "errors.403.title": "Geen rechten",
+    "errors.403.body": "Je hebt niet de rechten die nodig zijn om deze pagina te bekijken.",
+    "error.403.title": "403 · Toegang geweigerd · serverjonas"
+}

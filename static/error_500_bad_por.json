@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_500_bad"
+    },
+    "errors.500.title": "Erro interno",
+    "errors.500.body": "Há aqui algo errado. O erro é do nosso lado, não do teu. Tenta novamente dentro de momentos.",
+    "error.500_bad.title": "500 · Erro interno · serverjonas"
+}

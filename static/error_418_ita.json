@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "error_418"
+    },
+    "errors.418.title": "Sono una teiera",
+    "errors.418.body": "Ops! La tua richiesta non può essere elaborata qui: questo server è una teiera, non una macchina da caffè.",
+    "errors.418.learn_more": "Cos'è questo?",
+    "error.418.title": "418 · Sono una teiera · serverjonas"
+}

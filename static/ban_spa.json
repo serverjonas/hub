@@ -1,0 +1,10 @@
+{
+    "_meta": {
+        "page": "ban"
+    },
+    "ban.title": "Bloqueado · serverjonas",
+    "ban.badge": "Cuenta bloqueada",
+    "ban.heading": "Has sido excluido de la red Serverjonas.",
+    "ban.body": "Tu cuenta ha sido bloqueada por un moderador o administrador.",
+    "ban.reason_label": "Motivo"
+}

@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_500_bad"
+    },
+    "errors.500.title": "Błąd wewnętrzny",
+    "errors.500.body": "Coś tu nie działa. Błąd leży po naszej stronie, nie po Twojej. Spróbuj ponownie za chwilę.",
+    "error.500_bad.title": "500 · Błąd wewnętrzny · serverjonas"
+}

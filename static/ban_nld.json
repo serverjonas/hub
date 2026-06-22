@@ -1,0 +1,10 @@
+{
+    "_meta": {
+        "page": "ban"
+    },
+    "ban.title": "Geblokkeerd · serverjonas",
+    "ban.badge": "Account geblokkeerd",
+    "ban.heading": "Je bent buitengesloten van het Serverjonas-netwerk.",
+    "ban.body": "Je account is vergrendeld door een moderator of beheerder.",
+    "ban.reason_label": "Reden"
+}

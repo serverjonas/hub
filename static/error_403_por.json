@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_403"
+    },
+    "errors.403.title": "Sem permissão",
+    "errors.403.body": "Não tens as permissões necessárias para aceder a esta página.",
+    "error.403.title": "403 · Acesso negado · serverjonas"
+}

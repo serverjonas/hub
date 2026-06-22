@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_404"
+    },
+    "errors.404.title": "Strona nie znaleziona",
+    "errors.404.body": "Żądana strona nie istnieje lub została przeniesiona.",
+    "error.404.title": "404 · Strona nie znaleziona · serverjonas"
+}

@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "error_418"
+    },
+    "errors.418.title": "Soy una tetera",
+    "errors.418.body": "¡Ups! Tu solicitud no se puede procesar aquí: este servidor es una tetera, no una cafetera.",
+    "errors.418.learn_more": "¿Qué es esto?",
+    "error.418.title": "418 · Soy una tetera · serverjonas"
+}

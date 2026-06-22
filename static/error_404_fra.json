@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_404"
+    },
+    "errors.404.title": "Page introuvable",
+    "errors.404.body": "La page demandée n'existe pas ou a été déplacée.",
+    "error.404.title": "404 · Page introuvable · serverjonas"
+}

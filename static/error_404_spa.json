@@ -1,0 +1,8 @@
+{
+    "_meta": {
+        "page": "error_404"
+    },
+    "errors.404.title": "Página no encontrada",
+    "errors.404.body": "La página solicitada no existe o ha sido movida.",
+    "error.404.title": "404 · Página no encontrada · serverjonas"
+}

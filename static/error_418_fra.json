@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "error_418"
+    },
+    "errors.418.title": "Je suis une théière",
+    "errors.418.body": "Oups ! Ta requête ne peut pas être traitée ici : ce serveur est une théière, pas une machine à café.",
+    "errors.418.learn_more": "Qu'est-ce que c'est ?",
+    "error.418.title": "418 · Je suis une théière · serverjonas"
+}
