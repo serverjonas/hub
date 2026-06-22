@@ -207,46 +207,32 @@ def are_friends(a: int, b: int) -> bool:
     conn.close()
     return ok
 
-
 def get_mutual_friends(a: int, b: int) -> list:
-    """Liste der akzeptierten Freunde, die a UND b gemeinsam haben.
-
-    Liefert eine Liste von ``(user_id, user_name)`` Tupeln – stabil sortiert
-    nach dem Namen.
-    """
+    """Liste der akzeptierten Freunde, die a UND b gemeinsam haben."""
     if not a or not b or a == b:
         return []
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
         """
+        WITH friends_of(uid, fid) AS (
+            SELECT user_id, friend_id FROM friendships WHERE status = 'accepted'
+            UNION ALL
+            SELECT friend_id, user_id FROM friendships WHERE status = 'accepted'
+        )
         SELECT u.user_id, u.user_name
         FROM users u
-        WHERE u.user_id IN (
-            SELECT CASE WHEN f1.user_id = ? THEN f1.friend_id ELSE f1.user_id END
-            FROM friendships f1
-            WHERE f1.status = 'accepted'
-              AND ((f1.user_id = ? AND f1.friend_id IN (
-                    SELECT CASE WHEN f2.user_id = ? THEN f2.friend_id ELSE f2.user_id END
-                    FROM friendships f2
-                    WHERE f2.status = 'accepted'
-                      AND (f2.user_id = ? OR f2.friend_id = ?)
-              )) OR (f1.friend_id = ? AND f1.user_id IN (
-                    SELECT CASE WHEN f2.user_id = ? THEN f2.friend_id ELSE f2.user_id END
-                    FROM friendships f2
-                    WHERE f2.status = 'accepted'
-                      AND (f2.user_id = ? OR f2.friend_id = ?)
-              )))
-        )
+        WHERE u.user_id IN (SELECT fid FROM friends_of WHERE uid = ?)
+          AND u.user_id IN (SELECT fid FROM friends_of WHERE uid = ?)
+          AND u.user_id != ?
+          AND u.user_id != ?
         ORDER BY u.user_name COLLATE NOCASE ASC
         """,
-        (a, a, b, a, b, b,
-         a, b, a, b, b, a),
+        (a, b, a, b),
     )
     rows = cur.fetchall()
     conn.close()
     return [(r[0], r[1]) for r in rows]
-
 
 # ─── Profile / Avatare ─────────────────────────────────────────────────────
 
