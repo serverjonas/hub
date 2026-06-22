@@ -128,11 +128,77 @@
     position: relative;
 }
 
-.chat-avatar.vip {
-    background: linear-gradient(135deg, #FFD89B, #E8A86A);
+.chat-avatar { position: relative; }
+.chat-avatar > img {
+    width: 100%; height: 100%; object-fit: cover;
 }
-.chat-avatar.admin {
-    background: linear-gradient(135deg, #ff6b6b, #c92a2a);
+
+/* ─── Chat Header Search ─── */
+.chat-search-bar {
+    padding: 10px 22px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.chat-search-bar input {
+    flex: 1;
+    background: var(--bg-warm);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    font-size: 13px;
+    transition: var(--transition);
+}
+.chat-search-bar input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.chat-search-results {
+    position: absolute;
+    inset: auto 22px auto 22px;
+    margin-top: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    max-height: 360px;
+    overflow-y: auto;
+    z-index: 50;
+}
+.chat-search-hit {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 13px;
+}
+.chat-search-hit:hover { background: var(--accent-lighter); }
+.chat-search-hit:last-child { border-bottom: none; }
+.chat-search-hit mark {
+    background: rgba(245, 158, 11, 0.30);
+    padding: 1px 4px;
+    border-radius: 4px;
+}
+.chat-search-hit .hit-meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+}
+.chat-search-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+}
+
+.chat-highlight {
+    background: rgba(245, 158, 11, 0.30);
+    padding: 1px 4px;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(245, 158, 11, 0.45);
 }
 
 .chat-item-body {
@@ -545,7 +611,9 @@
                    class="chat-item {% if active_id == c.id %}active{% endif %}"
                    data-name="{{ c.name|lower }}"
                    data-unread="{{ c.unread }}">
-                    <div class="chat-avatar {% if c.admin %}admin{% elif c.vip %}vip{% endif %}">{{ initial }}</div>
+                    <div class="chat-avatar {% if c.admin %}admin{% elif c.vip %}vip{% endif %}">
+                        {{ avatar_img(c.id, c.avatar_path or '', c.name, 'md') | safe }}
+                    </div>
                     <div class="chat-item-body">
                         <div class="chat-item-row">
                             <div class="chat-item-name">{{ c.name }}</div>
@@ -577,10 +645,14 @@
                 <i data-lucide="chevron-left" style="width: 18px; height: 18px;"></i>
             </button>
             <div class="chat-avatar {% if active_user.admin %}admin{% elif active_user.vip %}vip{% endif %}">
-                {{ active_user.name[:1]|upper }}
+                {{ avatar_img(active_user.id, active_user.avatar_path or '', active_user.name, 'md') | safe }}
             </div>
             <div class="chat-header-name">
-                <b>{{ active_user.name }}</b>
+                <b>
+                    <a href="/user/{{ active_user.name }}" style="color: inherit; text-decoration: none;">
+                        {{ active_user.name }}
+                    </a>
+                </b>
                 <small>
                     <span class="chat-status-dot"></span>
                     <span data-i18n="chat.status.online">online</span>
@@ -592,6 +664,18 @@
                 </a>
             </div>
         </header>
+
+        <div class="chat-search-bar" id="chatSearchBar">
+            <i data-lucide="search" style="width: 14px; height: 14px; color: var(--text-dim); flex-shrink: 0;"></i>
+            <input type="text" id="chatSearchInput"
+                   placeholder="…" data-i18n-placeholder="chat.search.messages_placeholder"
+                   autocomplete="off" maxlength="100">
+            <button type="button" class="btn" id="chatSearchClear"
+                    style="padding: 6px 10px; font-size: 12px; display: none;">
+                <i data-lucide="x" style="width: 12px; height: 12px;"></i>
+            </button>
+            <div class="chat-search-results" id="chatSearchResults" style="display: none;"></div>
+        </div>
 
         <div class="chat-body" id="chatBody">
             {% if messages %}
@@ -744,9 +828,23 @@
         return d.toLocaleDateString([], { weekday: "long", day: "2-digit", month: "2-digit" });
     }
 
-    function dayBucket(ts) {
-        return Math.floor(ts / 86400);
-    }
+    // Set day-bucket timestamp for existing render so we can dedupe correctly.
+    document.querySelectorAll(".msg-day").forEach(function (el) {
+        var t = parseInt(el.getAttribute("data-day") || "0", 10) || 0;
+        el.setAttribute("data-day-ts", String(t));
+    });
+
+    // Time labels on existing render
+    document.querySelectorAll(".msg-meta [data-time]").forEach(function (el) {
+        var t = parseInt(el.getAttribute("data-time"), 10);
+        el.textContent = formatTime(t);
+    });
+    document.querySelectorAll(".chat-item-time[data-time]").forEach(function (el) {
+        var t = parseInt(el.getAttribute("data-time"), 10);
+        el.textContent = formatTime(t);
+    });
+
+    /* ─── Stop polling when tab hidden ─── */
 
     function appendMessage(m) {
         if (!chatBody) return;
@@ -983,6 +1081,164 @@
     document.querySelectorAll(".chat-item-time[data-time]").forEach(function (el) {
         var t = parseInt(el.getAttribute("data-time"), 10);
         el.textContent = formatTime(t);
+    });
+
+    /* ─── DM search (client + server) ─── */
+    var searchInput = document.getElementById("chatSearchInput");
+    var searchClear = document.getElementById("chatSearchClear");
+    var searchResults = document.getElementById("chatSearchResults");
+    var pmatches = [];
+    var pserverMatches = [];
+    var pactiveQuery = "";
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>\"']/g, function (c) {
+            return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c];
+        });
+    }
+    function escapeRegex(s) {
+        return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+    function highlight(text, q) {
+        if (!q) return escapeHtml(text);
+        var safe = escapeHtml(text);
+        var pattern = escapeRegex(q);
+        return safe.replace(new RegExp(pattern, "gi"), function (m) {
+            return "<mark class=\"chat-highlight\">" + m + "</mark>";
+        });
+    }
+
+    function applyClientFilter(q) {
+        var rows = chatBody ? chatBody.querySelectorAll(".msg-row") : [];
+        if (!q) {
+            rows.forEach(function (r) {
+                r.style.display = "";
+                var b = r.querySelector(".msg-bubble");
+                if (b) {
+                    var orig = b.getAttribute("data-original") || b.textContent;
+                    b.textContent = orig;
+                    b.setAttribute("data-original", orig);
+                }
+            });
+            return;
+        }
+        var rx = new RegExp(escapeRegex(q), "i");
+        pmatches = [];
+        rows.forEach(function (r) {
+            var b = r.querySelector(".msg-bubble");
+            if (!b) return;
+            if (!b.getAttribute("data-original")) {
+                b.setAttribute("data-original", b.textContent);
+            }
+            var orig = b.getAttribute("data-original");
+            if (rx.test(orig)) {
+                r.style.display = "";
+                b.innerHTML = highlight(orig, q);
+                pmatches.push({
+                    id: r.getAttribute("data-id"),
+                    message: orig,
+                    time: r.querySelector("[data-time]")
+                        ? parseInt(r.querySelector("[data-time]").getAttribute("data-time"), 10)
+                        : 0,
+                });
+            } else {
+                r.style.display = "none";
+                b.innerHTML = highlight(orig, q);
+            }
+        });
+    }
+
+    function renderResultsPanel() {
+        if (!searchResults) return;
+        if (!pactiveQuery) { searchResults.style.display = "none"; return; }
+        var seen = new Set();
+        var total = [];
+        pserverMatches.forEach(function (m) { if (!seen.has(String(m.id))) { total.push(m); seen.add(String(m.id)); } });
+        pmatches.forEach(function (m) { if (!seen.has(String(m.id))) { total.push(m); seen.add(String(m.id)); } });
+
+        if (total.length === 0) {
+            searchResults.innerHTML =
+                '<div class="chat-search-empty">' +
+                ((window.t && window.t("chat.search.empty")) || "Keine Treffer.") + '</div>';
+            searchResults.style.display = "block";
+            return;
+        }
+        var html = "";
+        total.slice(0, 30).forEach(function (m) {
+            var fromMine = (m.from === ACTIVE);
+            var sender = fromMine ? "you" : "them";
+            html += '<div class="chat-search-hit" data-jump-id="' + escapeHtml(String(m.id)) + '">'
+                 + '<div>' + highlight(m.message, pactiveQuery) + '</div>'
+                 + '<div class="hit-meta">' +
+                   (sender === "you" ? ((window.t && window.t("chat.preview.you")) || "Du:") : sender) +
+                   ' · ' + formatTime(m.time) +
+                   '</div>'
+                 + '</div>';
+        });
+        searchResults.innerHTML = html;
+        searchResults.style.display = "block";
+        searchResults.querySelectorAll(".chat-search-hit").forEach(function (el) {
+            el.addEventListener("click", function () {
+                var id = el.getAttribute("data-jump-id");
+                var row = chatBody && chatBody.querySelector('[data-id="' + id + '"]');
+                if (row) {
+                    rows.forEach(function (r) { r.style.display = ""; });
+                    row.scrollIntoView({ behavior: "smooth", block: "center" });
+                    row.style.transition = "box-shadow 0.6s ease";
+                    row.style.boxShadow = "0 0 0 4px rgba(245, 158, 11, 0.6)";
+                    setTimeout(function () { row.style.boxShadow = ""; }, 1500);
+                }
+            });
+        });
+    }
+
+    if (searchInput) {
+        var debounceTimer = null;
+        searchInput.addEventListener("input", function () {
+            var q = searchInput.value.trim();
+            pactiveQuery = q;
+            if (searchClear) searchClear.style.display = q ? "flex" : "none";
+            clearTimeout(debounceTimer);
+            if (!q) {
+                pmatches = [];
+                pserverMatches = [];
+                applyClientFilter("");
+                renderResultsPanel();
+                return;
+            }
+            applyClientFilter(q);
+            renderResultsPanel();
+            debounceTimer = setTimeout(function () {
+                fetch("/chat/" + ACTIVE + "/search?q=" + encodeURIComponent(q), {
+                    credentials: "same-origin",
+                    cache: "no-store",
+                })
+                .then(function (r) { return r.ok ? r.json() : { matches: [] }; })
+                .then(function (data) {
+                    pserverMatches = data.matches || [];
+                    renderResultsPanel();
+                })
+                .catch(function () { /* ignore */ });
+            }, 220);
+        });
+    }
+    if (searchClear) {
+        searchClear.addEventListener("click", function () {
+            if (searchInput) searchInput.value = "";
+            pactiveQuery = "";
+            pserverMatches = [];
+            pmatches = [];
+            searchClear.style.display = "none";
+            applyClientFilter("");
+            renderResultsPanel();
+        });
+    }
+    document.addEventListener("click", function (ev) {
+        if (!searchResults) return;
+        if (searchResults.contains(ev.target)) return;
+        if (searchInput && searchInput.contains(ev.target)) return;
+        if (searchClear && searchClear.contains(ev.target)) return;
+        searchResults.style.display = "none";
     });
 
     /* ─── Stop polling when tab hidden ─── */

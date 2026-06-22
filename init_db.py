@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import time
 
 DB_PATH = "./users.db"
 
@@ -135,6 +136,58 @@ _ensure_column(cur, "users", "last_email_sent_at", "INTEGER")
 
 # Mod-Panel: tracked who placed a ban so admins can apply cooldowns later.
 _ensure_column(cur, "ban", "banned_by", "INTEGER")
+
+# ─── Profile / Avatar / Groupchat-Migrationen ──────────────────────────
+# Diese Spalten wurden mit dem Roll-out von Profilseiten, Avatar-Upload
+# und dem Groupchat-Modul eingeführt. Wir migrieren idempotent, damit ein
+# Re-Run von init_db.py auf einer bestehenden DB sicher ist.
+_ensure_column(cur, "users", "bio", "TEXT NOT NULL DEFAULT ''")
+_ensure_column(cur, "users", "avatar_path", "TEXT")
+_ensure_column(cur, "users", "profile_visibility", "TEXT NOT NULL DEFAULT 'public'")
+_ensure_column(cur, "users", "created_at", "INTEGER")
+
+# Bestandsschutz: ältere Installationen haben u.U. ``created_at IS NULL``
+# auf ``users``. Wir backfillen mit now(), damit ``get_profile_v()`` einen
+# echten UNIX-Timestamp zurückgeben kann (join-date-Anzeige).
+_cur_now = int(time.time())
+cur.execute(
+    "UPDATE users SET created_at = ? "
+    "WHERE created_at IS NULL OR created_at = 0",
+    (_cur_now,),
+)
+
+# Groupchat-Bridge-Spalte: ``notifications`` trägt für ``type='group_dm'``
+# die zugehörige ``chat_groups.group_id``.
+_ensure_column(cur, "notifications", "group_id", "INTEGER")
+
+# Groupchat-Tabellen werden frisch angelegt, falls sie noch nicht
+# existieren. ON DELETE CASCADE räumt beim Löschen einer Gruppe deren
+# Mitglieder mit auf.
+cur.executescript(
+    """
+    CREATE TABLE IF NOT EXISTS chat_groups (
+        group_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+        name         TEXT    NOT NULL,
+        description  TEXT    NOT NULL DEFAULT '',
+        owner_id     INTEGER NOT NULL,
+        created_at   INTEGER NOT NULL,
+        FOREIGN KEY (owner_id) REFERENCES users(user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS chat_group_members (
+        group_id  INTEGER NOT NULL,
+        user_id   INTEGER NOT NULL,
+        joined_at INTEGER NOT NULL,
+        role      TEXT    NOT NULL DEFAULT 'member',
+        PRIMARY KEY (group_id, user_id),
+        FOREIGN KEY (group_id) REFERENCES chat_groups(group_id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id)  REFERENCES users(user_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_group_members_user
+        ON chat_group_members(user_id);
+    """
+)
 
 conn.commit()
 conn.close()

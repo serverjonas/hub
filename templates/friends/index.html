@@ -42,9 +42,26 @@
     gap: 12px;
 }
 
+.friend-avatar {
+    width: 44px; height: 44px;
+    border-radius: 14px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--accent-gradient);
+}
+
+.friend-avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+
 .friend-name {
     font-weight: 600;
+    text-decoration: none;
+    color: inherit;
 }
+
+.friend-name:hover { color: var(--accent); }
 
 .friend-actions {
     display: flex;
@@ -150,16 +167,27 @@
     <div class="section">
         <h2><i data-lucide="users"></i> Deine Freunde</h2>
         {% if friends %}
-            {% for id, name in friends %}
+            {% for fr in friends %}
             <div class="friend-item">
                 <div class="friend-info">
-                    <i data-lucide="user"></i>
-                    <span class="friend-name">{{ name }}</span>
+                    <div class="friend-avatar">
+                        {{ avatar_img(fr.id, fr.avatar_path or '', fr.name, 'sm') | safe }}
+                    </div>
+                    <div>
+                        <a href="/user/{{ fr.name }}" class="friend-name">{{ fr.name }}</a>
+                        <div style="font-size: 12px; color: var(--text-dim); margin-top: 2px;">
+                            <a href="/chat/{{ fr.id }}" style="color: var(--accent); text-decoration: none; font-weight: 600;"
+                               data-i18n="friends.chat_link">Nachricht senden</a>
+                        </div>
+                    </div>
                 </div>
                 <div class="friend-actions">
+                    <a href="/chat/{{ fr.id }}" class="btn" style="padding: 8px 14px; font-size: 12px;">
+                        <i data-lucide="message-circle" style="width: 14px; height: 14px;"></i>
+                    </a>
                     <form method="POST" style="display:inline">
                         <input type="hidden" name="action" value="remove">
-                        <input type="hidden" name="other_id" value="{{ id }}">
+                        <input type="hidden" name="other_id" value="{{ fr.id }}">
                         <button type="submit" class="btn" style="padding: 8px 16px; font-size: 12px; color: #ef4444;">
                             Entfernen
                         </button>

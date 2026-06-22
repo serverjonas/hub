@@ -1,4 +1,5 @@
 # main app.py
+import argparse
 import importlib.util
 import json
 import os
@@ -103,8 +104,9 @@ def check_ban():
 def inject_notifications():
     user = get_current_user()
     if user is None:
-        return {"unread_count": 0, "roles":{"admin":0, "vip":0, "mod":0}}
-    
+        return {"unread_count": 0, "user_id": None,
+                "roles":{"admin":0, "vip":0, "mod":0}}
+
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
@@ -113,8 +115,9 @@ def inject_notifications():
     )
     count = cur.fetchone()[0]
     conn.close()
-    
-    return {"unread_count": count, "roles":get_infos(user["id"])}
+
+    return {"unread_count": count, "user_id": user["id"],
+            "roles": get_infos(user["id"])}
 
 @app.after_request
 def log_activity(response):
@@ -207,5 +210,51 @@ def RunServerRelease():
     app.run(host="0.0.0.0", port=5000, debug=False)
 
 
+# ─── CLI parsing ──────────────────────────────────────────────────────────────────
+# `python app.py --debug` startet Flask im Debug-Modus UND deaktiviert alle
+# externen Side-Effects (E-Mail-Versand via msmtp, …). Praktisch für lokale
+# Entwicklung, in der ein echter SMTP-Relay meist nicht verfügbar ist.
+#
+# Das Modul toolbox/email.py liest das Flag über os.environ.get("DEBUG_NO_EMAIL")
+# und überspringt den Versand. So bleibt die Verifizierungs-Flow (Eingabe einer
+# E-Mail-Adresse → verify-URL) in dev/test lauffähig, ohne tatsächlich Mails zu
+# versenden.
+DEBUG_NO_EMAIL_ENV = "DEBUG_NO_EMAIL"
+
+
+def _parse_cli_args():
+    parser = argparse.ArgumentParser(
+        prog="app.py",
+        description="serverjonas hub — Flask entry point.",
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help=(
+            "Startet Flask im Debug-Modus und deaktiviert externe Side-Effects "
+            "(E-Mail-Versand via msmtp etc.)."
+        ),
+    )
+    return parser.parse_args()
+
+
+def _apply_debug_mode():
+    """Mark debug mode for the email subsystem and the rest of the app."""
+    os.environ[DEBUG_NO_EMAIL_ENV] = "1"
+    print(
+        "\033[33m[DEBUG]\033[0m \033[90mDebug-Modus aktiv\033[0m\n"
+        f"  \033[90m• Flask reload + Tracebacks aktiv\033[0m\n"
+        f"  \033[90m• E-Mail-Versand deaktiviert "
+        f"(env ${DEBUG_NO_EMAIL_ENV} = 1)\033[0m\n"
+        f"  \033[90m• msmtp wird nicht aufgerufen — Mails werden nur lokal "
+        "geloggt\033[0m"
+    )
+
+
 if __name__ == "__main__":
-    RunServerRelease()
+    args = _parse_cli_args()
+    if args.debug:
+        _apply_debug_mode()
+        RunServerDebug()
+    else:
+        RunServerRelease()

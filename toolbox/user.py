@@ -1,4 +1,5 @@
 import os
+import re
 import sqlite3
 import time
 import logging
@@ -166,18 +167,270 @@ def get_friends(user_id):
     cur = conn.cursor()
     cur.execute(
         """
-        SELECT u.user_id FROM users u
+        SELECT u.user_id, u.user_name, u.admin, u.vip, u.mod
+        FROM users u
         JOIN friendships f ON (
             (f.user_id = ? AND f.friend_id = u.user_id) OR
             (f.friend_id = ? AND f.user_id = u.user_id)
         )
         WHERE f.status = 'accepted'
+        ORDER BY u.user_name COLLATE NOCASE ASC
     """,
         (user_id, user_id),
     )
     rows = cur.fetchall()
     conn.close()
-    return [row[0] for row in rows]
+    return [
+        {"id": r[0], "name": r[1], "admin": bool(r[2]),
+         "vip": bool(r[3]), "mod": bool(r[4])}
+        for r in rows
+    ]
+
+
+def are_friends(a: int, b: int) -> bool:
+    """True wenn zwischen a und b eine akzeptierte Freundschaft besteht."""
+    if not a or not b or a == b:
+        return False
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT 1 FROM friendships
+        WHERE status = 'accepted' AND (
+            (user_id = ? AND friend_id = ?) OR
+            (user_id = ? AND friend_id = ?)
+        )
+        """,
+        (a, b, b, a),
+    )
+    ok = cur.fetchone() is not None
+    conn.close()
+    return ok
+
+
+def get_mutual_friends(a: int, b: int) -> list:
+    """Liste der akzeptierten Freunde, die a UND b gemeinsam haben.
+
+    Liefert eine Liste von ``(user_id, user_name)`` Tupeln – stabil sortiert
+    nach dem Namen.
+    """
+    if not a or not b or a == b:
+        return []
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT u.user_id, u.user_name
+        FROM users u
+        WHERE u.user_id IN (
+            SELECT CASE WHEN f1.user_id = ? THEN f1.friend_id ELSE f1.user_id END
+            FROM friendships f1
+            WHERE f1.status = 'accepted'
+              AND ((f1.user_id = ? AND f1.friend_id IN (
+                    SELECT CASE WHEN f2.user_id = ? THEN f2.friend_id ELSE f2.user_id END
+                    FROM friendships f2
+                    WHERE f2.status = 'accepted'
+                      AND (f2.user_id = ? OR f2.friend_id = ?)
+              )) OR (f1.friend_id = ? AND f1.user_id IN (
+                    SELECT CASE WHEN f2.user_id = ? THEN f2.friend_id ELSE f2.user_id END
+                    FROM friendships f2
+                    WHERE f2.status = 'accepted'
+                      AND (f2.user_id = ? OR f2.friend_id = ?)
+              )))
+        )
+        ORDER BY u.user_name COLLATE NOCASE ASC
+        """,
+        (a, a, b, a, b, b,
+         a, b, a, b, b, a),
+    )
+    rows = cur.fetchall()
+    conn.close()
+    return [(r[0], r[1]) for r in rows]
+
+
+# ─── Profile / Avatare ─────────────────────────────────────────────────────
+
+
+PROFILE_VIS_PUBLIC = "public"
+PROFILE_VIS_FRIENDS = "friends"
+PROFILE_VIS_PRIVATE = "private"
+VALID_PROFILE_VIS = (PROFILE_VIS_PUBLIC, PROFILE_VIS_FRIENDS, PROFILE_VIS_PRIVATE)
+
+BIO_MAX_LEN = 500
+
+
+def get_user_profile(user_id: int) -> Optional[dict]:
+    """Vollständiges Profil-Bundle für Anzeige + Bearbeitung.
+
+    Liefert ``None`` wenn der User nicht (mehr) existiert. Alle Felder sind
+    konservativ defaultet (leerer Bio, ``public`` Sichtbarkeit, ``created_at``
+    = 0 = unbekannt).
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT user_id, user_name, admin, vip, mod,
+               bio, avatar_path, profile_visibility,
+               email, email_active, created_at
+        FROM users
+        WHERE user_id = ?
+        """,
+        (user_id,),
+    )
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return None
+    return {
+        "id": row[0],
+        "name": row[1],
+        "admin": bool(row[2]),
+        "vip": bool(row[3]),
+        "mod": bool(row[4]),
+        "bio": row[5] or "",
+        "avatar_path": row[6],
+        "profile_visibility": (row[7] or PROFILE_VIS_PUBLIC),
+        "email": row[8],
+        "email_active": bool(row[9]),
+        "created_at": int(row[10] or 0),
+    }
+
+
+def get_user_by_name(name: str) -> Optional[dict]:
+    """Wie ``get_user_profile``, aber Lookup über den Namen.
+
+    Case-insensitive – Nutzernamen werden vom Register-Modul auf
+    ``[a-zA-Z0-9_-+\?!@#$%*=]{3,32}`` beschränkt, daher harmlos.
+    """
+    if not name:
+        return None
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT user_id FROM users
+        WHERE LOWER(user_name) = LOWER(?)
+        LIMIT 1
+        """,
+        (name.strip(),),
+    )
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return None
+    return get_user_profile(row[0])
+
+
+def update_user_profile(
+    user_id: int,
+    *,
+    bio: Optional[str] = None,
+    avatar_path: Optional[str] = None,
+    avatar_clear: bool = False,
+    visibility: Optional[str] = None,
+) -> Optional[str]:
+    """Patcht einzelne Profil-Felder. Liefert ``None`` bei Erfolg oder eine
+    Fehlermeldung wenn die Validierung fehlschlägt.
+    """
+    sets = []
+    params: list = []
+
+    if bio is not None:
+        clean = (bio or "").strip()
+        if len(clean) > BIO_MAX_LEN:
+            return (
+                f"Bio ist zu lang ({len(clean)} > {BIO_MAX_LEN} Zeichen)."
+            )
+        sets.append("bio = ?")
+        params.append(clean)
+
+    if avatar_clear:
+        sets.append("avatar_path = NULL")
+    elif avatar_path is not None:
+        sets.append("avatar_path = ?")
+        params.append(avatar_path)
+
+    if visibility is not None:
+        if visibility not in VALID_PROFILE_VIS:
+            return f"Ungültige Sichtbarkeit: {visibility!r}"
+        sets.append("profile_visibility = ?")
+        params.append(visibility)
+
+    if not sets:
+        return None  # noop
+
+    sql = "UPDATE users SET " + ", ".join(sets) + " WHERE user_id = ?"
+    params.append(user_id)
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(sql, tuple(params))
+    conn.commit()
+    conn.close()
+    return None
+
+
+def change_password(user_id: int, current_pw: str, new_pw: str) -> Optional[str]:
+    """Setzt das Passwort nach Validierung. Liefert ``None`` bei Erfolg oder
+    eine lokalisierbare Fehlermeldung (key oder Klartext).
+    """
+    if not current_pw or not new_pw:
+        return "current_or_new_missing"
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT password_hash FROM users WHERE user_id = ?", (user_id,))
+    row = cur.fetchone()
+    if not row:
+        conn.close()
+        return "user_missing"
+    stored = row[0]
+    if not check_password_hash(stored, current_pw):
+        conn.close()
+        return "current_wrong"
+    if current_pw == new_pw:
+        conn.close()
+        return "pw_same"
+    if len(new_pw) < 8:
+        conn.close()
+        return "pw_short"
+    if not re.search(r"\d", new_pw):
+        conn.close()
+        return "pw_no_digit"
+    banned_pw = {"passwort", "password", "12345678", "hallo123"}
+    if new_pw.lower() in banned_pw:
+        conn.close()
+        return "pw_common"
+    cur.execute(
+        "UPDATE users SET password_hash = ? WHERE user_id = ?",
+        (generate_password_hash(new_pw), user_id),
+    )
+    conn.commit()
+    conn.close()
+    return None
+
+
+def kill_other_sessions(user_id: int, keep_session_id: Optional[str]) -> int:
+    """Löscht alle Sessions des Users außer der aktuellen.
+
+    Gibt die Anzahl der abgemeldeten Sessions zurück.
+    """
+    if not user_id:
+        return 0
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    if keep_session_id:
+        cur.execute(
+            "DELETE FROM sessions WHERE user_id = ? AND session_id != ?",
+            (user_id, keep_session_id),
+        )
+    else:
+        cur.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
+    deleted = cur.rowcount or 0
+    conn.commit()
+    conn.close()
+    return deleted
 
 
 # ─── E-Mail-Verifizierung ────────────────────────────────────────────────

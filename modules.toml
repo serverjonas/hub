@@ -144,3 +144,15 @@ pfad = "chat"
 url = "/chat"
 description = "SJNchat – direktnachrichten mit freunden"
 active = true
+
+[profile]
+pfad = "profile"
+url = "/"
+description = "öffentlich Profile, Avatare, Bio, Sichtbarkeit, Passwort"
+active = true
+
+[groupchat]
+pfad = "groupchat"
+url = "/groups"
+description = "Gruppenchats basierend auf dem Notification-System"
+active = true

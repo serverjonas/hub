@@ -1,4 +1,5 @@
 import re
+import os
 
 from flask import (
     Blueprint,
@@ -89,7 +90,15 @@ def _send_verification(email_addr, username, token):
 
 @bp.before_request
 def gate_unverified_email():
-    """Lenkt nicht-verifizierte User (nur bei GET) auf /hub/email um."""
+    """Lenkt nicht-verifizierte User (nur bei GET) auf /hub/email um.
+
+    Wenn $DEBUG_NO_EMAIL=1 gesetzt ist (von `python app.py --debug`), wird der
+    Gate komplett übersprungen — sonst müsste man in Dev den Verify-Link, den
+    msmtp nie versendet hat, manuell aus den Logs fummeln.
+    """
+    if os.environ.get("DEBUG_NO_EMAIL", "").strip().lower() in ("1", "true", "yes"):
+        return  # Debug-Modus: keine E-Mail-Sperre.
+
     if request.method != "GET":
         return
 

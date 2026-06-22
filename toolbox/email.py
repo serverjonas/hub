@@ -1,14 +1,20 @@
 # toolbox/email.py
-"""Versendet E-Mails \u00fcber das lokal installierte `msmtp` (SMTP-Relay).
+"""Versendet E-Mails über das lokal installierte `msmtp` (SMTP-Relay).
 
-Das Modul ruft `msmtp -t` als Subprozess auf und \u00fcbergibt eine vollst\u00e4ndige
-RFC822-Nachricht \u00fcber stdin. Damit msmtp die Empf\u00e4nger findet, MUSS die
+Das Modul ruft `msmtp -t` als Subprozess auf und übergibt eine vollständige
+RFC822-Nachricht über stdin. Damit msmtp die Empfänger findet, MUSS die
 Nachricht mindestens einen `To:`-Header enthalten.
 
 Sicherheit:
-- KEIN `shell=True` (Args werden als Liste \u00fcbergeben)
-- Es wird ein minimaler, bereinigter Env-Kontext \u00fcbergeben (nur PATH + HOME),
+- KEIN `shell=True` (Args werden als Liste übergeben)
+- Es wird ein minimaler, bereinigter Env-Kontext übergeben (nur PATH + HOME),
   damit sensible ENV-Variablen wie `SECRET_KEY` nicht an msmtp durchgereicht werden.
+
+Debug-Modus:
+- Wenn `$DEBUG_NO_EMAIL=1` gesetzt ist (von `app.py --debug` aktiviert), wird
+  KEIN msmtp-Aufruf getätigt. Die Mail wird stattdessen geloggt und es wird
+  ``(True, None)`` zurückgegeben, damit der Verifizierungs-Flow in Dev/Test
+  ohne echten SMTP-Relay durchläuft.
 """
 
 import logging
@@ -28,13 +34,13 @@ def _mail_from():
 
 
 def _public_base_url():
-    """Liefert die \u00f6ffentliche Basis-URL der App aus PUBLIC_BASE_URL oder f\u00e4llt
-    auf eine sinnvolle Default-Adresse zur\u00fcck, sofern nicht konfiguriert."""
+    """Liefert die öffentliche Basis-URL der App aus PUBLIC_BASE_URL oder fällt
+    auf eine sinnvolle Default-Adresse zurück, sofern nicht konfiguriert."""
     return os.environ.get("PUBLIC_BASE_URL", "https://serverjonas.de")
 
 
 def _safe_env():
-    """Stark reduziertes Env f\u00fcr den Subprozess; vermeidet Leaks sensibler Vars."""
+    """Stark reduziertes Env für den Subprozess; vermeidet Leaks sensibler Vars."""
     safe = {"PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"}
     home = os.environ.get("HOME")
     if home:
@@ -43,6 +49,16 @@ def _safe_env():
     if lang:
         safe["LANG"] = lang
     return safe
+
+
+def _is_debug_no_email() -> bool:
+    """True wenn die App im Debug-Modus läuft und Mails nicht versendet werden.
+
+    Gesteuert über $DEBUG_NO_EMAIL (wird von app.py beim --debug-Flag gesetzt).
+    Damit kann der Verifizierungs-Flow lokal trotzdem durchlaufen, ohne dass
+    tatsächlich Mails verschickt werden.
+    """
+    return os.environ.get("DEBUG_NO_EMAIL", "").strip().lower() in ("1", "true", "yes")
 
 
 def build_message(to_address, subject, text_body):
@@ -63,10 +79,27 @@ def _rfc_bytes(msg):
 def send_email(to_address, subject, text_body, timeout=8):
     """Versendet eine Nur-Text-Mail via msmtp.
 
-    Liefert (True, None) bei Erfolg, sonst (False, Fehlermeldung).
+    Liefert (True, None) bei Erfolg, sonst (False, Fehlermeldung). Im Debug-Modus
+    ($DEBUG_NO_EMAIL=1) wird der Versand übersprungen und das Mail lokal geloggt,
+    damit die Verifizierungs-Route in Dev/Test trotzdem „OK“ zurückgibt.
     """
     if not to_address or "@" not in to_address:
-        return False, "Ung\u00fcltige Empf\u00e4nger-Adresse"
+        return False, "Ungültige Empfänger-Adresse"
+
+    if _is_debug_no_email():
+        log.warning(
+            "DEBUG_NO_EMAIL=1 — E-Mail nicht versendet. Inhalt wird geloggt:\n"
+            "  To:      %s\n"
+            "  Subject: %s\n"
+            "  Body:    %s",
+            to_address, subject, (text_body or "")[:400],
+        )
+        print(
+            f"\033[33m[email debug]\033[0m würde zu={to_address} "
+            f"\033[90msubject=\033[0m{subject!r} "
+            f"\033[90mbody=(…)\033[0m"
+        )
+        return True, None
 
     msg = build_message(to_address, subject, text_body)
     payload = _rfc_bytes(msg)
@@ -101,17 +134,17 @@ def send_email(to_address, subject, text_body, timeout=8):
 
 
 def verification_email_body(username, verify_url, ttl_hours=24):
-    """Plain-Text-Body f\u00fcr die Verifizierungs-Mail (deutschsprachig)."""
+    """Plain-Text-Body für die Verifizierungs-Mail (deutschsprachig)."""
     return (
         f"Hallo {username},\n\n"
-        f"bitte best\u00e4tige deine E-Mail-Adresse, um den serverjonas-Hub "
-        f"freizuschalten. Klicke dazu innerhalb der n\u00e4chsten {ttl_hours} Stunden "
+        f"bitte bestätige deine E-Mail-Adresse, um den serverjonas-Hub "
+        f"freizuschalten. Klicke dazu innerhalb der nächsten {ttl_hours} Stunden "
         f"auf den folgenden Link:\n\n"
         f"   {verify_url}\n\n"
         f"Wenn du diesen Account nicht angefordert hast, ignoriere diese Nachricht "
-        f"einfach \u2013 es ist dann nichts weiter zu tun. Aus Sicherheitsgr\u00fcnden "
-        f"wird der Link mit einem Einmal-Token gesch\u00fctzt.\n\n"
-        f"\u2014 serverjonas\n"
+        f"einfach – es ist dann nichts weiter zu tun. Aus Sicherheitsgründen "
+        f"wird der Link mit einem Einmal-Token geschützt.\n\n"
+        f"— serverjonas\n"
     )
 
 

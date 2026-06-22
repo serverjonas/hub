@@ -41,6 +41,7 @@ from toolbox.user import (
 )
 from toolbox.news import (
     get_chat_messages,
+    search_chat_messages,
     send_dm,
 )
 
@@ -171,7 +172,8 @@ def _user_summary(user_id: int):
     conn = _conn()
     cur = conn.cursor()
     cur.execute(
-        "SELECT user_id, user_name, admin, vip, mod FROM users WHERE user_id = ?",
+        "SELECT user_id, user_name, admin, vip, mod, avatar_path "
+        "FROM users WHERE user_id = ?",
         (user_id,),
     )
     row = cur.fetchone()
@@ -184,6 +186,7 @@ def _user_summary(user_id: int):
         "admin": bool(row[2]),
         "vip": bool(row[3]),
         "mod": bool(row[4]),
+        "avatar_path": row[5],
     }
 
 
@@ -198,7 +201,7 @@ def _conversations_for(user_id: int):
 
     cur.execute(
         """
-        SELECT u.user_id, u.user_name, u.admin, u.vip, u.mod
+        SELECT u.user_id, u.user_name, u.admin, u.vip, u.mod, u.avatar_path
         FROM users u
         JOIN friendships f ON (
             (f.user_id = ? AND f.friend_id = u.user_id) OR
@@ -253,6 +256,7 @@ def _conversations_for(user_id: int):
                 "admin": bool(fr["admin"]),
                 "vip": bool(fr["vip"]),
                 "mod": bool(fr["mod"]),
+                "avatar_path": fr["avatar_path"],
                 "last_message": last["message"] if last else "",
                 "last_time": int(last["created_at"]) if last else 0,
                 "last_from_me": bool(last and last["sender_id"] == user_id),
@@ -399,6 +403,36 @@ def send(friend_id: int):
             "time": now,
         },
     )
+
+
+# ─── DM Search ────────────────────────────────────────────────────────────
+
+@bp.route("/<int:friend_id>/search", methods=["GET"])
+def search(friend_id: int):
+    """Volltext-Suche (LIKE-basiert) in einer 1:1-Konversation.
+
+    Liefert eine JSON-Trefferliste (id, from, to, message, time). Wird vom
+    Chat-UI client-side zum Filtern der gerenderten Nachrichten genutzt.
+    """
+    user = _require_login()
+    _require_friend(user["id"], friend_id)
+    q = (request.args.get("q", "") or "").strip()
+    if not q:
+        return jsonify(matches=[], count=0, query=q)
+    if len(q) > 200:
+        q = q[:200]
+    raw = search_chat_messages(user["id"], friend_id, q, limit=200)
+    out = [
+        {
+            "id": int(m["id"]),
+            "from": int(m["from"]) if m["from"] is not None else None,
+            "to": int(m["to"]) if m["to"] is not None else None,
+            "message": m["message"],
+            "time": int(m["created_at"]),
+        }
+        for m in raw
+    ]
+    return jsonify(matches=out, count=len(out), query=q)
 
 
 # ─── Polling ────────────────────────────────────────────────────────────────

@@ -1,0 +1,822 @@
+{% extends "base.html" %}
+
+{% block page_id %}groupchat{% endblock %}
+{% block title_i18n %}group.title{% endblock %}
+{% block title %}Groups · serverjonas{% endblock %}
+
+{% block extra_style %}
+.gc-shell {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    height: calc(100vh - 200px);
+    min-height: 560px;
+    max-width: 1140px;
+    margin: 0 auto;
+}
+
+.gc-sidebar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.gc-sidebar-header {
+    padding: 20px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.gc-sidebar-header h1 {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.gc-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px;
+}
+
+.gc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+    margin-bottom: 4px;
+}
+
+.gc-item:hover { background: var(--surface-hover); }
+.gc-item.active {
+    background: var(--accent-lighter);
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.gc-item-avatar {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: var(--accent-gradient);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-family: var(--font-heading);
+}
+
+.gc-item-body { flex: 1; min-width: 0; }
+
+.gc-item-name { font-weight: 600; font-size: 14px; }
+.gc-item-sub { font-size: 12px; color: var(--text-dim); }
+
+.gc-pane {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.gc-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.gc-header h2 {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.gc-header-meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gc-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px;
+    background:
+        radial-gradient(800px 400px at 50% 0%, var(--pastel-peach) 0%, transparent 60%),
+        var(--bg);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+[data-theme="dark"] .gc-body,
+[data-theme="oled"] .gc-body {
+    background: var(--bg);
+}
+
+.gc-msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 78%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 14px 8px;
+    box-shadow: var(--shadow-sm);
+    animation: fadeInUp 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gc-msg.mine {
+    align-self: flex-end;
+    border-color: rgba(108, 99, 255, 0.35);
+    background: var(--accent-lighter);
+}
+
+.gc-msg-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--accent);
+}
+
+.gc-msg-header .sender-avatar {
+    width: 22px; height: 22px;
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+.gc-msg-header .sender-avatar img {
+    width: 22px; height: 22px;
+}
+
+.gc-msg-header a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.gc-msg-header a:hover {
+    text-decoration: underline;
+}
+
+.gc-msg-bubble {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-main);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.gc-msg-time {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    text-align: right;
+}
+
+.gc-day {
+    align-self: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 600;
+}
+
+.gc-composer {
+    border-top: 1px solid var(--border);
+    padding: 14px 18px 18px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.gc-composer textarea {
+    flex: 1;
+    background: var(--bg-warm);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    resize: none;
+    min-height: 44px;
+    max-height: 160px;
+    transition: var(--transition);
+}
+
+.gc-composer textarea:focus {
+    outline: none; border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.gc-composer-send {
+    background: var(--accent-gradient);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    width: 44px; height: 44px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(108, 99, 255, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gc-search-bar {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-warm);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.gc-search-bar input {
+    flex: 1;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.gc-search-bar input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.gc-search-results {
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.gc-search-hit {
+    background: var(--bg-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+.gc-search-hit mark {
+    background: rgba(245, 158, 11, 0.30);
+    padding: 1px 4px;
+    border-radius: 4px;
+}
+
+.member-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-warm);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.member-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.member-row .member-avatar {
+    width: 28px; height: 28px;
+    border-radius: 9px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.member-row .member-name {
+    flex: 1;
+    font-weight: 600;
+}
+
+.member-row .role-pill {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: var(--accent-lighter);
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.gc-empty {
+    margin: auto;
+    text-align: center;
+    color: var(--text-dim);
+    max-width: 360px;
+    padding: 32px;
+}
+
+.create-group-form {
+    padding: 16px 18px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-warm);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.create-group-form input {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.create-group-form .form-row {
+    display: flex;
+    gap: 8px;
+}
+
+@media (max-width: 900px) {
+    .gc-shell { grid-template-columns: 1fr; height: calc(100vh - 180px); }
+}
+{% endblock %}
+
+{% block content %}
+<div class="gc-shell" data-active-id="{{ active_id or 0 }}">
+
+    <!-- Sidebar -->
+    <aside class="gc-sidebar" id="gcSidebar">
+        <div class="gc-sidebar-header">
+            <h1>
+                <i data-lucide="users-round" style="color: var(--accent);"></i>
+                <span data-i18n="group.title">Gruppen</span>
+            </h1>
+        </div>
+
+        <div class="gc-list" id="gcList">
+            {% if not groups %}
+            <div style="padding: 32px 16px; text-align: center; color: var(--text-dim); font-size: 14px;">
+                <i data-lucide="message-square-plus" style="width: 36px; height: 36px; opacity: 0.4;"></i>
+                <div style="margin-top: 12px;" data-i18n="group.empty.title">Noch keine Gruppen</div>
+                <div style="font-size: 12px; margin-top: 4px;" data-i18n="group.empty.body">
+                    Erstelle unten deine erste Gruppe.
+                </div>
+            </div>
+            {% else %}
+                {% for g in groups %}
+                {% set initial = char_initials(g.name) %}
+                <a href="/groups/{{ g.id }}" class="gc-item {% if active_id == g.id %}active{% endif %}"
+                   data-gid="{{ g.id }}" data-name="{{ g.name|lower }}">
+                    <div class="gc-item-avatar">{{ initial }}</div>
+                    <div class="gc-item-body">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="gc-item-name">
+                                {% if g.unread %}<span style="color: var(--accent);">●</span>{% endif %}
+                                {{ g.name }}
+                            </div>
+                            {% if g.unread %}
+                            <span class="gc-badge" style="background: var(--accent-gradient); color: white; font-size: 11px; padding: 2px 8px; border-radius: var(--radius-full); font-weight: 700;">
+                                {{ g.unread }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div class="gc-item-sub">
+                            {{ g.last_message[:36] if g.last_message else ('—' if not g.last_message else '') }}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <form class="create-group-form" action="/groups/create" method="POST" id="createGroupForm">
+            <input type="text" name="name" required minlength="1" maxlength="50"
+                   class="form-control" placeholder="…" data-i18n-placeholder="group.create.name_placeholder">
+            <div class="form-row">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                    <span data-i18n="group.create.submit">Gruppe erstellen</span>
+                </button>
+            </div>
+        </form>
+    </aside>
+
+    <!-- Main pane -->
+    <section class="gc-pane">
+        {% if active and active_id %}
+
+        <!-- Search bar -->
+        <form class="gc-search-bar" action="/groups/{{ active_id }}/search" method="GET">
+            <input type="text" name="q" value="{{ search_query }}"
+                   placeholder="…" data-i18n-placeholder="group.search.placeholder"
+                   autocomplete="off" maxlength="100">
+            <button type="submit" class="btn" style="padding: 8px 14px; font-size: 13px;">
+                <i data-lucide="search" style="width: 14px; height: 14px;"></i>
+                <span data-i18n="group.search.submit">Suchen</span>
+            </button>
+            {% if search_query %}
+            <a href="/groups/{{ active_id }}" class="icon-pill" title="zurück">
+                <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+            </a>
+            {% endif %}
+        </form>
+
+        <header class="gc-header">
+            <div style="width: 44px; height: 44px; border-radius: 14px;
+                        background: var(--accent-gradient); color: white;
+                        display: flex; align-items: center; justify-content: center;
+                        font-weight: 700; font-family: var(--font-heading); font-size: 17px;">
+                {{ char_initials(active.name) }}
+            </div>
+            <div style="flex: 1;">
+                <h2>{{ active.name }}</h2>
+                <div class="gc-header-meta">
+                    <i data-lucide="users" style="width: 12px; height: 12px;"></i>
+                    <span>{{ active_members|length }} / {{ 20 }}
+                        <span data-i18n="group.members.label">Mitglieder</span>
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        {% if banned %}
+        <div class="composer-status" style="padding: 10px 18px; background: rgba(239, 68, 68, 0.08); color: #ef4444; text-align: center; font-size: 13px; border-top: 1px solid rgba(239, 68, 68, 0.15);">
+            <i data-lucide="shield-x" style="width: 14px; height: 14px;"></i>
+            <span data-i18n="chat.composer.banned">Du bist gebannt und kannst keine Nachrichten senden.</span>
+        </div>
+        {% endif %}
+
+        {% if search_results %}
+        <div class="gc-search-results">
+            <h3 style="font-size: 14px; color: var(--text-dim); font-weight: 600;">
+                <span data-i18n="group.search.results_header">Suchergebnisse</span> ({{ search_results|length }})
+            </h3>
+            {% for r in search_results %}
+            <div class="gc-search-hit">
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">
+                    <strong>
+                        <a href="/user/{{ get_user_by_name_from_id(r.sender_id) }}">
+                            {{ get_user_by_name_from_id(r.sender_id) or ('u' + (r.sender_id|string)) }}
+                        </a>
+                    </strong>
+                    · <span>{{ r.created_at | datetime_ymd }}</span>
+                </div>
+                <div>{{ r.message | escape_search('') }}</div>
+            </div>
+            {% else %}
+            <div class="gc-empty" data-i18n="group.search.empty">Keine Treffer.</div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="gc-body" id="gcBody">
+            {% if messages %}
+                {% set ns = namespace(prev_day=0) %}
+                {% for m in messages %}
+                    {% set bucket = (m.created_at // 86400) %}
+                    {% if bucket != ns.prev_day %}
+                        {% set ns.prev_day = bucket %}
+                        <div class="gc-day" data-day="{{ m.created_at }}">
+                            {{ _day_label(m.created_at) }}
+                        </div>
+                    {% endif %}
+                    {% set mine = (m.sender_id == user_id) %}
+                    {% set sender_name = get_user_by_name_from_id(m.sender_id) %}
+                    <div class="gc-msg {% if mine %}mine{% endif %}" data-id="{{ m.id }}">
+                        <div class="gc-msg-header">
+                            {% if not mine %}
+                            <div class="sender-avatar">
+                                {{ avatar_img(m.sender_id, '', sender_name or '', 'sm') | safe }}
+                            </div>
+                            {% endif %}
+                            <a href="/user/{{ sender_name or '' }}">
+                                {{ sender_name or ('u' + (m.sender_id|string)) }}
+                            </a>
+                        </div>
+                        <div class="gc-msg-bubble">{{ m.message }}</div>
+                        <div class="gc-msg-time" data-time="{{ m.created_at }}">
+                            {{ _time_short(m.created_at) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+            <div class="gc-empty">
+                <i data-lucide="messages-square" style="width: 36px; height: 36px; color: var(--accent);"></i>
+                <h3 style="font-family: var(--font-heading); margin: 12px 0 6px;">
+                    <span data-i18n="group.welcome">{{ active.name }}</span>
+                </h3>
+                <p data-i18n="group.welcome.body">Schreibe die erste Nachricht in die Gruppe.</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if not search_results %}
+        <form class="gc-composer" id="gcForm" autocomplete="off"
+              action="/groups/{{ active_id }}/send" method="POST">
+            <textarea name="message" id="gcInput" rows="1" required
+                      {% if banned %}disabled{% endif %}
+                      data-i18n-placeholder="chat.composer.placeholder"
+                      maxlength="2000"></textarea>
+            <button type="submit" class="gc-composer-send" {% if banned %}disabled{% endif %}>
+                <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+            </button>
+        </form>
+        {% endif %}
+
+        <!-- Members panel -->
+        {% if active_members and not search_results %}
+        <div class="member-list">
+            {% for m in active_members %}
+            <div class="member-row" data-uid="{{ m.user_id }}">
+                <div class="member-avatar">
+                    {{ avatar_img(m.user_id, '', m.user_name, 'sm') | safe }}
+                </div>
+                <div class="member-name">
+                    <a href="/user/{{ m.user_name }}" style="color: inherit; text-decoration: none;">
+                        {{ m.user_name }}
+                    </a>
+                </div>
+                {% if m.role == "owner" %}
+                <span class="role-pill" data-i18n="group.role.owner">Owner</span>
+                {% endif %}
+                {% if active.owner_id == user_id and m.role != "owner" %}
+                <form action="/groups/{{ active_id }}/members/remove" method="POST" style="display: inline;">
+                    <input type="hidden" name="user_id" value="{{ m.user_id }}">
+                    <button type="submit" class="icon-pill" style="color: #ef4444;" data-i18n-title="group.remove" title="Entfernen">
+                        <i data-lucide="user-x" style="width: 14px; height: 14px;"></i>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if addable_friends and active.owner_id == user_id %}
+        <form action="/groups/{{ active_id }}/members/add" method="POST" style="padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center;">
+            <span style="font-size: 12px; color: var(--text-dim);" data-i18n="group.invite">Freund einladen:</span>
+            <select name="username" class="form-control" style="flex: 1; max-width: 220px; padding: 8px 12px; font-size: 13px;">
+                {% for fr in addable_friends %}
+                <option value="{{ fr.name }}">{{ fr.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary" style="padding: 8px 14px; font-size: 13px;">
+                <i data-lucide="user-plus" style="width: 14px; height: 14px;"></i>
+                <span data-i18n="group.invite.cta">Einladen</span>
+            </button>
+        </form>
+        {% endif %}
+
+        {% if active.owner_id == user_id %}
+        <div style="padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end;">
+            <form action="/groups/{{ active_id }}/delete" method="POST">
+                <input type="hidden" name="confirm" value="1">
+                <button type="submit" class="btn" style="color: #ef4444; padding: 8px 14px; font-size: 13px;"
+                        onclick="return confirm('{{ 'group.confirm_delete' | i18n_literal or 'Wirklich löschen?' }}')">
+                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                    <span data-i18n="group.delete">Gruppe löschen</span>
+                </button>
+            </form>
+        </div>
+        {% elif active.owner_id != user_id %}
+        <div style="padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end;">
+            <form action="/groups/{{ active_id }}/leave" method="POST">
+                <button type="submit" class="btn" style="padding: 8px 14px; font-size: 13px;"
+                        onclick="return confirm('{{ 'group.confirm_leave' | i18n_literal or 'Wirklich verlassen?' }}')">
+                    <i data-lucide="log-out" style="width: 14px; height: 14px;"></i>
+                    <span data-i18n="group.leave">Verlassen</span>
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="gc-body">
+            <div class="gc-empty">
+                <i data-lucide="message-square-plus" style="width: 60px; height: 60px; color: var(--accent);"></i>
+                <h3 style="font-family: var(--font-heading); margin: 16px 0 8px;"
+                    data-i18n="group.welcome.title">Willkommen bei Groups</h3>
+                <p data-i18n="group.welcome.body">
+                    Erstelle deine erste Gruppe oder warte, bis du eingeladen wirst.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+{% if active_id %}
+<script>
+(function () {
+    var ACTIVE = parseInt("{{ active_id }}", 10);
+    var body = document.getElementById("gcBody");
+    var form = document.getElementById("gcForm");
+    var input = document.getElementById("gcInput");
+    var lastId = parseInt("{{ owned_max_id }}", 10) || 0;
+    var SIDEBAR = document.getElementById("gcList");
+    var MY_ID = parseInt("{{ user_id if user_id is defined else 0 }}", 10);
+
+    function fmtTime(ts) {
+        var d = new Date(ts * 1000);
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+    function fmtDay(ts) {
+        var d = new Date(ts * 1000);
+        var now = new Date();
+        var yest = new Date(now); yest.setDate(now.getDate() - 1);
+        var t = window.t || function (k) { return k; };
+        if (d.toDateString() === now.toDateString()) return t("chat.day.today");
+        if (d.toDateString() === yest.toDateString()) return t("chat.day.yesterday");
+        return d.toLocaleDateString([], { weekday: "long", day: "2-digit", month: "2-digit" });
+    }
+    function dayBucket(ts) { return Math.floor(ts / 86400); }
+    function scrollBottom(smooth) {
+        if (!body) return;
+        body.scrollTop = body.scrollHeight + (smooth ? 200 : 0);
+    }
+
+    function avatarUrl(uid) {
+        return "/profile/avatar-fallback/u" + uid;
+    }
+
+    function appendMsg(m) {
+        if (!body) return;
+        if (body.querySelector('[data-id="' + m.id + '"]')) return;
+        var lastDay = body.querySelector(".gc-day:last-of-type");
+        var lastTs = lastDay ? parseInt(lastDay.getAttribute("data-day"), 10) : null;
+        if (lastTs === null || dayBucket(m.created_at) !== dayBucket(lastTs)) {
+            var day = document.createElement("div");
+            day.className = "gc-day";
+            day.setAttribute("data-day", String(m.created_at));
+            day.textContent = fmtDay(m.created_at);
+            body.appendChild(day);
+        }
+        var mine = (m.sender_id === MY_ID);
+        var row = document.createElement("div");
+        row.className = "gc-msg" + (mine ? " mine" : "");
+        row.setAttribute("data-id", String(m.id));
+        if (!mine) {
+            var header = document.createElement("div");
+            header.className = "gc-msg-header";
+            var av = document.createElement("img");
+            av.src = avatarUrl(m.sender_id);
+            av.style.cssText = "width:22px;height:22px;border-radius:7px;object-fit:cover;";
+            header.appendChild(av);
+            var sender = document.createElement("span");
+            sender.textContent = "u" + m.sender_id; // Server-side would override; simpler.
+            header.appendChild(sender);
+            row.appendChild(header);
+        }
+        var bubble = document.createElement("div");
+        bubble.className = "gc-msg-bubble";
+        bubble.textContent = m.message;
+        row.appendChild(bubble);
+        var time = document.createElement("div");
+        time.className = "gc-msg-time";
+        time.setAttribute("data-time", String(m.created_at));
+        time.textContent = fmtTime(m.created_at);
+        row.appendChild(time);
+        body.appendChild(row);
+        if (m.id > lastId) lastId = m.id;
+    }
+    scrollBottom(false);
+
+    var pollTimer = null;
+    var pollFails = 0;
+
+    async function poll() {
+        try {
+            var res = await fetch("/groups/" + ACTIVE + "/poll?after_id=" + lastId,
+                                  { credentials: "same-origin", cache: "no-store" });
+            if (!res.ok) { pollFails++; schedulePoll(); return; }
+            pollFails = 0;
+            var data = await res.json();
+            var msgs = data.messages || [];
+            if (msgs.length > 0) {
+                var empty = body && body.querySelector(".gc-empty");
+                if (empty) empty.remove();
+                var wasBottom = (body.scrollTop + body.clientHeight) >= (body.scrollHeight - 80);
+                msgs.forEach(appendMsg);
+                if (wasBottom) scrollBottom(true);
+                schedulePoll(1500);
+                return;
+            }
+        } catch (e) { pollFails++; }
+        schedulePoll();
+    }
+    function schedulePoll(after) {
+        clearTimeout(pollTimer);
+        var delay = after || 4000;
+        if (pollFails) delay = Math.min(delay * 2, 15000);
+        pollTimer = setTimeout(poll, delay);
+    }
+    document.addEventListener("visibilitychange", function () {
+        if (document.hidden) clearTimeout(pollTimer);
+        else poll();
+    });
+
+    if (form) {
+        form.addEventListener("submit", async function (ev) {
+            ev.preventDefault();
+            var txt = (input.value || "").trim();
+            if (!txt) return;
+            input.disabled = true;
+            try {
+                var res = await fetch("/groups/" + ACTIVE + "/send", {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: "message=" + encodeURIComponent(txt),
+                });
+                var data = await res.json().catch(function () { return {}; });
+                if (res.ok && data.ok) {
+                    appendMsg({
+                        id: data.id || (lastId + 1),
+                        sender_id: MY_ID,
+                        created_at: (data.message && data.message.time) || Math.floor(Date.now() / 1000),
+                        message: txt,
+                    });
+                    input.value = "";
+                    input.style.height = "auto";
+                    scrollBottom(true);
+                } else {
+                    var msg = (data && data.error) || "send_failed";
+                    var friendly =
+                        msg === "banned"    ? (window.t ? window.t("chat.error.banned")    : "Du bist gebannt.") :
+                        msg === "too_long"  ? (window.t ? window.t("chat.error.too_long")  : "Zu lang.") :
+                        msg === "empty"     ? (window.t ? window.t("chat.error.empty")     : "Leer.") :
+                                              (window.t ? window.t("chat.error.generic")    : "Senden fehlgeschlagen.");
+                    showError(friendly);
+                }
+            } catch (e) {
+                showError(window.t ? window.t("chat.error.network") : "Netzwerkfehler.");
+            } finally {
+                input.disabled = false;
+                input.focus();
+            }
+        });
+        input.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter" && !ev.shiftKey) {
+                ev.preventDefault();
+                form.requestSubmit();
+            }
+        });
+        input.addEventListener("input", function () {
+            input.style.height = "auto";
+            input.style.height = Math.min(input.scrollHeight, 160) + "px";
+        });
+    }
+
+    function showError(text) {
+        var composer = document.querySelector(".gc-composer");
+        if (!composer) return;
+        var old = document.querySelector(".composer-status.transient");
+        if (old) old.remove();
+        var bar = document.createElement("div");
+        bar.className = "composer-status transient";
+        bar.style.cssText = "padding:10px 18px;background:rgba(239,68,68,0.08);color:#ef4444;text-align:center;font-size:13px;border-top:1px solid rgba(239,68,68,0.15);";
+        bar.textContent = text;
+        composer.parentNode.insertBefore(bar, composer);
+        setTimeout(function () {
+            bar.style.opacity = "0";
+            setTimeout(function () { bar.remove(); }, 400);
+        }, 3500);
+    }
+
+    poll();
+})();
+</script>
+{% endif %}
+{% endblock %}
