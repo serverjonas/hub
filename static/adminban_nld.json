@@ -1,0 +1,26 @@
+{
+    "_meta": {
+        "page": "adminban"
+    },
+    "admin.table.user": "Gebruiker",
+    "admin.table.roles": "Rollen",
+    "admin.table.status": "Status",
+    "admin.table.actions": "Acties",
+    "admin.stats.registered": "Geregistreerde gebruikers",
+    "admin.stats.bans": "Actieve bans",
+    "banadmin.unban": "Debannen",
+    "banadmin.reason_placeholder": "Reden...",
+    "banadmin.days": "Dagen",
+    "banadmin.permanent": "Permanent",
+    "banadmin.ban": "Bannen",
+    "banadmin.banned": "GEBAND",
+    "banadmin.until": "tot",
+    "banadmin.active": "Actief",
+    "banadmin.by": "door",
+    "banadmin.by.you": "(jij)",
+    "banadmin.protected": "Beschermd",
+    "banadmin.mod_protected": "(alleen admins)",
+    "banadmin.self": "— jezelf",
+    "banadmin.cooldown_mod": "Mod­cooldown",
+    "admin.cards.bans": "Ban­beheer · serverjonas"
+}

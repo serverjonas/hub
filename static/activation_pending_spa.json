@@ -1,0 +1,7 @@
+{
+    "_meta": { "page": "activation_pending" },
+    "activation.title": "Cuenta no activada",
+    "activation.badge": "Pendiente",
+    "activation.heading": "Cuenta aún no activada",
+    "activation.body": "Por favor, espera hasta que un moderador o admin conceda el acceso."
+}

@@ -1,0 +1,10 @@
+{
+    "_meta": {
+        "page": "not_logged_in"
+    },
+    "loggedin.title": "Non connesso · serverjonas",
+    "loggedin.important": "Importante",
+    "loggedin.heading": "Accesso richiesto",
+    "loggedin.body": "Devi essere connesso per accedere a questa pagina.",
+    "loggedin.cta": "Accedi ora"
+}

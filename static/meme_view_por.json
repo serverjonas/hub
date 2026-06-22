@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "meme_view"
+    },
+    "memes.view.title": "Visualizador de memes · serverjonas",
+    "memes.view.next": "Próximo meme",
+    "memes.view.empty": "Ainda sem memes.",
+    "memes.view.upload_title": "Carregar meme"
+}

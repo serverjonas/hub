@@ -1,0 +1,32 @@
+{
+    "_meta": {
+        "page": "sjnchat"
+    },
+    "chat.title": "SJNchat",
+    "chat.search.placeholder": "Поиск друзей...",
+    "chat.empty": "У тебя пока нет разговоров.",
+    "chat.empty.friend": "Сначала добавь друзей, чтобы начать общаться.",
+    "chat.preview.you": "Ты:",
+    "chat.status.online": "онлайн",
+    "chat.action.back": "Назад",
+    "chat.action.friends": "Друзья",
+    "chat.action.send": "Отправить",
+    "chat.composer.placeholder": "Напиши сообщение…",
+    "chat.composer.placeholder.banned": "Сейчас ты не можешь ответить...",
+    "chat.composer.banned": "Ты забанен и не можешь отправлять сообщения.",
+    "chat.start.title": "Поздоровайся!",
+    "chat.start.body": "Отправь первое сообщение {name}. Сообщения приватны и видны только вам двоим.",
+    "chat.nofriends.title": "Пока нет друзей",
+    "chat.nofriends.body": "SJNchat работает только с друзьями. Сначала добавь друзей, чтобы здесь писать.",
+    "chat.nofriends.cta": "Управлять друзьями",
+    "chat.welcome.title": "Добро пожаловать в SJNchat",
+    "chat.welcome.body": "Выбери друга из списка, чтобы начать разговор – или пригласи новых.",
+    "chat.error.banned": "Ты забанен и не можешь отправлять.",
+    "chat.error.too_long": "Сообщение слишком длинное.",
+    "chat.error.empty": "Пустые сообщения не разрешены.",
+    "chat.error.generic": "Не удалось отправить, попробуй ещё раз.",
+    "chat.error.network": "Сетевая ошибка – попробуй снова.",
+    "chat.day.today": "Сегодня",
+    "chat.day.yesterday": "Вчера",
+    "chat.time.yesterday": "Вчера"
+}

@@ -1,0 +1,20 @@
+{
+    "_meta": {
+        "page": "admin_users_manager"
+    },
+    "admin.table.user": "Utente",
+    "admin.table.admin": "Admin",
+    "admin.table.sessions": "Sessioni",
+    "admin.table.actions": "Azioni",
+    "admin.active_label": "Attivo",
+    "admin.action.logout": "Esci",
+    "admin.mod_no_logout": "—",
+    "admin.cards.users": "Gestione utenti · serverjonas",
+    "admin.suggestions.heading": "Suggerimenti di ruolo aperti",
+    "admin.suggestions.from": "da",
+    "admin.suggestions.approve": "Approva",
+    "admin.suggestions.reject": "Rifiuta",
+    "admin.suggestions.empty": "Nessun suggerimento aperto.",
+    "admin.suggestions.created": "Suggerimento inviato. In attesa di revisione admin.",
+    "mods.users.subtitle": "I toggle di ruolo sono suggerimenti — gli admin revisionano e decidono."
+}

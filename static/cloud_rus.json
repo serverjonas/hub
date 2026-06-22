@@ -1,0 +1,7 @@
+{
+    "_meta": { "page": "cloud" },
+    "cloud.delete": "🗑",
+    "cloud.selected_template": "📦 Выбрано: {files}",
+    "cloud.upload_failed": "Загрузка не удалась",
+    "cloud.network_error": "Сетевая ошибка"
+}

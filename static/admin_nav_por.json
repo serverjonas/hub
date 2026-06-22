@@ -1,0 +1,23 @@
+{
+    "_meta": {
+        "page": "admin_nav"
+    },
+    "admin.title": "Painel de administração",
+    "admin.dashboard": "Painel admin",
+    "admin.stats.users": "Utilizadores",
+    "admin.stats.bans": "Bans ativos",
+    "admin.stats.status": "Estado do servidor",
+    "admin.stats.online": "Online",
+    "admin.stats.registered": "Utilizadores registados",
+    "admin.cards.users": "Gestão de utilizadores",
+    "admin.cards.users.desc": "Gere contas, papéis e sessões.",
+    "admin.cards.bans": "Gestão de bans",
+    "admin.cards.bans.desc": "Controla sanções e exclusões.",
+    "admin.cards.notifs": "Gestor de notificações",
+    "admin.cards.notifs.desc": "Cria e gere notificações.",
+    "admin.cards.logs": "Registos de auditoria",
+    "admin.cards.logs.desc": "Vê a atividade do servidor e filtra por IP, rota ou estado.",
+    "admin.cards.suggestions": "Sugestões de papel",
+    "admin.cards.suggestions.desc": "Rever sugestões pendentes dos mods.",
+    "admin.nav.title": "Painel admin · serverjonas"
+}

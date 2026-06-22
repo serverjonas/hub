@@ -1,0 +1,7 @@
+{
+    "_meta": { "page": "activation_pending" },
+    "activation.title": "Аккаунт не активирован",
+    "activation.badge": "Ожидание",
+    "activation.heading": "Аккаунт ещё не активирован",
+    "activation.body": "Подожди, пока модератор или админ даст доступ."
+}

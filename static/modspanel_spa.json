@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "modspanel"
+    },
+    "mods.nav.title": "Panel de mods · serverjonas",
+    "mods.dashboard": "Panel de mods",
+    "mods.subtitle": "Gestión de usuarios, baneos y registros para la comunidad.",
+    "mods.cooldown.title": "Estás en cooldown de baneo",
+    "mods.cooldown.body": "No puedes banear a nadie durante 7 días después de que un admin haya revocado uno de tus baneos.",
+    "mods.my_suggestions.heading": "Mis sugerencias abiertas",
+    "mods.my_suggestions.hint": "Puedes sugerir cambios en los roles de los usuarios. Los admins revisarán tus sugerencias.",
+    "mods.my_suggestions.view_all": "Ver todas",
+    "mods.my_suggestions.empty": "No hay sugerencias abiertas ahora mismo.",
+    "mods.suggestions.title": "Mis sugerencias · serverjonas",
+    "mods.suggestions.heading": "Mis sugerencias",
+    "mods.suggestions.target": "Usuario",
+    "mods.suggestions.role": "Rol",
+    "mods.suggestions.value": "Valor",
+    "mods.suggestions.comment": "Comentario",
+    "mods.suggestions.created": "Creado",
+    "mods.suggestions.empty": "No tienes sugerencias abiertas ahora mismo.",
+    "mods.users.subtitle": "Los toggles de rol son sugerencias — los admins revisan y deciden.",
+    "mods.users.desc": "Enviar sugerencias de rol.",
+    "mods.bans.desc": "Banear sin afectar a mods/admins."
+}

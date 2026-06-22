@@ -1,0 +1,13 @@
+{
+    "_meta": {
+        "page": "memes_upload"
+    },
+    "memes.upload.title": "Загрузить мем · serverjonas",
+    "memes.upload.heading": "Загрузить мем",
+    "memes.upload.subtitle": "Поделись своим юмором с сообществом.",
+    "memes.upload.label.title": "Название (необязательно)",
+    "memes.upload.placeholder.title": "Подходящее название...",
+    "memes.upload.label.file": "Выбери файл (изображение/видео)",
+    "memes.upload.submit": "Загрузить",
+    "memes.upload.back": "Назад в ленту"
+}

@@ -1,0 +1,23 @@
+{
+    "_meta": {
+        "page": "admin_nav"
+    },
+    "admin.title": "Панель администратора",
+    "admin.dashboard": "Панель админа",
+    "admin.stats.users": "Пользователи",
+    "admin.stats.bans": "Активные баны",
+    "admin.stats.status": "Статус сервера",
+    "admin.stats.online": "Онлайн",
+    "admin.stats.registered": "Зарегистрированные",
+    "admin.cards.users": "Управление пользователями",
+    "admin.cards.users.desc": "Управляй аккаунтами, ролями и сессиями.",
+    "admin.cards.bans": "Управление банами",
+    "admin.cards.bans.desc": "Контроль санкций и исключений.",
+    "admin.cards.notifs": "Менеджер уведомлений",
+    "admin.cards.notifs.desc": "Создавай и управляй уведомлениями.",
+    "admin.cards.logs": "Журналы аудита",
+    "admin.cards.logs.desc": "Просмотр активности сервера с фильтром по IP, маршруту или статусу.",
+    "admin.cards.suggestions": "Предложения ролей",
+    "admin.cards.suggestions.desc": "Просмотр ожидающих предложений модераторов.",
+    "admin.nav.title": "Панель админа · serverjonas"
+}

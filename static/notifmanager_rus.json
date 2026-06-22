@@ -1,0 +1,20 @@
+{
+    "_meta": {
+        "page": "notifmanager"
+    },
+    "notifadmin.title": "Менеджер уведомлений",
+    "notifadmin.heading": "Менеджер уведомлений",
+    "notifadmin.success": "Уведомление успешно отправлено!",
+    "notifadmin.label.target": "Получатель",
+    "notifadmin.label.type": "Тип",
+    "notifadmin.label.message": "Сообщение",
+    "notifadmin.target.all": "Все пользователи",
+    "notifadmin.target.single": "Отдельные пользователи",
+    "notifadmin.type.system": "Система (по умолчанию)",
+    "notifadmin.type.info": "Информация",
+    "notifadmin.type.warning": "Предупреждение",
+    "notifadmin.type.important": "Важное / тревога",
+    "notifadmin.placeholder.message": "Твоё сообщение здесь...",
+    "notifadmin.submit": "Отправить уведомление",
+    "notifmanager.title": "Уведомления · serverjonas"
+}

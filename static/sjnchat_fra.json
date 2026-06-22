@@ -1,0 +1,32 @@
+{
+    "_meta": {
+        "page": "sjnchat"
+    },
+    "chat.title": "SJNchat",
+    "chat.search.placeholder": "Rechercher un ami...",
+    "chat.empty": "Tu n'as pas encore de conversations.",
+    "chat.empty.friend": "Ajoute d'abord des amis pour commencer à discuter.",
+    "chat.preview.you": "Toi :",
+    "chat.status.online": "en ligne",
+    "chat.action.back": "Retour",
+    "chat.action.friends": "Amis",
+    "chat.action.send": "Envoyer",
+    "chat.composer.placeholder": "Écris un message…",
+    "chat.composer.placeholder.banned": "Tu ne peux pas répondre pour le moment...",
+    "chat.composer.banned": "Tu es banni et ne peux pas envoyer de messages.",
+    "chat.start.title": "Dis bonjour !",
+    "chat.start.body": "Envoie le premier message à {name}. Les messages sont privés et visibles uniquement entre vous deux.",
+    "chat.nofriends.title": "Pas encore d'amis",
+    "chat.nofriends.body": "SJNchat ne fonctionne qu'avec tes amis. Ajoute d'abord des amis pour discuter ici.",
+    "chat.nofriends.cta": "Gérer les amis",
+    "chat.welcome.title": "Bienvenue dans SJNchat",
+    "chat.welcome.body": "Choisis un ami dans la liste pour démarrer une conversation – ou invite de nouveaux amis.",
+    "chat.error.banned": "Tu es banni et tu ne peux pas envoyer.",
+    "chat.error.too_long": "Le message est trop long.",
+    "chat.error.empty": "Les messages vides ne sont pas autorisés.",
+    "chat.error.generic": "Échec de l'envoi, réessaie.",
+    "chat.error.network": "Erreur réseau – réessaie.",
+    "chat.day.today": "Aujourd'hui",
+    "chat.day.yesterday": "Hier",
+    "chat.time.yesterday": "Hier"
+}

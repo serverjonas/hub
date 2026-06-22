@@ -1,0 +1,26 @@
+{
+    "_meta": {
+        "page": "adminban"
+    },
+    "admin.table.user": "Пользователь",
+    "admin.table.roles": "Роли",
+    "admin.table.status": "Статус",
+    "admin.table.actions": "Действия",
+    "admin.stats.registered": "Зарегистрированные",
+    "admin.stats.bans": "Активные баны",
+    "banadmin.unban": "Разбанить",
+    "banadmin.reason_placeholder": "Причина...",
+    "banadmin.days": "Дней",
+    "banadmin.permanent": "Навсегда",
+    "banadmin.ban": "Забанить",
+    "banadmin.banned": "ЗАБАНЕН",
+    "banadmin.until": "до",
+    "banadmin.active": "Активен",
+    "banadmin.by": "от",
+    "banadmin.by.you": "(ты)",
+    "banadmin.protected": "Защищён",
+    "banadmin.mod_protected": "(только админы)",
+    "banadmin.self": "— себя",
+    "banadmin.cooldown_mod": "Cooldown мода",
+    "admin.cards.bans": "Управление банами · serverjonas"
+}

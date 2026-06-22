@@ -1,0 +1,20 @@
+{
+    "_meta": {
+        "page": "admin_users_manager"
+    },
+    "admin.table.user": "Utilizador",
+    "admin.table.admin": "Admin",
+    "admin.table.sessions": "Sessões",
+    "admin.table.actions": "Ações",
+    "admin.active_label": "Ativa",
+    "admin.action.logout": "Sair",
+    "admin.mod_no_logout": "—",
+    "admin.cards.users": "Gestão de utilizadores · serverjonas",
+    "admin.suggestions.heading": "Sugestões de papel abertas",
+    "admin.suggestions.from": "de",
+    "admin.suggestions.approve": "Aprovar",
+    "admin.suggestions.reject": "Rejeitar",
+    "admin.suggestions.empty": "Sem sugestões abertas.",
+    "admin.suggestions.created": "Sugestão enviada. Aguarda revisão do admin.",
+    "mods.users.subtitle": "Os toggles de papel são sugestões — os admins analisam e decidem."
+}

@@ -1,0 +1,13 @@
+{
+    "_meta": {
+        "page": "memes_upload"
+    },
+    "memes.upload.title": "Subir meme · serverjonas",
+    "memes.upload.heading": "Subir meme",
+    "memes.upload.subtitle": "Comparte tu humor con la comunidad.",
+    "memes.upload.label.title": "Título (opcional)",
+    "memes.upload.placeholder.title": "Un título acertado...",
+    "memes.upload.label.file": "Elegir archivo (imagen/vídeo)",
+    "memes.upload.submit": "Subir",
+    "memes.upload.back": "Volver al feed"
+}

@@ -1,0 +1,32 @@
+{
+    "_meta": {
+        "page": "sjnchat"
+    },
+    "chat.title": "SJNchat",
+    "chat.search.placeholder": "Szukaj znajomych...",
+    "chat.empty": "Nie masz jeszcze rozmów.",
+    "chat.empty.friend": "Dodaj najpierw znajomych, by zacząć czatować.",
+    "chat.preview.you": "Ty:",
+    "chat.status.online": "online",
+    "chat.action.back": "Wstecz",
+    "chat.action.friends": "Znajomi",
+    "chat.action.send": "Wyślij",
+    "chat.composer.placeholder": "Napisz wiadomość…",
+    "chat.composer.placeholder.banned": "W tej chwili nie możesz odpowiedzieć...",
+    "chat.composer.banned": "Jesteś zbanowany i nie możesz wysyłać wiadomości.",
+    "chat.start.title": "Przywitaj się!",
+    "chat.start.body": "Wyślij pierwszą wiadomość do {name}. Wiadomości są prywatne i widoczne tylko dla was dwojga.",
+    "chat.nofriends.title": "Brak znajomych",
+    "chat.nofriends.body": "SJNchat działa tylko ze znajomymi. Dodaj najpierw znajomych, by tu pisać.",
+    "chat.nofriends.cta": "Zarządzaj znajomymi",
+    "chat.welcome.title": "Witaj w SJNchacie",
+    "chat.welcome.body": "Wybierz znajomego z listy, by zacząć rozmowę – lub zaproś nowych.",
+    "chat.error.banned": "Jesteś zbanowany i nie możesz wysłać.",
+    "chat.error.too_long": "Wiadomość jest za długa.",
+    "chat.error.empty": "Puste wiadomości nie są dozwolone.",
+    "chat.error.generic": "Wysyłanie się nie powiodło, spróbuj ponownie.",
+    "chat.error.network": "Błąd sieci – spróbuj ponownie.",
+    "chat.day.today": "Dziś",
+    "chat.day.yesterday": "Wczoraj",
+    "chat.time.yesterday": "Wczoraj"
+}

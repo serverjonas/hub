@@ -1,0 +1,10 @@
+{
+    "_meta": {
+        "page": "not_logged_in"
+    },
+    "loggedin.title": "Не в сети · serverjonas",
+    "loggedin.important": "Важно",
+    "loggedin.heading": "Нужно войти",
+    "loggedin.body": "Нужно войти в аккаунт, чтобы открыть эту страницу.",
+    "loggedin.cta": "Войти сейчас"
+}

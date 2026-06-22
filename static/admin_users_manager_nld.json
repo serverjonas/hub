@@ -1,0 +1,20 @@
+{
+    "_meta": {
+        "page": "admin_users_manager"
+    },
+    "admin.table.user": "Gebruiker",
+    "admin.table.admin": "Admin",
+    "admin.table.sessions": "Sessies",
+    "admin.table.actions": "Acties",
+    "admin.active_label": "Actief",
+    "admin.action.logout": "Uitloggen",
+    "admin.mod_no_logout": "—",
+    "admin.cards.users": "Gebruikers­beheer · serverjonas",
+    "admin.suggestions.heading": "Open rol­suggesties",
+    "admin.suggestions.from": "van",
+    "admin.suggestions.approve": "Goedkeuren",
+    "admin.suggestions.reject": "Afwijzen",
+    "admin.suggestions.empty": "Geen open suggesties.",
+    "admin.suggestions.created": "Suggestie ingediend. Wacht op beheer­beoordeling.",
+    "mods.users.subtitle": "Rol­toggles zijn suggesties — admins beoordelen en beslissen."
+}

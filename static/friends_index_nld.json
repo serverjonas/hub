@@ -1,0 +1,14 @@
+{
+    "_meta": { "page": "friends_index" },
+    "friends.add.title": "Vriend toevoegen",
+    "friends.add.placeholder": "Voer gebruikersnaam in...",
+    "friends.add.submit": "Verzoek sturen",
+    "friends.incoming": "Inkomende verzoeken",
+    "friends.accept": "Accepteren",
+    "friends.decline": "Weigeren",
+    "friends.your": "Jouw vrienden",
+    "friends.remove": "Verwijderen",
+    "friends.empty": "Je hebt nog geen vrienden toegevoegd.",
+    "friends.outgoing": "Verstuurde verzoeken",
+    "friends.withdraw": "Intrekken"
+}

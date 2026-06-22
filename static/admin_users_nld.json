@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "admin_users"
+    },
+    "admin.title": "Beheer­paneel",
+    "adminpanel.subtitle": "Gebruikers­beheer en systeemoverzicht",
+    "adminpanel.empty": "Geen gebruikers in de database.",
+    "admin.users.title": "Gebruikers · serverjonas"
+}

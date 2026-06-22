@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "meme_view"
+    },
+    "memes.view.title": "Visionneuse de memes · serverjonas",
+    "memes.view.next": "Meme suivant",
+    "memes.view.empty": "Pas encore de memes.",
+    "memes.view.upload_title": "Téléverser un meme"
+}

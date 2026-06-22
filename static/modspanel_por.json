@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "modspanel"
+    },
+    "mods.nav.title": "Painel de mods · serverjonas",
+    "mods.dashboard": "Painel de mods",
+    "mods.subtitle": "Gestão de utilizadores, bans e registos para a comunidade.",
+    "mods.cooldown.title": "Estás em cooldown de ban",
+    "mods.cooldown.body": "Não podes banir ninguém durante 7 dias depois de um admin revogar um dos teus bans.",
+    "mods.my_suggestions.heading": "Minhas sugestões abertas",
+    "mods.my_suggestions.hint": "Podes sugerir alterações em papéis de utilizadores. Os admins analisam as tuas sugestões.",
+    "mods.my_suggestions.view_all": "Mostrar todas",
+    "mods.my_suggestions.empty": "Sem sugestões abertas neste momento.",
+    "mods.suggestions.title": "Minhas sugestões · serverjonas",
+    "mods.suggestions.heading": "Minhas sugestões",
+    "mods.suggestions.target": "Utilizador",
+    "mods.suggestions.role": "Papel",
+    "mods.suggestions.value": "Valor",
+    "mods.suggestions.comment": "Comentário",
+    "mods.suggestions.created": "Criado",
+    "mods.suggestions.empty": "Não tens sugestões abertas neste momento.",
+    "mods.users.subtitle": "Os toggles de papel são sugestões — os admins analisam e decidem.",
+    "mods.users.desc": "Submeter sugestões de papel.",
+    "mods.bans.desc": "Banir sem afetar mods/admins."
+}

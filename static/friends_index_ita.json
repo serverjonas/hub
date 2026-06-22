@@ -1,0 +1,14 @@
+{
+    "_meta": { "page": "friends_index" },
+    "friends.add.title": "Aggiungi amico",
+    "friends.add.placeholder": "Inserisci nome utente...",
+    "friends.add.submit": "Invia richiesta",
+    "friends.incoming": "Richieste in arrivo",
+    "friends.accept": "Accetta",
+    "friends.decline": "Rifiuta",
+    "friends.your": "I tuoi amici",
+    "friends.remove": "Rimuovi",
+    "friends.empty": "Non hai ancora aggiunto amici.",
+    "friends.outgoing": "Richieste inviate",
+    "friends.withdraw": "Ritira"
+}

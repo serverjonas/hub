@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "modspanel"
+    },
+    "mods.nav.title": "Panel modów · serverjonas",
+    "mods.dashboard": "Panel modów",
+    "mods.subtitle": "Zarządzanie użytkownikami, banami i logami dla społeczności.",
+    "mods.cooldown.title": "Jesteś na cooldownie banów",
+    "mods.cooldown.body": "Nie możesz nikogo zbanować przez 7 dni po tym, jak admin cofnął jeden z twoich banów.",
+    "mods.my_suggestions.heading": "Moje otwarte sugestie",
+    "mods.my_suggestions.hint": "Możesz sugerować zmiany w rolach użytkowników. Admini przeglądają twoje sugestie.",
+    "mods.my_suggestions.view_all": "Pokaż wszystkie",
+    "mods.my_suggestions.empty": "Brak otwartych sugestii.",
+    "mods.suggestions.title": "Moje sugestie · serverjonas",
+    "mods.suggestions.heading": "Moje sugestie",
+    "mods.suggestions.target": "Użytkownik",
+    "mods.suggestions.role": "Rola",
+    "mods.suggestions.value": "Wartość",
+    "mods.suggestions.comment": "Komentarz",
+    "mods.suggestions.created": "Utworzono",
+    "mods.suggestions.empty": "Nie masz teraz otwartych sugestii.",
+    "mods.users.subtitle": "Przełączniki ról to sugestie — admini przeglądają i decydują.",
+    "mods.users.desc": "Wysyłaj sugestie ról.",
+    "mods.bans.desc": "Banuj bez ruszania modów/adminów."
+}

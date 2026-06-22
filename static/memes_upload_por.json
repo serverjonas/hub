@@ -1,0 +1,13 @@
+{
+    "_meta": {
+        "page": "memes_upload"
+    },
+    "memes.upload.title": "Carregar meme · serverjonas",
+    "memes.upload.heading": "Carregar meme",
+    "memes.upload.subtitle": "Partilha o teu humor com a comunidade.",
+    "memes.upload.label.title": "Título (opcional)",
+    "memes.upload.placeholder.title": "Um título adequado...",
+    "memes.upload.label.file": "Escolher ficheiro (imagem/vídeo)",
+    "memes.upload.submit": "Carregar",
+    "memes.upload.back": "Voltar ao feed"
+}

@@ -1,0 +1,14 @@
+{
+    "_meta": { "page": "friends_index" },
+    "friends.add.title": "Dodaj znajomego",
+    "friends.add.placeholder": "Wpisz nazwę użytkownika...",
+    "friends.add.submit": "Wyślij zaproszenie",
+    "friends.incoming": "Otrzymane zaproszenia",
+    "friends.accept": "Akceptuj",
+    "friends.decline": "Odrzuć",
+    "friends.your": "Twoi znajomi",
+    "friends.remove": "Usuń",
+    "friends.empty": "Nie dodałeś jeszcze znajomych.",
+    "friends.outgoing": "Wysłane zaproszenia",
+    "friends.withdraw": "Wycofaj"
+}

@@ -1,0 +1,20 @@
+{
+    "_meta": {
+        "page": "notifmanager"
+    },
+    "notifadmin.title": "Menadżer powiadomień",
+    "notifadmin.heading": "Menadżer powiadomień",
+    "notifadmin.success": "Powiadomienie zostało pomyślnie wysłane!",
+    "notifadmin.label.target": "Odbiorca",
+    "notifadmin.label.type": "Typ",
+    "notifadmin.label.message": "Wiadomość",
+    "notifadmin.target.all": "Wszyscy użytkownicy",
+    "notifadmin.target.single": "Pojedynczy użytkownicy",
+    "notifadmin.type.system": "System (domyślny)",
+    "notifadmin.type.info": "Informacja",
+    "notifadmin.type.warning": "Ostrzeżenie",
+    "notifadmin.type.important": "Ważne / alarm",
+    "notifadmin.placeholder.message": "Twoja wiadomość tutaj...",
+    "notifadmin.submit": "Wyślij powiadomienie",
+    "notifmanager.title": "Powiadomienia · serverjonas"
+}

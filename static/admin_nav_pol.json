@@ -1,0 +1,23 @@
+{
+    "_meta": {
+        "page": "admin_nav"
+    },
+    "admin.title": "Panel administracji",
+    "admin.dashboard": "Panel administratora",
+    "admin.stats.users": "Użytkownicy",
+    "admin.stats.bans": "Aktywne bany",
+    "admin.stats.status": "Status serwera",
+    "admin.stats.online": "Online",
+    "admin.stats.registered": "Zarejestrowani użytkownicy",
+    "admin.cards.users": "Zarządzanie użytkownikami",
+    "admin.cards.users.desc": "Zarządzaj kontami, rolami i sesjami.",
+    "admin.cards.bans": "Zarządzanie banami",
+    "admin.cards.bans.desc": "Kontroluj sankcje i wykluczenia.",
+    "admin.cards.notifs": "Menadżer powiadomień",
+    "admin.cards.notifs.desc": "Twórz i zarządzaj powiadomieniami.",
+    "admin.cards.logs": "Logi audytu",
+    "admin.cards.logs.desc": "Przeglądaj aktywność serwera i filtruj po IP, trasie lub statusie.",
+    "admin.cards.suggestions": "Sugestie ról",
+    "admin.cards.suggestions.desc": "Przejrzyj oczekujące sugestie moderatorów.",
+    "admin.nav.title": "Panel admina · serverjonas"
+}

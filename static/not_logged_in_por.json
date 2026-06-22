@@ -1,0 +1,10 @@
+{
+    "_meta": {
+        "page": "not_logged_in"
+    },
+    "loggedin.title": "Sem sessão · serverjonas",
+    "loggedin.important": "Importante",
+    "loggedin.heading": "Início de sessão necessário",
+    "loggedin.body": "Tens de ter sessão iniciada para aceder a esta página.",
+    "loggedin.cta": "Iniciar sessão agora"
+}

@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "meme_view"
+    },
+    "memes.view.title": "Просмотрщик мемов · serverjonas",
+    "memes.view.next": "Следующий мем",
+    "memes.view.empty": "Мемов пока нет.",
+    "memes.view.upload_title": "Загрузить мем"
+}

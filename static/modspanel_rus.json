@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "modspanel"
+    },
+    "mods.nav.title": "Панель модераторов · serverjonas",
+    "mods.dashboard": "Панель модератора",
+    "mods.subtitle": "Управление пользователями, банами и журналами для сообщества.",
+    "mods.cooldown.title": "Ты на cooldown бана",
+    "mods.cooldown.body": "Ты не можешь банить 7 дней после того, как админ отменил один из твоих банов.",
+    "mods.my_suggestions.heading": "Мои открытые предложения",
+    "mods.my_suggestions.hint": "Ты можешь предлагать изменения ролей. Админы проверяют твои предложения.",
+    "mods.my_suggestions.view_all": "Показать все",
+    "mods.my_suggestions.empty": "Сейчас нет открытых предложений.",
+    "mods.suggestions.title": "Мои предложения · serverjonas",
+    "mods.suggestions.heading": "Мои предложения",
+    "mods.suggestions.target": "Пользователь",
+    "mods.suggestions.role": "Роль",
+    "mods.suggestions.value": "Значение",
+    "mods.suggestions.comment": "Комментарий",
+    "mods.suggestions.created": "Создано",
+    "mods.suggestions.empty": "У тебя сейчас нет открытых предложений.",
+    "mods.users.subtitle": "Переключатели ролей — это предложения, админы проверяют и решают.",
+    "mods.users.desc": "Отправлять предложения по ролям.",
+    "mods.bans.desc": "Банить без воздействия на модов/админов."
+}

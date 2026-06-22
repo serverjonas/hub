@@ -1,0 +1,23 @@
+{
+    "_meta": {
+        "page": "admin_nav"
+    },
+    "admin.title": "Beheer­paneel",
+    "admin.dashboard": "Beheer­dashboard",
+    "admin.stats.users": "Gebruikers",
+    "admin.stats.bans": "Actieve bans",
+    "admin.stats.status": "Server­status",
+    "admin.stats.online": "Online",
+    "admin.stats.registered": "Geregistreerde gebruikers",
+    "admin.cards.users": "Gebruikers­beheer",
+    "admin.cards.users.desc": "Beheer accounts, rollen en sessies.",
+    "admin.cards.bans": "Ban­beheer",
+    "admin.cards.bans.desc": "Controle sancties en uitsluitingen.",
+    "admin.cards.notifs": "Meldingen­beheer",
+    "admin.cards.notifs.desc": "Meldingen aanmaken en beheren.",
+    "admin.cards.logs": "Audit­logboeken",
+    "admin.cards.logs.desc": "Bekijk serveractiviteit en filter op IP, route of status.",
+    "admin.cards.suggestions": "Rol­suggesties",
+    "admin.cards.suggestions.desc": "Beoordeel openstaande suggesties van mods.",
+    "admin.nav.title": "Beheer­paneel · serverjonas"
+}

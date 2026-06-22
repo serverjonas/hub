@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "modspanel"
+    },
+    "mods.nav.title": "Mod­paneel · serverjonas",
+    "mods.dashboard": "Mod­dashboard",
+    "mods.subtitle": "Gebruikers­beheer, bans en logboeken voor de community.",
+    "mods.cooldown.title": "Je zit in een ban­cooldown",
+    "mods.cooldown.body": "Je kunt 7 dagen lang niemand bannen nadat een admin een van je bans heeft ingetrokken.",
+    "mods.my_suggestions.heading": "Mijn open suggesties",
+    "mods.my_suggestions.hint": "Je kunt wijzigingen in gebruikers­rollen voorstellen. Admins beoordelen je suggesties.",
+    "mods.my_suggestions.view_all": "Alle weergeven",
+    "mods.my_suggestions.empty": "Geen open suggesties nu.",
+    "mods.suggestions.title": "Mijn suggesties · serverjonas",
+    "mods.suggestions.heading": "Mijn suggesties",
+    "mods.suggestions.target": "Gebruiker",
+    "mods.suggestions.role": "Rol",
+    "mods.suggestions.value": "Waarde",
+    "mods.suggestions.comment": "Opmerking",
+    "mods.suggestions.created": "Aangemaakt",
+    "mods.suggestions.empty": "Je hebt op dit moment geen open suggesties.",
+    "mods.users.subtitle": "Rol­toggles zijn suggesties — admins beoordelen en beslissen.",
+    "mods.users.desc": "Rol­suggesties indienen.",
+    "mods.bans.desc": "Bannen zonder mods/beheerders te raken."
+}

@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "admin_users"
+    },
+    "admin.title": "Панель админа",
+    "adminpanel.subtitle": "Управление пользователями и обзор системы",
+    "adminpanel.empty": "В базе нет пользователей.",
+    "admin.users.title": "Пользователи · serverjonas"
+}

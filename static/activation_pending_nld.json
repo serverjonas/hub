@@ -1,0 +1,7 @@
+{
+    "_meta": { "page": "activation_pending" },
+    "activation.title": "Account niet geactiveerd",
+    "activation.badge": "In afwachting",
+    "activation.heading": "Account nog niet geactiveerd",
+    "activation.body": "Wacht tot een moderator of beheerder toegang verleent."
+}

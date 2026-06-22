@@ -1,0 +1,10 @@
+{
+    "_meta": {
+        "page": "not_logged_in"
+    },
+    "loggedin.title": "Niet ingelogd · serverjonas",
+    "loggedin.important": "Belangrijk",
+    "loggedin.heading": "Inloggen vereist",
+    "loggedin.body": "Je moet ingelogd zijn om deze pagina te bekijken.",
+    "loggedin.cta": "Nu inloggen"
+}

@@ -1,0 +1,13 @@
+{
+    "_meta": {
+        "page": "memes_upload"
+    },
+    "memes.upload.title": "Prześlij mema · serverjonas",
+    "memes.upload.heading": "Prześlij mema",
+    "memes.upload.subtitle": "Podziel się swoim humorem ze społecznością.",
+    "memes.upload.label.title": "Tytuł (opcjonalnie)",
+    "memes.upload.placeholder.title": "Trafny tytuł...",
+    "memes.upload.label.file": "Wybierz plik (obraz/wideo)",
+    "memes.upload.submit": "Prześlij",
+    "memes.upload.back": "Wróć do kanału"
+}

@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "meme_view"
+    },
+    "memes.view.title": "Przeglądarka memów · serverjonas",
+    "memes.view.next": "Następny mem",
+    "memes.view.empty": "Brak jeszcze memów.",
+    "memes.view.upload_title": "Prześlij mema"
+}

@@ -1,0 +1,13 @@
+{
+    "_meta": {
+        "page": "memes_upload"
+    },
+    "memes.upload.title": "Meme uploaden · serverjonas",
+    "memes.upload.heading": "Meme uploaden",
+    "memes.upload.subtitle": "Deel je humor met de community.",
+    "memes.upload.label.title": "Titel (optioneel)",
+    "memes.upload.placeholder.title": "Een pakkende titel...",
+    "memes.upload.label.file": "Kies bestand (afbeelding/video)",
+    "memes.upload.submit": "Uploaden",
+    "memes.upload.back": "Terug naar feed"
+}

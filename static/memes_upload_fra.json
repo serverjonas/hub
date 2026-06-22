@@ -1,0 +1,13 @@
+{
+    "_meta": {
+        "page": "memes_upload"
+    },
+    "memes.upload.title": "Téléverser un meme · serverjonas",
+    "memes.upload.heading": "Téléverser un meme",
+    "memes.upload.subtitle": "Partage ton humour avec la communauté.",
+    "memes.upload.label.title": "Titre (optionnel)",
+    "memes.upload.placeholder.title": "Un titre approprié...",
+    "memes.upload.label.file": "Choisir un fichier (image/vidéo)",
+    "memes.upload.submit": "Téléverser",
+    "memes.upload.back": "Retour au fil"
+}

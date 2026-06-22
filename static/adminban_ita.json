@@ -1,0 +1,26 @@
+{
+    "_meta": {
+        "page": "adminban"
+    },
+    "admin.table.user": "Utente",
+    "admin.table.roles": "Ruoli",
+    "admin.table.status": "Stato",
+    "admin.table.actions": "Azioni",
+    "admin.stats.registered": "Utenti registrati",
+    "admin.stats.bans": "Ban attivi",
+    "banadmin.unban": "Sbanna",
+    "banadmin.reason_placeholder": "Motivo...",
+    "banadmin.days": "Giorni",
+    "banadmin.permanent": "Permanente",
+    "banadmin.ban": "Banna",
+    "banadmin.banned": "BANNATO",
+    "banadmin.until": "fino al",
+    "banadmin.active": "Attivo",
+    "banadmin.by": "da",
+    "banadmin.by.you": "(tu)",
+    "banadmin.protected": "Protetto",
+    "banadmin.mod_protected": "(solo admin)",
+    "banadmin.self": "— te stesso",
+    "banadmin.cooldown_mod": "Cooldown mod",
+    "admin.cards.bans": "Gestione ban · serverjonas"
+}

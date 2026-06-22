@@ -1,0 +1,32 @@
+{
+    "_meta": {
+        "page": "sjnchat"
+    },
+    "chat.title": "SJNchat",
+    "chat.search.placeholder": "Zoek vrienden...",
+    "chat.empty": "Je hebt nog geen gesprekken.",
+    "chat.empty.friend": "Voeg eerst vrienden toe om te chatten.",
+    "chat.preview.you": "Jij:",
+    "chat.status.online": "online",
+    "chat.action.back": "Terug",
+    "chat.action.friends": "Vrienden",
+    "chat.action.send": "Versturen",
+    "chat.composer.placeholder": "Schrijf een bericht…",
+    "chat.composer.placeholder.banned": "Je kunt nu niet reageren...",
+    "chat.composer.banned": "Je bent gebanned en kunt geen berichten sturen.",
+    "chat.start.title": "Zeg hoi!",
+    "chat.start.body": "Stuur het eerste bericht naar {name}. Berichten zijn privé en alleen zichtbaar voor jullie twee.",
+    "chat.nofriends.title": "Nog geen vrienden",
+    "chat.nofriends.body": "SJNchat werkt alleen met je vrienden. Voeg eerst vrienden toe om hier te chatten.",
+    "chat.nofriends.cta": "Vrienden beheren",
+    "chat.welcome.title": "Welkom bij SJNchat",
+    "chat.welcome.body": "Kies een vriend uit de lijst om een gesprek te starten – of nodig nieuwe vrienden uit.",
+    "chat.error.banned": "Je bent gebanned en kunt niet versturen.",
+    "chat.error.too_long": "Bericht is te lang.",
+    "chat.error.empty": "Lege berichten zijn niet toegestaan.",
+    "chat.error.generic": "Versturen mislukt, probeer opnieuw.",
+    "chat.error.network": "Netwerkfout – probeer opnieuw.",
+    "chat.day.today": "Vandaag",
+    "chat.day.yesterday": "Gisteren",
+    "chat.time.yesterday": "Gisteren"
+}

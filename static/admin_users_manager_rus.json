@@ -1,0 +1,20 @@
+{
+    "_meta": {
+        "page": "admin_users_manager"
+    },
+    "admin.table.user": "Пользователь",
+    "admin.table.admin": "Админ",
+    "admin.table.sessions": "Сессии",
+    "admin.table.actions": "Действия",
+    "admin.active_label": "Активна",
+    "admin.action.logout": "Выйти",
+    "admin.mod_no_logout": "—",
+    "admin.cards.users": "Управление пользователями · serverjonas",
+    "admin.suggestions.heading": "Открытые предложения ролей",
+    "admin.suggestions.from": "от",
+    "admin.suggestions.approve": "Одобрить",
+    "admin.suggestions.reject": "Отклонить",
+    "admin.suggestions.empty": "Открытых предложений нет.",
+    "admin.suggestions.created": "Предложение отправлено. Ждёт проверки админа.",
+    "mods.users.subtitle": "Переключатели ролей — это предложения, админы рассматривают и решают."
+}

@@ -1,0 +1,7 @@
+{
+    "_meta": { "page": "cloud" },
+    "cloud.delete": "🗑",
+    "cloud.selected_template": "📦 Seleccionado: {files}",
+    "cloud.upload_failed": "Error al subir",
+    "cloud.network_error": "Error de red"
+}

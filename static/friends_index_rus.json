@@ -1,0 +1,14 @@
+{
+    "_meta": { "page": "friends_index" },
+    "friends.add.title": "Добавить друга",
+    "friends.add.placeholder": "Введи имя пользователя...",
+    "friends.add.submit": "Отправить запрос",
+    "friends.incoming": "Входящие запросы",
+    "friends.accept": "Принять",
+    "friends.decline": "Отклонить",
+    "friends.your": "Твои друзья",
+    "friends.remove": "Удалить",
+    "friends.empty": "Ты ещё не добавил друзей.",
+    "friends.outgoing": "Отправленные запросы",
+    "friends.withdraw": "Отозвать"
+}

@@ -1,0 +1,20 @@
+{
+    "_meta": {
+        "page": "notifmanager"
+    },
+    "notifadmin.title": "Meldingen­beheerder",
+    "notifadmin.heading": "Meldingen­beheerder",
+    "notifadmin.success": "De melding is succesvol verzonden!",
+    "notifadmin.label.target": "Ontvanger",
+    "notifadmin.label.type": "Type",
+    "notifadmin.label.message": "Bericht",
+    "notifadmin.target.all": "Alle gebruikers",
+    "notifadmin.target.single": "Individuele gebruikers",
+    "notifadmin.type.system": "Systeem (standaard)",
+    "notifadmin.type.info": "Informatie",
+    "notifadmin.type.warning": "Waarschuwing",
+    "notifadmin.type.important": "Belangrijk / alarm",
+    "notifadmin.placeholder.message": "Jouw bericht hier...",
+    "notifadmin.submit": "Melding versturen",
+    "notifmanager.title": "Meldingen · serverjonas"
+}

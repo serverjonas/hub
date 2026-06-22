@@ -1,0 +1,20 @@
+{
+    "_meta": {
+        "page": "admin_users_manager"
+    },
+    "admin.table.user": "Użytkownik",
+    "admin.table.admin": "Admin",
+    "admin.table.sessions": "Sesje",
+    "admin.table.actions": "Akcje",
+    "admin.active_label": "Aktywna",
+    "admin.action.logout": "Wyloguj",
+    "admin.mod_no_logout": "—",
+    "admin.cards.users": "Zarządzanie użytkownikami · serverjonas",
+    "admin.suggestions.heading": "Otwarte sugestie ról",
+    "admin.suggestions.from": "od",
+    "admin.suggestions.approve": "Zatwierdź",
+    "admin.suggestions.reject": "Odrzuć",
+    "admin.suggestions.empty": "Brak otwartych sugestii.",
+    "admin.suggestions.created": "Sugestia wysłana. Oczekuje na przegląd admina.",
+    "mods.users.subtitle": "Przełączniki ról to sugestie — admini przeglądają i decydują."
+}
