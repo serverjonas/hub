@@ -10,11 +10,19 @@ bp = Blueprint("friends", __name__, template_folder="../../templates/friends")
 
 
 def get_friends(user_id):
+    """Return the user's accepted friends as a list of small dicts.
+
+    Templates iterate over the result and access ``id``, ``name`` and
+    ``avatar_path`` as named fields (see ``templates/friends/index.html``).
+    Returning dicts instead of raw tuples keeps that wiring working — if this
+    ever regresses back to plain tuples the friend list will silently render
+    blank, because Jinja's ``Undefined`` swallows missing attributes.
+    """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
         """
-        SELECT u.user_id, u.user_name FROM users u
+        SELECT u.user_id, u.user_name, u.avatar_path FROM users u
         JOIN friendships f ON (
             (f.user_id = ? AND f.friend_id = u.user_id) OR
             (f.friend_id = ? AND f.user_id = u.user_id)
@@ -24,12 +32,18 @@ def get_friends(user_id):
     """,
         (user_id, user_id),
     )
-    result = cur.fetchall()
+    rows = cur.fetchall()
     conn.close()
-    return result
+    return [
+        {"id": row[0], "name": row[1], "avatar_path": row[2]}
+        for row in rows
+    ]
 
 
 def get_pending_incoming(user_id):
+    # Returns raw ``(user_id, user_name)`` tuples so the template can unpack
+    # them with ``{% for id, name in incoming %}``. ``get_friends`` above uses
+    # a dict shape instead — keep that mismatch in mind if you touch this.
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
