@@ -15,6 +15,7 @@ from toolbox.email import (
     build_verify_url,
     send_email,
     verification_email_body,
+    verification_email_body_html,
 )
 from toolbox.user import (
     consume_email_verification,
@@ -73,13 +74,23 @@ def _login_required():
 
 
 def _send_verification(email_addr, username, token):
-    """Kapselt den msmtp-Versand für die Verifizierungs-Mail."""
+    """Kapselt den msmtp-Versand für die Verifizierungs-Mail.
+
+    Versendet eine ``multipart/alternative``-Mail mit HTML als bevorzugter
+    Darstellung und Plain-Text als Fallback.
+    """
+    verify_url = build_verify_url(token)
     return send_email(
         to_address=email_addr,
         subject="Bestätige deine E-Mail – serverjonas",
         text_body=verification_email_body(
             username,
-            build_verify_url(token),
+            verify_url,
+            ttl_hours=24,
+        ),
+        html_body=verification_email_body_html(
+            username,
+            verify_url,
             ttl_hours=24,
         ),
     )
