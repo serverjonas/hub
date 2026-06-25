@@ -17,8 +17,8 @@
         <!-- Lucide Icons -->
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
-            /* ─── Design Tokens (Hand-Drawn) ─── */
-            :root {
+            /* ─── Design Tokens (Hand-Drawn Light = default Paper) ─── */
+            :root, [data-theme="paper"] {
                 --font-body: 'Patrick Hand', 'Kalam', cursive, system-ui, sans-serif;
                 --font-heading: 'Kalam', 'Patrick Hand', cursive, system-ui, sans-serif;
 
@@ -68,94 +68,84 @@
                 --transition-fast: all 0.12s ease;
             }
 
-            /* ─── Dark Theme (Chalkboard variant of Hand-Drawn) ─── */
-            [data-theme="dark"] {
-                --bg: #2a2826;
-                --bg-warm: #36322e;
-                --surface: #3a3633;
-                --surface-hover: #454039;
-                --muted: #1f1d1b;
-                --border: #fdfbf7;       /* White "chalk" line */
-                --border-strong: #ffffff;
-                --text-main: #fdfbf7;
-                --text-secondary: #e5e0d8;
-                --text-dim: #a8a298;
-                --accent: #ff6b6b;
-                --accent-lighter: rgba(255, 107, 107, 0.15);
-                --secondary: #6ea7e8;
-                --secondary-lighter: rgba(110, 167, 232, 0.15);
-                --postit: #5c5340;
-            }
-            [data-theme="dark"] nav { background: #3a3633; }
-            [data-theme="dark"] .mobile-nav { background: #3a3633; }
-            [data-theme="dark"] .lang-dropdown-menu { background: #454039; }
+            /* ─── Unified OLED standard (all Dark modes look identical) ───
+               One unified dark theme for paper-dark, neuromorph-dark, win95-amber
+               and synthwave — a clean, normal dark website. No glow, no scanlines,
+               no CRT amber phosphor, no bevels. */
+            [data-theme="paper-dark"],
+            [data-theme="neuromorph-dark"],
+            [data-theme="win95-amber"],
+            [data-theme="synthwave"] {
+                --bg: #0f1216;               /* Deep, easy-on-the-eyes OLED-friendly dark */
+                --bg-warm: #0f1216;
+                --surface: #171a21;
+                --surface-hover: #222630;
+                --muted: #1c2028;
+                --border: #3b4252;
+                --border-strong: #4c566a;
+                --text-main: #e7e9ee;
+                --text-secondary: #b8bcc4;
+                --text-dim: #7a8190;
 
-            /* ─── OLED Theme (pure black, white chalk) ─── */
-            [data-theme="oled"] {
-                --bg: #000000;
-                --bg-warm: #0a0a0a;
-                --surface: #0f0f0f;
-                --surface-hover: #1a1a1a;
-                --muted: #0a0a0a;
-                --border: #fdfbf7;
-                --border-strong: #ffffff;
-                --text-main: #fdfbf7;
-                --text-secondary: #d4cfc4;
-                --text-dim: #908a7e;
-                --accent: #ff6b6b;
-                --accent-lighter: rgba(255, 107, 107, 0.18);
-                --secondary: #6ea7e8;
-                --secondary-lighter: rgba(110, 167, 232, 0.18);
-                --postit: #4d3b00;
-            }
-            [data-theme="oled"] nav { background: #0f0f0f; }
-            [data-theme="oled"] .mobile-nav { background: #0f0f0f; }
-            [data-theme="oled"] .lang-dropdown-menu { background: #1a1a1a; }
+                --accent: #4ea3ff;           /* Friendly, modern blue */
+                --accent-light: #7cb9ff;
+                --accent-lighter: rgba(78, 163, 255, 0.15);
+                --accent-glow: rgba(78, 163, 255, 0.25);
+                --secondary: #5ee0ad;
+                --secondary-lighter: rgba(94, 224, 173, 0.15);
+                --postit: #222630;
 
-            /* ─── Paper Theme (aged/newspaper variant) ─── */
-            [data-theme="paper"] {
-                --bg: #f0e8d4;
-                --bg-warm: #e8dec0;
-                --surface: #faf3de;
-                --surface-hover: #f5ecca;
-                --muted: #d4c8a8;
-                --border: #3d3525;
-                --border-strong: #2a2418;
-                --text-main: #2a2418;
-                --text-secondary: #5a4d35;
-                --text-dim: #7a6a4e;
-                --accent: #c23535;
-                --accent-light: #d05050;
-                --accent-lighter: rgba(194, 53, 53, 0.15);
-                --secondary: #1f4f8a;
-                --secondary-lighter: rgba(31, 79, 138, 0.12);
-                --postit: #fff099;
-            }
-            [data-theme="paper"] nav { background: #faf3de; }
-            [data-theme="paper"] .mobile-nav { background: #faf3de; }
-            [data-theme="paper"] .lang-dropdown-menu { background: #f5ecca; }
+                /* System fonts — no special / vintage family on dark */
+                --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                --font-heading: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-            /* ─── Neumorphism (Soft UI) Theme — cool monochromatic — ─── */
+                /* Gentle modern radii — no wobbly, no bevel, no neon */
+                --wobbly-1: 10px;
+                --wobbly-2: 10px;
+                --wobbly-3: 8px;
+                --wobbly-4: 8px;
+                --wobbly-circle: 50%;
+                --radius-full: 9999px;
+                --radius-sm: 6px;
+                --radius-md: 10px;
+                --radius-lg: 14px;
+                --radius-xl: 20px;
+
+                /* Soft modern shadows */
+                --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+                --shadow-md: 0 4px 6px rgba(0,0,0,0.5);
+                --shadow-lg: 0 10px 15px rgba(0,0,0,0.6);
+                --shadow-xl: 0 20px 25px rgba(0,0,0,0.6);
+                --shadow-inset: inset 0 2px 4px rgba(0,0,0,0.4);
+                --shadow-inset-deep: inset 0 4px 8px rgba(0,0,0,0.6);
+                --shadow-inset-small: inset 0 1px 2px rgba(0,0,0,0.4);
+                --shadow-glow: var(--shadow-md);
+
+                --transition: all 0.2s ease;
+                --transition-fast: all 0.1s ease;
+            }
+
+            /* ─── Neumorphism (Soft UI) Theme — LIGHT only — ─── */
             [data-theme="neuromorph"] {
                 --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
                 --font-heading: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif;
 
                 --bg: #E0E5EC;          /* Cool clay surface */
                 --bg-warm: #E0E5EC;
-                --surface: #E0E5EC;     /* Same as background → "molded from same material" */
+                --surface: #E0E5EC;
                 --surface-hover: #dde2eb;
                 --muted: #c9d1de;
-                --border: transparent;  /* Neumorphism never uses borders */
+                --border: transparent;
                 --border-strong: transparent;
-                --text-main: #3D4852;   /* 7.5:1 AA contrast */
+                --text-main: #3D4852;
                 --text-secondary: #4A5664;
-                --text-dim: #6B7280;    /* 4.6:1 AA contrast */
+                --text-dim: #6B7280;
 
-                --accent: #6C63FF;      /* Soft violet for focus / CTAs */
+                --accent: #6C63FF;
                 --accent-light: #8B84FF;
                 --accent-lighter: rgba(108, 99, 255, 0.10);
                 --accent-glow: rgba(108, 99, 255, 0.25);
-                --secondary: #38B2AC;   /* Teal for success states */
+                --secondary: #38B2AC;
                 --secondary-lighter: rgba(56, 178, 172, 0.10);
                 --postit: #E0E5EC;
 
@@ -171,13 +161,10 @@
                 --radius-lg: 24px;
                 --radius-xl: 32px;
 
-                /* Soft, dual opposing RGBA shadows (light top-left, dark bottom-right) */
                 --shadow-sm: 5px 5px 10px rgb(163,177,198,0.6), -5px -5px 10px rgba(255,255,255,0.5);
                 --shadow-md: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5);
                 --shadow-lg: 12px 12px 20px rgb(163,177,198,0.7), -12px -12px 20px rgba(255,255,255,0.6);
                 --shadow-xl: 16px 16px 24px rgb(163,177,198,0.7), -16px -16px 24px rgba(255,255,255,0.6);
-
-                /* Inset presets (for inputs, active wells, focus) */
                 --shadow-inset: inset 6px 6px 10px rgb(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5);
                 --shadow-inset-deep: inset 10px 10px 20px rgb(163,177,198,0.7), inset -10px -10px 20px rgba(255,255,255,0.6);
                 --shadow-inset-small: inset 3px 3px 6px rgb(163,177,198,0.6), inset -3px -3px 6px rgba(255,255,255,0.5);
@@ -186,29 +173,150 @@
                 --transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, background 0.3s ease, color 0.3s ease;
                 --transition-fast: all 0.18s ease-out;
             }
-            /* No paper grain in neumorph — clean cool grey */
+
+            /* ─── 90s Retro (Windows 95 Silver) — classic system grey, bevels everywhere ─ */
+            [data-theme="win95-silver"] {
+                --font-body: 'MS Sans Serif', 'MS Sans Serif 8-bit', 'Tahoma', 'Geneva', sans-serif;
+                --font-heading: 'Arial Black', 'Impact', 'Haettenschweiler', sans-serif;
+
+                --bg: #c0c0c0;
+                --bg-warm: #c0c0c0;
+                --surface: #c0c0c0;
+                --surface-hover: #d4d4d4;
+                --muted: #808080;
+                --border: #000000;
+                --border-strong: #ffffff;
+                --text-main: #000000;
+                --text-secondary: #000000;
+                --text-dim: #404040;
+
+                --accent: #0000ff;
+                --accent-light: #4040ff;
+                --accent-lighter: rgba(0, 0, 255, 0.15);
+                --accent-glow: rgba(0, 0, 255, 0.22);
+                --secondary: #008000;
+                --secondary-lighter: rgba(0, 128, 0, 0.12);
+                --postit: #ffffcc;
+
+                /* Force square corners everywhere */
+                --wobbly-1: 0;
+                --wobbly-2: 0;
+                --wobbly-3: 0;
+                --wobbly-4: 0;
+                --wobbly-circle: 0;
+                --radius-full: 0;
+                --radius-sm: 0;
+                --radius-md: 0;
+                --radius-lg: 0;
+                --radius-xl: 0;
+
+                --shadow-sm: inset -1px -1px 0 #0a0a0a, inset 1px 1px 0 #ffffff,
+                             inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf;
+                --shadow-md: var(--shadow-sm);
+                --shadow-lg: var(--shadow-sm);
+                --shadow-xl: var(--shadow-sm);
+                --shadow-inset: inset 1px 1px 0 #808080, inset -1px -1px 0 #ffffff,
+                                inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf;
+                --shadow-inset-deep: var(--shadow-inset);
+                --shadow-inset-small: var(--shadow-inset);
+
+                --transition: none;
+                --transition-fast: none;
+            }
+
+            /* ───── 90s Retro Light (win95-silver) overrides ───── */
+            [data-theme="win95-silver"] body {
+                background-image: linear-gradient(45deg, #b0b0b0 25%, transparent 25%),
+                                  linear-gradient(-45deg, #b0b0b0 25%, transparent 25%),
+                                  linear-gradient(45deg, transparent 75%, #b0b0b0 75%),
+                                  linear-gradient(-45deg, transparent 75%, #b0b0b0 75%);
+                background-size: 4px 4px;
+                background-position: 0 0, 0 2px, 2px -2px, -2px 0;
+                letter-spacing: 0;
+            }
+            [data-theme="win95-silver"] .bg-decoration { display: none; }
+            [data-theme="win95-silver"] nav,
+            [data-theme="win95-silver"] .mobile-nav,
+            [data-theme="win95-silver"] .lang-dropdown-menu { border-radius: 0; }
+            [data-theme="win95-silver"] nav {
+                background: var(--bg);
+                border: 2px solid;
+                border-color: #ffffff #808080 #808080 #ffffff;
+                box-shadow: none;
+                top: 12px;
+            }
+            [data-theme="win95-silver"] .mobile-nav {
+                background: var(--bg);
+                border-left: 2px solid;
+                border-color: #ffffff #808080 #808080 #ffffff;
+            }
+            [data-theme="win95-silver"] .footer-inner { border-top: 2px solid #808080; }
+            [data-theme="win95-silver"] .form-control {
+                border-radius: 0;
+                border: 2px solid;
+                border-color: #808080 #ffffff #ffffff #808080;
+                box-shadow: inset 1px 1px 0 #404040, inset -1px -1px 0 #dfdfdf;
+                background: #ffffff;
+                color: #000000;
+            }
+            [data-theme="win95-silver"] .btn {
+                border-radius: 0;
+                border: 2px solid;
+                border-color: #ffffff #808080 #808080 #ffffff;
+                box-shadow: var(--shadow-sm);
+                font-family: var(--font-heading);
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+            [data-theme="win95-silver"] .btn:hover { transform: none; }
+            [data-theme="win95-silver"] .btn:active {
+                border-color: #808080 #ffffff #ffffff #808080;
+                box-shadow: inset 1px 1px 0 #404040, inset -1px -1px 0 #dfdfdf;
+                transform: translate(1px, 1px);
+            }
+            [data-theme="win95-silver"] .settings-card::before,
+            [data-theme="win95-silver"] .auth-container::before,
+            [data-theme="win95-silver"] .auth-container::after { display: none; }
+            [data-theme="win95-silver"] .option-card,
+            [data-theme="win95-silver"] .design-preview { transform: none; border-radius: 0; }
+            [data-theme="win95-silver"] .option-card:hover { transform: none; background: #d4d4d4; }
+            [data-theme="win95-silver"] .option-card.active {
+                background: var(--accent-lighter);
+                border-color: var(--accent);
+                border-radius: 0;
+                transform: none;
+            }
+            [data-theme="win95-silver"] .option-card.active::after {
+                border-radius: 0;
+                box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff,
+                            inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+                width: 24px; height: 24px; top: -8px; right: -8px;
+            }
+            [data-theme="win95-silver"] .design-preview {
+                border: 2px solid;
+                border-color: #ffffff #808080 #808080 #ffffff;
+                box-shadow: none;
+            }
+            [data-theme="win95-silver"] .design-banner,
+            [data-theme="win95-silver"] .notif-badge { border-radius: 0; }
+
+            /* ───── Soft UI Light (neuromorph) overrides ───── */
             [data-theme="neuromorph"] body { background-image: none; }
             [data-theme="neuromorph"] .bg-decoration,
             [data-theme="neuromorph"] .bg-doodle { display: none; }
-            [data-theme="neuromorph"] nav { background: #E0E5EC; border-color: transparent; }
-            [data-theme="neuromorph"] .mobile-nav { background: #E0E5EC; border-color: transparent; }
-            [data-theme="neuromorph"] .lang-dropdown-menu { background: #E0E5EC; border-color: transparent; }
-            /* Footer dashed border becomes soft shadow */
+            [data-theme="neuromorph"] nav,
+            [data-theme="neuromorph"] .mobile-nav,
+            [data-theme="neuromorph"] .lang-dropdown-menu { border-color: transparent; }
             [data-theme="neuromorph"] .footer-inner { border-top: none; }
-
-            /* — Neumorph-specific overrides for shared components — */
-            /* Inputs feel like drilled wells (inset), not raised */
             [data-theme="neuromorph"] .form-control {
                 box-shadow: var(--shadow-inset);
                 border-color: transparent;
-                background: #E0E5EC;
             }
             [data-theme="neuromorph"] .form-control:focus {
                 border-color: transparent;
                 box-shadow: var(--shadow-inset-deep), 0 0 0 3px var(--accent-lighter);
                 outline: none;
             }
-            /* Buttons hover lifts deeper */
             [data-theme="neuromorph"] .btn:hover {
                 transform: translateY(-1px);
                 box-shadow: var(--shadow-lg);
@@ -217,11 +325,9 @@
                 transform: translateY(0.5px);
                 box-shadow: var(--shadow-inset-small);
             }
-            /* The postit-tape pseudo-element feels alien in neumorph — hide it */
             [data-theme="neuromorph"] .settings-card::before,
             [data-theme="neuromorph"] .auth-container::before,
             [data-theme="neuromorph"] .auth-container::after { display: none; }
-            /* Make sure 'hover rotate' on cards does not snap: smoother transitions */
             [data-theme="neuromorph"] .card,
             [data-theme="neuromorph"] .option-card,
             [data-theme="neuromorph"] .setting-action,
@@ -233,8 +339,131 @@
                 transform: translateY(-2px);
                 box-shadow: var(--shadow-lg);
             }
-            /* Theme card "active" marker uses extruded violet circle */
             [data-theme="neuromorph"] .option-card.active { background: #dde2eb; }
+
+            /* ───── Unified OLED Standard reset ─────
+               Selector variable (DRY) — covers all four Dark IDs.
+               The OLED look is one clean dark website: no hand-drawn doodles,
+               no paper tape decoration, no neon glow, no bevels. Slim borders
+               and disable playful hover transforms. */
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"]) nav { border-width: 1.5px; }
+
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"]) .brand:hover,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"]) .icon-btn:hover,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"]) .mobile-nav-link:hover,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"]) .footer-links a:hover,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"]) .nav-links a:hover { transform: none; }
+
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"]) .icon-btn:hover { background: var(--surface-hover); box-shadow: none; }
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"]) .brand:hover { color: var(--accent); }
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"]) .footer-links a:hover { text-decoration-style: solid; }
+
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"]) body { background-image: none !important; }
+
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .bg-decoration,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .bg-doodle,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .settings-card::before,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .auth-container::before,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .auth-container::after { display: none !important; }
+
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .btn,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .form-control,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .notif-toast { border-width: 1.5px !important; }
+
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .btn:hover,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .design-preview,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .option-card,
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .notif-toast { transform: none; }
+
+            /* Footer + cards lose the pencil-dashed / post-it feel too. */
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .footer-inner { border-top: 1px solid var(--border); }
+            :where([data-theme="paper-dark"],
+                   [data-theme="neuromorph-dark"],
+                   [data-theme="win95-amber"],
+                   [data-theme="synthwave"])
+                .notif-toast { border-radius: var(--radius-md); }
 
             /* ─── Reset ─── */
             *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -243,24 +472,17 @@
 
             body {
                 background-color: var(--bg);
-                /* Paper grain via radial-gradient dots (notebook paper feel) */
                 background-image: radial-gradient(var(--muted) 1px, transparent 1px);
                 background-size: 24px 24px;
                 background-attachment: fixed;
                 color: var(--text-main);
                 font-family: var(--font-body);
-                font-size: 18px;        /* Patrick Hand runs small — bump base */
+                font-size: 18px;
                 line-height: 1.55;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
                 min-height: 100vh;
                 overflow-x: hidden;
-            }
-
-            [data-theme="dark"] body,
-            [data-theme="oled"] body {
-                /* On chalkboard, fade dots so the surface stays readable */
-                background-image: radial-gradient(rgba(253, 251, 247, 0.06) 1px, transparent 1px);
             }
 
             h1, h2, h3, h4, .brand { font-family: var(--font-heading); letter-spacing: -0.3px; }
@@ -288,7 +510,6 @@
                 overflow: hidden;
             }
 
-            /* Hand-drawn doodles in the background — decorative only */
             .bg-doodle {
                 position: absolute;
                 opacity: 0.12;
@@ -302,8 +523,6 @@
             .bg-doodle-2 { top: 30%; right: 6%; transform: rotate(6deg);   font-size: 22px; }
             .bg-doodle-3 { bottom: 12%; left: 8%; transform: rotate(-4deg); font-size: 26px; }
             .bg-doodle-4 { bottom: 22%; right: 10%; transform: rotate(10deg); font-size: 20px; }
-            [data-theme="dark"] .bg-doodle,
-            [data-theme="oled"] .bg-doodle { opacity: 0.06; color: var(--border); }
 
             /* ─── Navbar (hand-drawn pill) ─── */
             nav {
@@ -551,7 +770,7 @@
 
             textarea.form-control { resize: vertical; min-height: 90px; }
 
-            /* ─── Post-it utility (used by some child pages via class) ─── */
+            /* ─── Post-it utility ─── */
             .postit {
                 background: var(--postit);
                 border: 2px solid var(--border);
@@ -676,9 +895,61 @@
     <body data-page="{% block page_id %}base{% endblock %}">
         <script>
             (function() {
-                const theme = localStorage.getItem("theme");
-                if (theme) document.documentElement.setAttribute("data-theme", theme);
+                // ── First-visit design picker redirect ───────────────────────
+                const PICKED_KEY = "serverjonas_design_picked";
+                let picked = "0";
+                try { picked = localStorage.getItem(PICKED_KEY) || "0"; } catch (_) {}
 
+                const PATH = window.location.pathname;
+                const EXEMPT_PREFIXES = [
+                    "/design",
+                    "/static",
+                    "/api",
+                    "/login",
+                    "/register",
+                    "/rights",
+                    "/status",
+                    "/ban"
+                ];
+                const isExempt = EXEMPT_PREFIXES.some(function (p) {
+                    return PATH === p || PATH.indexOf(p + "/") === 0;
+                });
+
+                const isTopFrame = (function () {
+                    try { return window.top === window.self; } catch (_) { return true; }
+                })();
+
+                if (picked !== "1" && !isExempt && isTopFrame) {
+                    window.location.replace("/design");
+                    return;
+                }
+
+                // ── Theme migration: all 4 Dark IDs share one OLED Standard look.
+                const THEME_MAP = {
+                    light: "paper",
+                    dark: "paper-dark",
+                    oled: "paper-dark",
+                    paper: "paper",
+                    neuromorph: "neuromorph"
+                };
+                const VALID = [
+                    "paper", "paper-dark",
+                    "neuromorph", "neuromorph-dark",
+                    "win95-silver", "win95-amber",
+                    "synthwave"
+                ];
+
+                let theme;
+                try {
+                    const stored = localStorage.getItem("theme");
+                    if (stored) {
+                        theme = THEME_MAP[stored] || (VALID.includes(stored) ? stored : null);
+                        if (theme && theme !== stored) {
+                            try { localStorage.setItem("theme", theme); } catch (_) {}
+                        }
+                    }
+                } catch (_) {}
+                if (theme) document.documentElement.setAttribute("data-theme", theme);
                 var LANG_MAP = { deu: "de", eng: "en" };
                 var lang = localStorage.getItem("serverjonas_lang");
                 document.documentElement.setAttribute("lang", LANG_MAP[lang] || "de");
@@ -798,94 +1069,6 @@
         </div>
 
         {% block banner_extra %}{% endblock %}
-        <div class="design-banner" id="designBanner" hidden>
-            <span class="design-banner-text" data-i18n="design.banner.title">Willkommen! Wähle dein Lieblings-Design</span>
-            <a href="/design" class="design-banner-cta" data-i18n="design.banner.cta">Jetzt ansehen</a>
-            <button type="button" class="design-banner-close" id="designBannerClose" aria-label="Dismiss">&times;</button>
-        </div>
-
-        <style>
-            .design-banner {
-                position: fixed;
-                top: 92px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: var(--postit);
-                color: var(--text-main);
-                border: 2.5px solid var(--border);
-                border-radius: var(--wobbly-2);
-                box-sizing: border-box;
-                box-shadow: var(--shadow-md);
-                padding: 12px 18px;
-                z-index: 1100;
-                max-width: 720px;
-                width: calc(100% - 32px);
-                font-family: var(--font-body);
-                display: flex;
-                align-items: center;
-                gap: 14px;
-                animation: fadeInUp 0.5s ease;
-            }
-            [data-theme="neuromorph"] .design-banner {
-                border-color: transparent;
-                background: #dde2eb;
-            }
-            .design-banner-text { flex: 1; font-weight: 700; font-size: 1rem; }
-            .design-banner-cta {
-                background: var(--accent);
-                color: #ffffff;
-                padding: 7px 14px;
-                border-radius: 9999px;
-                text-decoration: none;
-                font-family: var(--font-heading);
-                font-size: 0.85rem;
-                font-weight: 700;
-                border: 2.5px solid var(--border);
-                box-shadow: 2px 2px 0 0 var(--border);
-                white-space: nowrap;
-            }
-            .design-banner-cta:hover { background: var(--accent); transform: translate(-1px,-1px); }
-            .design-banner-close {
-                background: transparent;
-                border: 2px solid var(--border);
-                border-radius: 9999px;
-                width: 32px;
-                height: 32px;
-                cursor: pointer;
-                font-size: 18px;
-                font-family: var(--font-heading);
-                color: var(--text-main);
-                line-height: 1;
-            }
-            .design-banner-close:hover { background: var(--accent); color: #ffffff; }
-            [hidden] { display: none !important; }
-            @media (max-width: 540px) {
-                .design-banner-text { font-size: 0.9rem; }
-            }
-        </style>
-        <script>
-            (function () {
-                const KEY = "serverjonas_design_picked";
-                const banner = document.getElementById("designBanner");
-                const close = document.getElementById("designBannerClose");
-                if (!banner) return;
-                if (window.location.pathname.startsWith("/design") ||
-                    window.location.pathname.startsWith("/static")) {
-                    return;
-                }
-                let picked = "0";
-                try { picked = localStorage.getItem(KEY) || "0"; } catch (_) {}
-                if (picked === "1") return;
-                banner.hidden = false;
-                if (close) {
-                    close.addEventListener("click", () => {
-                        try { localStorage.setItem(KEY, "1"); } catch (_) {}
-                        banner.hidden = true;
-                    });
-                }
-            })();
-        </script>
-
         <div class="container">{% block content %}{% endblock %}</div>
 
         <!-- Footer -->
@@ -896,7 +1079,7 @@
                 <div class="footer-links">
                     <a href="/rights" data-i18n="footer.privacy">Datenschutz</a>
                     <a href="/status" data-i18n="footer.status">Serverstatus</a>
-                    <a href="/news" data-i18n="footer.news">Neuigkeiten</a>
+                    <a href="/news" data-i-i18n="footer.news">Neuigkeiten</a>
                 </div>
             </div>
         </footer>

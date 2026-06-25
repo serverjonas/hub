@@ -26,12 +26,77 @@
     margin: 0 auto;
 }
 
+/* ─── Family sections: 2 groups, each holding 2 light/dark cards ─── */
+.design-family {
+    margin-bottom: 32px;
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.design-family:nth-of-type(2) { animation-delay: 0.12s; }
+
+.design-family-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 0 6px;
+}
+.design-family-title {
+    font-family: var(--font-heading);
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.design-family-title::before {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2.5px solid var(--border);
+    background: var(--accent);
+    transform: rotate(-8deg);
+    box-shadow: 2px 2px 0 0 var(--border);
+}
+.design-family-tagline {
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    flex: 1;
+    max-width: 420px;
+    text-align: right;
+}
+@media (max-width: 600px) {
+    .design-family-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .design-family-tagline { text-align: left; }
+}
+
 .design-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 22px;
-    margin-bottom: 40px;
 }
+
+/* ─── Mode chip: small "Light / Dark" label inside the card footer ─── */
+.mode-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-hover);
+    border: 2px solid var(--border);
+    border-radius: 9999px;
+    padding: 4px 10px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+.mode-chip svg { width: 12px; height: 12px; }
 
 .design-card {
     background: var(--surface);
@@ -87,7 +152,6 @@
     box-shadow: var(--shadow-sm);
     overflow: hidden;
 }
-
 .design-preview-btn {
     padding: 8px 16px;
     border-radius: 9999px;
@@ -96,11 +160,6 @@
     font-weight: 700;
     border: 2px solid currentColor;
     color: #ffffff;
-}
-.design-preview-chip {
-    width: 26px;
-    height: 26px;
-    border: 2px solid currentColor;
 }
 .design-preview-card {
     width: 70px;
@@ -111,11 +170,8 @@
     justify-content: center;
     font-size: 24px;
 }
-
-/* Neumorph preview override */
-[data-theme="neuromorph"] .design-card { border-color: transparent; }
-[data-theme="neuromorph"] .design-card.active { background: #dde2eb; }
-[data-theme="neuromorph"] .design-preview {
+[data-theme="neuromorph"] .design-preview,
+[data-theme="neuromorph-dark"] .design-preview {
     border-color: transparent;
     box-shadow: var(--shadow-inset);
 }
@@ -171,70 +227,157 @@
     gap: 12px;
     justify-content: center;
     flex-wrap: wrap;
-    margin-top: 16px;
+    margin-top: 24px;
 }
 {% endblock %}
 
 {% block content %}
 <div class="design-header">
     <h1 data-i18n="design.title">Wähle dein Design</h1>
-    <p data-i18n="design.subtitle">Wähle aus 5 sorgfältig gestalteten Themes — von hand-drawn bis neumorphic Soft UI.</p>
+    <p data-i18n="design.subtitle">Vier Familien, sieben Stimmungen — wähle was zu dir passt.</p>
+    <p style="margin-top: 8px; font-size: 0.95rem; color: var(--accent); font-weight: 700;">
+        <i data-lucide="info" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
+        <span data-i18n="design.dark_standard_notice">Hinweis: Alle Dark-Modi sind visuell identisch (OLED Standard).</span>
+    </p>
 </div>
 
-<div class="design-grid" id="designGrid">
-    {% for d in designs %}
-    <div class="design-card" data-design-id="{{ d.id }}" data-family="{{ d.family }}">
-        {% if d.id == 'neuromorph' %}<span class="badge-new" data-i18n="design.badge_new">Neu</span>{% endif %}
+{% for fam in families %}
+<div class="design-family" data-family="{{ fam.id }}">
 
-        <div class="design-preview" style="
-            background: {{ d.preview.bg }};
-            color: {{ d.preview.fg }};
-            border-color: {{ d.preview.fg }};
-        ">
-            {% if d.family == 'hand-drawn' %}
-                <div class="design-preview-card" style="
-                    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-                    background: {{ d.preview.bg }};
-                    border-color: {{ d.preview.fg }};
-                    transform: rotate(-3deg);
-                ">
-                    <span style="color: {{ d.preview.accent }}; font-family: 'Kalam', cursive; font-weight: 700;">✎</span>
-                </div>
-                <span class="design-preview-btn" style="
-                    background: {{ d.preview.accent }};
-                    border-color: {{ d.preview.fg }};
-                    color: #ffffff;
-                ">Go!</span>
-            {% else %}
-                <div class="design-preview-card" style="
-                    border-radius: 24px;
-                    background: {{ d.preview.bg }};
-                    border: none;
-                    box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5);
-                    color: {{ d.preview.accent }};
-                    font-size: 24px;
-                ">●</div>
-                <span class="design-preview-btn" style="
-                    background: {{ d.preview.accent }};
-                    color: #ffffff;
-                    box-shadow: 6px 6px 12px rgb(163,177,198,0.5), -6px -6px 12px rgba(255,255,255,0.4);
-                    border: none;
-                ">Go!</span>
-            {% endif %}
-        </div>
-
-        <div class="design-name" data-i18n="{{ d.name_key }}">{{ d.default_name }}</div>
-        <div class="design-tagline" data-i18n="{{ d.tagline_key }}">{{ d.default_tagline }}</div>
-
-        <div class="design-card-footer">
-            <button type="button" class="btn btn-primary choose-btn" data-pick="{{ d.id }}">
-                <i data-lucide="check" style="width: 16px; height: 16px;"></i>
-                <span data-i18n="design.choose">Auswählen</span>
-            </button>
-        </div>
+    <div class="design-family-header">
+        <div class="design-family-title"
+             data-i18n="{{ fam.label_key }}">{{ fam.default_label }}</div>
+        <div class="design-family-tagline"
+             data-i18n="{{ fam.tagline_key }}">{{ fam.default_tagline }}</div>
     </div>
-    {% endfor %}
+
+    <div class="design-grid">
+        {% for d in fam.designs %}
+        <div class="design-card"
+             data-design-id="{{ d.id }}"
+             data-family="{{ d.family_id }}"
+             data-mode="{{ d.mode }}">
+            {% if d.id in ['paper-dark', 'neuromorph-dark'] and d.family == 'soft_ui' %}<span class="badge-new">Neu</span>{% endif %}
+
+            <div class="design-preview" style="
+                background: {{ d.preview.bg }};
+                color: {{ d.preview.fg }};
+                border-color: {{ d.preview.fg }};
+            ">
+                {% if d.mode == 'dark' %}
+                    {# OLED Standard: clean dark preview, identical across all Dark families #}
+                    <div class="design-preview-card design-preview-oled" style="
+                        background: #0f1216;
+                        border: 1.5px solid {{ d.preview.accent }};
+                        color: {{ d.preview.accent }};
+                        font-family: system-ui, -apple-system, sans-serif;
+                        font-weight: 600;
+                        font-size: 22px;
+                        border-radius: 8px;
+                    ">Aa</div>
+                    <span class="design-preview-btn" style="
+                        background: {{ d.preview.accent }};
+                        color: #ffffff;
+                        font-family: system-ui, -apple-system, sans-serif;
+                        font-weight: 600;
+                        border: none;
+                        border-radius: 8px;
+                        padding: 8px 16px;
+                    ">OK</span>
+                {% elif d.family == 'hand-drawn' %}
+                    <div class="design-preview-card" style="
+                        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+                        background: {{ d.preview.bg }};
+                        border-color: {{ d.preview.fg }};
+                        transform: rotate(-3deg);
+                    ">
+                        <span style="color: {{ d.preview.accent }}; font-family: 'Kalam', cursive; font-weight: 700;">✎</span>
+                    </div>
+                    <span class="design-preview-btn" style="
+                        background: {{ d.preview.accent }};
+                        border-color: {{ d.preview.fg }};
+                        color: #ffffff;
+                    ">Go!</span>
+                {% elif d.family == 'soft_ui' %}
+                    <div class="design-preview-card" style="
+                        border-radius: 24px;
+                        background: {{ d.preview.bg }};
+                        border: none;
+                        box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5);
+                        color: {{ d.preview.accent }};
+                        font-size: 24px;
+                    ">●</div>
+                    <span class="design-preview-btn" style="
+                        background: {{ d.preview.accent }};
+                        color: #ffffff;
+                        box-shadow: 6px 6px 12px rgb(163,177,198,0.5), -6px -6px 12px rgba(255,255,255,0.4);
+                        border: none;
+                    ">Go!</span>
+                {% elif d.family == 'nineties_retro' %}
+                    <div class="design-preview-card design-preview-bevel" style="
+                        background: {{ d.preview.bg }};
+                        border: 2px solid;
+                        border-color: #ffffff #808080 #808080 #ffffff;
+                        font-family: 'Arial Black', sans-serif;
+                        color: {{ d.preview.accent }};
+                        font-size: 22px;
+                    ">95</div>
+                    <span class="design-preview-btn design-preview-bevel" style="
+                        background: {{ d.preview.accent }};
+                        color: #ffffff;
+                        border: 2px solid;
+                        border-color: #ffffff #000080 #000080 #ffffff;
+                        font-family: 'Arial Black', sans-serif;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                        padding: 6px 14px;
+                    ">OK</span>
+                {% else %}
+                    {# synthwave (and any unknown family) - clean OLED preview, no neon #}
+                    <div class="design-preview-card" style="
+                        background: #0f1216;
+                        border: 1.5px solid #3b4252;
+                        color: #e7e9ee;
+                        font-family: system-ui, -apple-system, sans-serif;
+                        font-weight: 600;
+                        font-size: 22px;
+                        border-radius: 8px;
+                    ">Aa</div>
+                    <span class="design-preview-btn" style="
+                        background: #4ea3ff;
+                        color: #ffffff;
+                        border: none;
+                        border-radius: 8px;
+                        padding: 8px 16px;
+                        font-family: system-ui, -apple-system, sans-serif;
+                        font-weight: 600;
+                    ">OK</span>
+                {% endif %}
+            </div>
+
+            <div class="design-name" data-i18n="{{ d.name_key }}">{{ d.default_name }}</div>
+            <div class="design-tagline" data-i18n="{{ d.tagline_key }}">{{ d.default_tagline }}</div>
+
+            <div class="design-card-footer">
+                <span class="mode-chip" data-mode="{{ d.mode }}">
+                    {% if d.mode == 'light' %}
+                        <i data-lucide="sun"></i>
+                        <span data-i18n="design.mode.light">Hell</span>
+                    {% else %}
+                        <i data-lucide="moon"></i>
+                        <span data-i18n="design.mode.dark">Dunkel</span>
+                    {% endif %}
+                </span>
+                <button type="button" class="btn btn-primary choose-btn" data-pick="{{ d.id }}">
+                    <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                    <span data-i18n="design.choose">Auswählen</span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
+{% endfor %}
 
 <div class="design-actions">
     <a href="/settings" class="btn">
@@ -252,7 +395,7 @@
     (function () {
         const STORAGE_THEME = "theme";
         const STORAGE_PICKED = "serverjonas_design_picked";
-        const current = localStorage.getItem(STORAGE_THEME) || "light";
+        const current = localStorage.getItem(STORAGE_THEME) || "paper";
         document.querySelectorAll(".design-card").forEach(card => {
             if (card.getAttribute("data-design-id") === current) {
                 card.classList.add("active");
@@ -269,7 +412,7 @@
             setTimeout(() => { window.location.href = "/hub"; }, 450);
         }
 
-        // Buttons + ganze Klick auf der Card
+        // Buttons + ganze Karte klickbar
         document.querySelectorAll(".choose-btn").forEach(btn => {
             btn.addEventListener("click", e => {
                 e.stopPropagation();

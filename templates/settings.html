@@ -141,6 +141,108 @@
     .options-grid { margin-left: 0; }
 }
 
+/* ─── Theme families: 2 buckets, each with 2 light/dark cards ─── */
+.theme-family {
+    margin-left: 58px;
+    margin-bottom: 22px;
+    padding: 16px 18px;
+    border: 2px dashed var(--border);
+    border-radius: var(--wobbly-2);
+    background: var(--surface-hover);
+    position: relative;
+    animation: fadeInUp 0.5s 0.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.theme-family:nth-of-type(2) { animation-delay: 0.18s; }
+
+.theme-family-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 0 0 12px;
+    flex-wrap: wrap;
+}
+.theme-family-name {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.theme-family-name::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border: 2px solid var(--border);
+    transform: rotate(-8deg);
+    box-shadow: 1px 1px 0 0 var(--border);
+}
+.theme-family-desc {
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.theme-family-grid {
+    margin-left: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.option-mode-tag {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 8px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 9999px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    box-shadow: 1px 1px 0 0 var(--border);
+}
+.option-card.active .option-mode-tag {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--border);
+}
+
+/* OLED-Standard Hinweis-Badge auf den 4 Dark-Karten.
+   Subtil, klein, ohne Hand-Drawn Wackel-Optik. */
+.oled-tag {
+    display: inline-block;
+    margin-top: 6px;
+    margin-left: 4px;
+    padding: 3px 8px;
+    background: var(--accent-lighter);
+    border: 1px solid var(--accent);
+    border-radius: 9999px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    transform: none;
+}
+.option-card.active .oled-tag {
+    background: var(--accent);
+    color: #ffffff;
+}
+
+@media (max-width: 600px) {
+    .theme-family { margin-left: 0; }
+    .theme-family-grid { grid-template-columns: 1fr; }
+}
+
 .option-card {
     background: var(--surface);
     border: 2.5px solid var(--border);
@@ -602,30 +704,87 @@
                 </div>
                 <span data-i18n="settings.theme.title">Erscheinungsbild</span>
             </h2>
-            <p class="settings-description" data-i18n="settings.theme.desc">Wähle ein Farbschema, das dir gefällt.</p>
+            <p class="settings-description" data-i18n="settings.theme.desc">Zwei Design-Familien — jeweils mit hellem und dunklem Modus.</p>
             <p class="settings-description" style="margin-left: 58px; font-size: 0.9rem; color: var(--accent); font-weight: 700;">
-                <a href="/design" data-i18n="settings.theme.picker_link">→ Alle Designs mit Vorschau ansehen</a>
+                <a href="/design" data-i18n="settings.theme.picker_link">→ Alle Designs nebeneinander vergleichen</a>
             </p>
-            <div class="options-grid">
-                <div class="option-card" data-option="theme" data-value="light">
-                    <i data-lucide="sun" class="option-icon" style="width: 32px; height: 32px;"></i>
-                    <div class="option-name" data-i18n="settings.theme.light">Hell</div>
+
+            <!-- ─── Family 1: Hand-Drawn ─── -->
+            <div class="theme-family">
+                <div class="theme-family-header">
+                    <div class="theme-family-name" data-i18n="settings.theme.family.hand_drawn">Hand-Drawn</div>
+                    <div class="theme-family-desc" data-i18n="settings.theme.family.hand_drawn_desc">Wackeliger Bleistift, warmes Papier.</div>
                 </div>
-                <div class="option-card" data-option="theme" data-value="dark">
-                    <i data-lucide="moon" class="option-icon" style="width: 32px; height: 32px;"></i>
-                    <div class="option-name" data-i18n="settings.theme.dark">Dunkel</div>
+                <div class="options-grid theme-family-grid">
+                    <div class="option-card" data-option="theme" data-value="paper">
+                        <i data-lucide="sun" class="option-icon" style="width: 32px; height: 32px;"></i>
+                        <div class="option-name" data-i18n="settings.theme.paper">Papier</div>
+                        <div class="option-mode-tag" data-i18n="design.mode.light">Hell</div>
+                    </div>
+                    <div class="option-card" data-option="theme" data-value="paper-dark">
+                        <i data-lucide="moon" class="option-icon" style="width: 32px; height: 32px;"></i>
+                        <div class="option-name" data-i18n="settings.theme.paper_dark">Papier Dunkel</div>
+                        <div class="option-mode-tag" data-i18n="design.mode.dark">Dunkel</div>
+                        <div class="oled-tag" data-i18n="settings.theme.oled_standard">OLED Standard</div>
+                    </div>
                 </div>
-                <div class="option-card" data-option="theme" data-value="oled">
-                    <i data-lucide="zap" class="option-icon" style="width: 32px; height: 32px;"></i>
-                    <div class="option-name">OLED</div>
+            </div>
+
+            <!-- ─── Family 2: Soft UI ─── -->
+            <div class="theme-family">
+                <div class="theme-family-header">
+                    <div class="theme-family-name" data-i18n="settings.theme.family.soft_ui">Soft UI</div>
+                    <div class="theme-family-desc" data-i18n="settings.theme.family.soft_ui_desc">Cool Clay, weiche Schatten.</div>
                 </div>
-                <div class="option-card" data-option="theme" data-value="paper">
-                    <i data-lucide="file-text" class="option-icon" style="width: 32px; height: 32px;"></i>
-                    <div class="option-name">Paper</div>
+                <div class="options-grid theme-family-grid">
+                    <div class="option-card" data-option="theme" data-value="neuromorph">
+                        <i data-lucide="circle" class="option-icon" style="width: 32px; height: 32px;"></i>
+                        <div class="option-name" data-i18n="settings.theme.neuromorph">Soft UI</div>
+                        <div class="option-mode-tag" data-i18n="design.mode.light">Hell</div>
+                    </div>
+                    <div class="option-card" data-option="theme" data-value="neuromorph-dark">
+                        <i data-lucide="circle" class="option-icon" style="width: 32px; height: 32px;"></i>
+                        <div class="option-name" data-i18n="settings.theme.neuromorph_dark">Soft UI Dunkel</div>
+                        <div class="option-mode-tag" data-i18n="design.mode.dark">Dunkel</div>
+                        <div class="oled-tag" data-i18n="settings.theme.oled_standard">OLED Standard</div>
+                    </div>
                 </div>
-                <div class="option-card" data-option="theme" data-value="neuromorph">
-                    <i data-lucide="circle" class="option-icon" style="width: 32px; height: 32px;"></i>
-                    <div class="option-name" data-i18n="settings.theme.neuromorph">Soft UI</div>
+            </div>
+
+            <!-- ─── Family 3: 90s Retro ─── -->
+            <div class="theme-family">
+                <div class="theme-family-header">
+                    <div class="theme-family-name" data-i18n="settings.theme.family.nineties_retro">90s Retro</div>
+                    <div class="theme-family-desc" data-i18n="settings.theme.family.nineties_retro_desc">Bevel-Buttons, MS Sans Serif, CRT-Optik.</div>
+                </div>
+                <div class="options-grid theme-family-grid">
+                    <div class="option-card" data-option="theme" data-value="win95-silver">
+                        <i data-lucide="monitor" class="option-icon" style="width: 32px; height: 32px;"></i>
+                        <div class="option-name" data-i18n="settings.theme.win95_silver">Windows 95 Silber</div>
+                        <div class="option-mode-tag" data-i18n="design.mode.light">Hell</div>
+                    </div>
+                    <div class="option-card" data-option="theme" data-value="win95-amber">
+                        <i data-lucide="terminal" class="option-icon" style="width: 32px; height: 32px;"></i>
+                        <div class="option-name" data-i18n="settings.theme.win95_amber">CRT Amber</div>
+                        <div class="option-mode-tag" data-i18n="design.mode.dark">Dunkel</div>
+                        <div class="oled-tag" data-i18n="settings.theme.oled_standard">OLED Standard</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Family 4: Synthwave OLED (dark only) ─── -->
+            <div class="theme-family">
+                <div class="theme-family-header">
+                    <div class="theme-family-name" data-i18n="settings.theme.family.synthwave">Synthwave</div>
+                    <div class="theme-family-desc" data-i18n="settings.theme.family.synthwave_desc">Neon-Glow, monospace, retro-Terminal auf OLED.</div>
+                </div>
+                <div class="options-grid theme-family-grid" style="grid-template-columns: 1fr;">
+                    <div class="option-card" data-option="theme" data-value="synthwave">
+                        <i data-lucide="zap" class="option-icon" style="width: 32px; height: 32px;"></i>
+                        <div class="option-name" data-i18n="settings.theme.synthwave">Synthwave</div>
+                        <div class="option-mode-tag" data-i18n="design.mode.dark">Dunkel (OLED)</div>
+                        <div class="oled-tag" data-i18n="settings.theme.oled_standard">OLED Standard</div>
+                    </div>
                 </div>
             </div>
         </div>
