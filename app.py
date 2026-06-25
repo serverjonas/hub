@@ -202,12 +202,21 @@ def hub(path):
     return abort(404)
 
 
+# ─── Server host/port (override via env) ──────────────────────────────────────
+# Default: 0.0.0.0:5000. Examples:
+#   PORT=3000 python3 app.py --debug
+#   python3 app.py                   # → :5000
+#   PORT=8080 python3 app.py         # → :8080
+DEFAULT_HOST = os.environ.get("HOST", "0.0.0.0")
+DEFAULT_PORT = int(os.environ.get("PORT", "5000"))
+
+
 def RunServerDebug():
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host=DEFAULT_HOST, port=DEFAULT_PORT, debug=True)
 
 
 def RunServerRelease():
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host=DEFAULT_HOST, port=DEFAULT_PORT, debug=False)
 
 
 # ─── CLI parsing ──────────────────────────────────────────────────────────────────

@@ -7,6 +7,8 @@
     "settings.theme.desc": "Wähle ein Farbschema, das dir gefällt.",
     "settings.theme.light": "Hell",
     "settings.theme.dark": "Dunkel",
+    "settings.theme.neuromorph": "Soft UI",
+    "settings.theme.picker_link": "→ Alle Designs mit Vorschau ansehen",
     "settings.profile.title": "Profil",
     "settings.profile.desc": "Profilbild, Bio und Sichtbarkeit verwalten.",
     "settings.profile.save": "Speichern",

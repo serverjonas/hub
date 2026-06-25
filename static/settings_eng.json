@@ -7,6 +7,8 @@
     "settings.theme.desc": "Choose a colour scheme you like.",
     "settings.theme.light": "Light",
     "settings.theme.dark": "Dark",
+    "settings.theme.neuromorph": "Soft UI",
+    "settings.theme.picker_link": "→ See all designs with preview",
     "settings.profile.title": "Profile",
     "settings.profile.desc": "Manage profile picture, bio and visibility.",
     "settings.profile.save": "Save",

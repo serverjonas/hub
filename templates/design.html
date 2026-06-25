@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Design wählen · serverjonas{% endblock %}
+{% block page_id %}design{% endblock %}
+{% block title_i18n %}design.page_title{% endblock %}
+
+{% block extra_style %}
+.design-header {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.design-header h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2.2rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+    line-height: 1.05;
+}
+.design-header p {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    font-family: var(--font-body);
+    max-width: 580px;
+    margin: 0 auto;
+}
+
+.design-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 22px;
+    margin-bottom: 40px;
+}
+
+.design-card {
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-1);
+    box-shadow: var(--shadow-md);
+    padding: 22px;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+.design-card:hover {
+    transform: translate(-3px, -3px) rotate(-0.6deg);
+    box-shadow: var(--shadow-lg);
+}
+.design-card.active {
+    border-color: var(--accent);
+    background: var(--postit);
+}
+.design-card.active::before {
+    content: "✓";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    color: #ffffff;
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-circle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+}
+
+.design-preview {
+    height: 120px;
+    border-radius: var(--wobbly-2);
+    padding: 16px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.design-preview-btn {
+    padding: 8px 16px;
+    border-radius: 9999px;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 2px solid currentColor;
+    color: #ffffff;
+}
+.design-preview-chip {
+    width: 26px;
+    height: 26px;
+    border: 2px solid currentColor;
+}
+.design-preview-card {
+    width: 70px;
+    height: 70px;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+/* Neumorph preview override */
+[data-theme="neuromorph"] .design-card { border-color: transparent; }
+[data-theme="neuromorph"] .design-card.active { background: #dde2eb; }
+[data-theme="neuromorph"] .design-preview {
+    border-color: transparent;
+    box-shadow: var(--shadow-inset);
+}
+
+.design-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: -0.3px;
+}
+
+.design-tagline {
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.design-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.design-card-footer .choose-btn {
+    flex: 1;
+    text-align: center;
+}
+
+.design-card .badge-new {
+    display: inline-block;
+    background: var(--accent);
+    color: #ffffff;
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 3px 9px;
+    border-radius: 9999px;
+    border: 2px solid var(--border);
+    box-shadow: 2px 2px 0 0 var(--border);
+    position: absolute;
+    top: -10px;
+    left: 14px;
+    transform: rotate(-2deg);
+}
+
+.design-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="design-header">
+    <h1 data-i18n="design.title">Wähle dein Design</h1>
+    <p data-i18n="design.subtitle">Wähle aus 5 sorgfältig gestalteten Themes — von hand-drawn bis neumorphic Soft UI.</p>
+</div>
+
+<div class="design-grid" id="designGrid">
+    {% for d in designs %}
+    <div class="design-card" data-design-id="{{ d.id }}" data-family="{{ d.family }}">
+        {% if d.id == 'neuromorph' %}<span class="badge-new" data-i18n="design.badge_new">Neu</span>{% endif %}
+
+        <div class="design-preview" style="
+            background: {{ d.preview.bg }};
+            color: {{ d.preview.fg }};
+            border-color: {{ d.preview.fg }};
+        ">
+            {% if d.family == 'hand-drawn' %}
+                <div class="design-preview-card" style="
+                    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+                    background: {{ d.preview.bg }};
+                    border-color: {{ d.preview.fg }};
+                    transform: rotate(-3deg);
+                ">
+                    <span style="color: {{ d.preview.accent }}; font-family: 'Kalam', cursive; font-weight: 700;">✎</span>
+                </div>
+                <span class="design-preview-btn" style="
+                    background: {{ d.preview.accent }};
+                    border-color: {{ d.preview.fg }};
+                    color: #ffffff;
+                ">Go!</span>
+            {% else %}
+                <div class="design-preview-card" style="
+                    border-radius: 24px;
+                    background: {{ d.preview.bg }};
+                    border: none;
+                    box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5);
+                    color: {{ d.preview.accent }};
+                    font-size: 24px;
+                ">●</div>
+                <span class="design-preview-btn" style="
+                    background: {{ d.preview.accent }};
+                    color: #ffffff;
+                    box-shadow: 6px 6px 12px rgb(163,177,198,0.5), -6px -6px 12px rgba(255,255,255,0.4);
+                    border: none;
+                ">Go!</span>
+            {% endif %}
+        </div>
+
+        <div class="design-name" data-i18n="{{ d.name_key }}">{{ d.default_name }}</div>
+        <div class="design-tagline" data-i18n="{{ d.tagline_key }}">{{ d.default_tagline }}</div>
+
+        <div class="design-card-footer">
+            <button type="button" class="btn btn-primary choose-btn" data-pick="{{ d.id }}">
+                <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                <span data-i18n="design.choose">Auswählen</span>
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="design-actions">
+    <a href="/settings" class="btn">
+        <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+        <span data-i18n="design.open_settings">Zu den Einstellungen</span>
+    </a>
+    <a href="/hub" class="btn">
+        <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+        <span data-i18n="design.skip">Erstmal überspringen</span>
+    </a>
+</div>
+
+<script>
+    // Aktives Theme aus localStorage lesen und Karte markieren
+    (function () {
+        const STORAGE_THEME = "theme";
+        const STORAGE_PICKED = "serverjonas_design_picked";
+        const current = localStorage.getItem(STORAGE_THEME) || "light";
+        document.querySelectorAll(".design-card").forEach(card => {
+            if (card.getAttribute("data-design-id") === current) {
+                card.classList.add("active");
+            }
+        });
+
+        function pickDesign(id) {
+            try {
+                localStorage.setItem(STORAGE_THEME, id);
+                localStorage.setItem(STORAGE_PICKED, "1");
+            } catch (_) {}
+            document.documentElement.setAttribute("data-theme", id);
+            // Kurzes Delay → Animation → redirect
+            setTimeout(() => { window.location.href = "/hub"; }, 450);
+        }
+
+        // Buttons + ganze Klick auf der Card
+        document.querySelectorAll(".choose-btn").forEach(btn => {
+            btn.addEventListener("click", e => {
+                e.stopPropagation();
+                pickDesign(btn.getAttribute("data-pick"));
+            });
+        });
+        document.querySelectorAll(".design-card").forEach(card => {
+            card.addEventListener("click", () => {
+                pickDesign(card.getAttribute("data-design-id"));
+            });
+        });
+    })();
+</script>
+{% endblock %}

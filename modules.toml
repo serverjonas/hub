@@ -156,3 +156,9 @@ pfad = "groupchat"
 url = "/groups"
 description = "Gruppenchats basierend auf dem Notification-System"
 active = true
+
+[design]
+pfad = "design"
+url = "/design"
+description = "Design-Picker: Auswahl-Screen für die 5 verfügbaren Themes"
+active = true
