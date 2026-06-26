@@ -215,29 +215,6 @@
     border-color: var(--border);
 }
 
-/* OLED-Standard Hinweis-Badge auf den 4 Dark-Karten.
-   Subtil, klein, ohne Hand-Drawn Wackel-Optik. */
-.oled-tag {
-    display: inline-block;
-    margin-top: 6px;
-    margin-left: 4px;
-    padding: 3px 8px;
-    background: var(--accent-lighter);
-    border: 1px solid var(--accent);
-    border-radius: 9999px;
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 0.65rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--accent);
-    transform: none;
-}
-.option-card.active .oled-tag {
-    background: var(--accent);
-    color: #ffffff;
-}
-
 @media (max-width: 600px) {
     .theme-family { margin-left: 0; }
     .theme-family-grid { grid-template-columns: 1fr; }
@@ -725,7 +702,6 @@
                         <i data-lucide="moon" class="option-icon" style="width: 32px; height: 32px;"></i>
                         <div class="option-name" data-i18n="settings.theme.paper_dark">Papier Dunkel</div>
                         <div class="option-mode-tag" data-i18n="design.mode.dark">Dunkel</div>
-                        <div class="oled-tag" data-i18n="settings.theme.oled_standard">OLED Standard</div>
                     </div>
                 </div>
             </div>
@@ -746,7 +722,6 @@
                         <i data-lucide="circle" class="option-icon" style="width: 32px; height: 32px;"></i>
                         <div class="option-name" data-i18n="settings.theme.neuromorph_dark">Soft UI Dunkel</div>
                         <div class="option-mode-tag" data-i18n="design.mode.dark">Dunkel</div>
-                        <div class="oled-tag" data-i18n="settings.theme.oled_standard">OLED Standard</div>
                     </div>
                 </div>
             </div>
@@ -767,7 +742,6 @@
                         <i data-lucide="terminal" class="option-icon" style="width: 32px; height: 32px;"></i>
                         <div class="option-name" data-i18n="settings.theme.win95_amber">CRT Amber</div>
                         <div class="option-mode-tag" data-i18n="design.mode.dark">Dunkel</div>
-                        <div class="oled-tag" data-i18n="settings.theme.oled_standard">OLED Standard</div>
                     </div>
                 </div>
             </div>
@@ -783,7 +757,6 @@
                         <i data-lucide="zap" class="option-icon" style="width: 32px; height: 32px;"></i>
                         <div class="option-name" data-i18n="settings.theme.synthwave">Synthwave</div>
                         <div class="option-mode-tag" data-i18n="design.mode.dark">Dunkel (OLED)</div>
-                        <div class="oled-tag" data-i18n="settings.theme.oled_standard">OLED Standard</div>
                     </div>
                 </div>
             </div>

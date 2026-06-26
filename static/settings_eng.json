@@ -4,7 +4,7 @@
     },
     "settings.subtitle": "Customise your Serverjonas experience.",
     "settings.theme.title": "Appearance",
-    "settings.theme.desc": "Two design families — each with light and dark mode.",
+    "settings.theme.desc": "Four design families — each Dark mode has its own look.",
     "settings.theme.paper": "Paper",
     "settings.theme.paper_dark": "Paper Dark",
     "settings.theme.neuromorph": "Soft UI",
@@ -16,10 +16,10 @@
     "settings.theme.family.nineties_retro": "90s Retro",
     "settings.theme.family.nineties_retro_desc": "Beveled buttons, MS Sans Serif, CRT flair.",
     "settings.theme.family.synthwave": "Synthwave",
-    "settings.theme.family.synthwave_desc": "Identical to all other Dark modes — clean OLED Standard layout.",
+    "settings.theme.family.synthwave_desc": "Clean OLED Standard layout — modern, distraction-free.",
     "settings.theme.win95_silver": "Windows 95 Silver",
-    "settings.theme.win95_amber": "CRT Amber (OLED)",
-    "settings.theme.synthwave": "OLED Standard",
+    "settings.theme.win95_amber": "CRT Amber",
+    "settings.theme.synthwave": "Synthwave OLED",
     "settings.theme.section.modes": "Choose light or dark mode:",
     "settings.theme.picker_link": "→ Compare all designs side-by-side",
     "settings.profile.title": "Profile",
@@ -81,6 +81,5 @@
     "settings.toast.pw_changed_toast": "Password updated — {sessions} other session(s) signed out.",
     "settings.error.unknown": "Unknown error.",
     "settings.error.network": "Network error.",
-    "settings.page_title": "Settings · serverjonas",
-    "settings.theme.oled_standard": "OLED Standard"
+    "settings.page_title": "Settings · serverjonas"
 }

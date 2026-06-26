@@ -4,8 +4,8 @@
     },
     "settings.subtitle": "Passe dein Erlebnis auf Serverjonas an.",
     "settings.theme.title": "Erscheinungsbild",
-    "settings.theme.desc": "Vier Design-Familien — alle Dark-Modi sind visuell identisch (OLED Standard).",
-    "settings.theme.dark_standard_hint": "Hinweis: Welchen Dark Mode du wählst, ändert das Aussehen nicht.",
+    "settings.theme.desc": "Vier Design-Familien — jeder Dark Mode hat seinen eigenen Look.",
+    "settings.theme.dark_standard_hint": "Vier Familien, sieben Designs.",
     "settings.theme.paper": "Papier",
     "settings.theme.paper_dark": "Papier Dunkel",
     "settings.theme.neuromorph": "Soft UI",
@@ -17,10 +17,10 @@
     "settings.theme.family.nineties_retro": "90er Retro",
     "settings.theme.family.nineties_retro_desc": "Bevel-Buttons, MS Sans Serif, CRT-Optik.",
     "settings.theme.family.synthwave": "Synthwave",
-    "settings.theme.family.synthwave_desc": "Identisch zu den anderen Dark-Modi — sauberes OLED-Standard-Layout.",
+    "settings.theme.family.synthwave_desc": "Sauberes OLED-Standard-Layout — modern, ablenkungsfrei.",
     "settings.theme.win95_silver": "Windows 95 Silber",
-    "settings.theme.win95_amber": "CRT Amber (OLED)",
-    "settings.theme.synthwave": "OLED Standard",
+    "settings.theme.win95_amber": "CRT Amber",
+    "settings.theme.synthwave": "Synthwave OLED",
     "settings.theme.section.modes": "Wähle hell oder dunkel:",
     "settings.theme.picker_link": "→ Alle Designs nebeneinander vergleichen",
     "settings.profile.title": "Profil",
@@ -82,6 +82,5 @@
     "settings.toast.pw_changed_toast": "Passwort aktualisiert — {sessions} andere Sitzung(en) abgemeldet.",
     "settings.error.unknown": "Unbekannter Fehler.",
     "settings.error.network": "Netzwerkfehler.",
-    "settings.page_title": "Einstellungen · serverjonas",
-    "settings.theme.oled_standard": "OLED Standard"
+    "settings.page_title": "Einstellungen · serverjonas"
 }

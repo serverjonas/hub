@@ -234,11 +234,7 @@
 {% block content %}
 <div class="design-header">
     <h1 data-i18n="design.title">Wähle dein Design</h1>
-    <p data-i18n="design.subtitle">Vier Familien, sieben Stimmungen — wähle was zu dir passt.</p>
-    <p style="margin-top: 8px; font-size: 0.95rem; color: var(--accent); font-weight: 700;">
-        <i data-lucide="info" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
-        <span data-i18n="design.dark_standard_notice">Hinweis: Alle Dark-Modi sind visuell identisch (OLED Standard).</span>
-    </p>
+    <p data-i18n="design.subtitle_v2">Vier Familien, sieben Stimmungen — wähle eine Light + Dark Kombination.</p>
 </div>
 
 {% for fam in families %}
@@ -333,7 +329,7 @@
                         padding: 6px 14px;
                     ">OK</span>
                 {% else %}
-                    {# synthwave (and any unknown family) - clean OLED preview, no neon #}
+                    {# synthwave (dark only) - clean OLED preview matching the dark website #}
                     <div class="design-preview-card" style="
                         background: #0f1216;
                         border: 1.5px solid #3b4252;
@@ -424,6 +420,46 @@
                 pickDesign(card.getAttribute("data-design-id"));
             });
         });
+
+        // ── First-Visit Welcome-Banner ──
+        // Wartet auf i18n-applied event (i18n.js triggert das nach locale-load),
+        // damit window.t("design.welcome") den aktuellen Sprach-Text liefert.
+        (function () {
+            function showFirstWelcome() {
+                try {
+                    if (localStorage.getItem("serverjonas_design_picked") === "1") return;
+                    if (!document.body) return;
+
+                    var fallback = "🔥 Willkommen bei serverjonas! Wähle eines von 4 Designs, um deine Seite zu personalisieren.";
+                    var tpl = (window.t && typeof window.t === "function" && window.t("design.welcome")) || fallback;
+
+                    var el = document.createElement("div");
+                    el.className = "notif-toast first-welcome";
+                    el.style.cssText = [
+                        "position:fixed", "top:96px", "left:50%",
+                        "transform:translateX(-50%) rotate(-1deg)",
+                        "z-index:9999", "max-width:520px",
+                        "font-size:1.05rem", "padding:18px 24px",
+                        "border-width:2.5px", "text-align:center"
+                    ].join(";");
+                    el.textContent = tpl;
+                    document.body.appendChild(el);
+
+                    setTimeout(function () {
+                        el.style.opacity = "0";
+                        el.style.transform = "translateX(-50%) translateY(-10px) rotate(1deg)";
+                        setTimeout(function () { el.remove(); }, 400);
+                    }, 12000);
+                } catch (_) { /* silent fallback */ }
+            }
+
+            // Trigger: i18n.fire once it's ready (oder sofort wenn schon da).
+            if (window.t && typeof window.t === "function") {
+                showFirstWelcome();
+            } else {
+                document.addEventListener("i18n:applied", showFirstWelcome, { once: true });
+            }
+        })();
     })();
 </script>
 {% endblock %}
