@@ -1,46 +1,41 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block page_id %}news{% endblock %} {% block
+title_i18n %}news.title{% endblock %} {% block title %}News · serverjonas{%
+endblock %} {% block content %}
 
-{% block page_id %}news{% endblock %}
-{% block title_i18n %}news.title{% endblock %}
-{% block title %}News · serverjonas{% endblock %}
+<h1 style="margin-bottom: 18px" data-i18n="news.heading">News</h1>
 
-{% block content %}
-
-<h1 style="margin-bottom: 18px;" data-i18n="news.heading">News</h1>
-
-<a href="/news/archive" class="btn" style="margin-bottom: 20px;">
+s<a href="/news/archive" class="btn" style="margin-bottom: 20px">
     <span data-i18n="news.show_old">Alte Nachrichten anzeigen (48h+)</span>
 </a>
 
-<div style="display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; flex-direction: column; gap: 12px">
+    {% for n in notifications %}
 
-{% for n in notifications %}
-
-<a href="/news/read/{{ n.id }}" style="text-decoration:none; color:inherit;">
-
-<div style="
+    <a
+        href="/news/read/{{ n.id }}"
+        style="text-decoration: none; color: inherit"
+    >
+        <div
+            style="
     background: var(--surface);
     border: 1px solid var(--border);
     border-left: {% if n.read == 0 %}4px solid #6366f1{% else %}1px solid var(--border){% endif %};
     border-radius: 14px;
     padding: 14px;
     transition: 0.2s;
-">
+"
+        >
+            <div style="font-size: 16px; font-weight: 800">{{ n.sender }}</div>
 
-    <div style="font-size: 16px; font-weight: 800;">
-        {{ n.sender }}
-    </div>
+            <div
+                style="font-size: 13px; color: var(--text-dim); margin-top: 4px"
+            >
+                {{ n.message }}
+            </div>
+        </div>
+    </a>
 
-    <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">
-        {{ n.message }}
-    </div>
-
-</div>
-
-</a>
-
-{% endfor %}
-
+    {% endfor %}
 </div>
 
 {% endblock %}

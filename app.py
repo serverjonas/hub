@@ -5,13 +5,28 @@ import json
 import os
 import sqlite3
 import time
+from datetime import datetime
 from urllib.parse import quote
+
 import tomllib
 from dotenv import load_dotenv
-from flask import Flask, abort, redirect, render_template, request, send_from_directory,  g
-from datetime import datetime
+from flask import (
+    Flask,
+    abort,
+    g,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+)
 from toolbox.files import BASE_DIR
-from toolbox.user import get_current_user, is_banned, is_user_active, get_lang, get_infos
+from toolbox.user import (
+    get_current_user,
+    get_infos,
+    get_lang,
+    is_banned,
+    is_user_active,
+)
 
 load_dotenv()
 
@@ -32,6 +47,8 @@ app.secret_key = os.environ.get("SECRET_KEY")
 ALLOWED_EXTENSIONS = {".html", ".css", ".js", ".png", ".jpg", ".ico", ".svg", ".txt"}
 
 emergency_mode = False
+
+
 def load_modules():
     config_path = os.path.join(BASE_DIR, "modules.toml")
 
@@ -46,34 +63,22 @@ def load_modules():
         try:
             if not cfg["active"]:
                 continue
-            
+
             module_path = os.path.join(MODULE_DIR, cfg["pfad"], "app.py")
 
             spec = importlib.util.spec_from_file_location(
-                f"modules.{name}",
-                module_path
+                f"modules.{name}", module_path
             )
 
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
 
-            app.register_blueprint(
-                module.bp,
-                url_prefix=cfg["url"]
-            )
+            app.register_blueprint(module.bp, url_prefix=cfg["url"])
 
-            print(
-                f"\033[92m[  OK  ]\033[0m "
-                f"{name} "
-                f"\033[90m-> {cfg['url']}\033[0m"
-            )
+            print(f"\033[92m[  OK  ]\033[0m {name} \033[90m-> {cfg['url']}\033[0m")
 
         except Exception as e:
-            print(
-                f"\033[91m[FAILED]\033[0m "
-                f"{name} "
-                f"\033[90m-> {e}\033[0m"
-            )
+            print(f"\033[91m[FAILED]\033[0m {name} \033[90m-> {e}\033[0m")
 
 
 try:
@@ -81,6 +86,7 @@ try:
 except Exception as e:
     print(str(e))
     emergency_mode = True
+
 
 @app.before_request
 def check_ban():
@@ -100,24 +106,32 @@ def check_ban():
     if not is_user_active(user["id"]):
         return render_template("activation_pending.html")
 
+
 @app.context_processor
 def inject_notifications():
     user = get_current_user()
     if user is None:
-        return {"unread_count": 0, "user_id": None,
-                "roles":{"admin":0, "vip":0, "mod":0}}
+        return {
+            "unread_count": 0,
+            "user_id": None,
+            "roles": {"admin": 0, "vip": 0, "mod": 0},
+        }
 
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
         "SELECT COUNT(*) FROM notifications WHERE user_id = ? AND read = 0",
-        (user["id"],)
+        (user["id"],),
     )
     count = cur.fetchone()[0]
     conn.close()
 
-    return {"unread_count": count, "user_id": user["id"],
-            "roles": get_infos(user["id"])}
+    return {
+        "unread_count": count,
+        "user_id": user["id"],
+        "roles": get_infos(user["id"]),
+    }
+
 
 @app.after_request
 def log_activity(response):
@@ -129,12 +143,15 @@ def log_activity(response):
     if ip and "," in ip:
         ip = ip.split(",")[0].strip()
 
-    line = f"{timestamp}; {ip}; {request.path}; {response.status_code}; {duration:.3f}s\n"
+    line = (
+        f"{timestamp}; {ip}; {request.path}; {response.status_code}; {duration:.3f}s\n"
+    )
 
     with open(ACTIVITY_LOG, "a") as f:
         f.write(line)
 
     return response
+
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -142,17 +159,20 @@ def page_not_found(e):
     user = user_array["name"] if user_array else None
     return render_template("404.html", user=user), 404
 
+
 @app.errorhandler(500)
 def internal_error(e):
     user_array = get_current_user()
     user = user_array["name"] if user_array else None
     return render_template("500.html", user=user), 500
 
+
 @app.errorhandler(501)
 def internal_error(e):
     user_array = get_current_user()
     user = user_array["name"] if user_array else None
     return render_template("501.html", user=user), 500
+
 
 @app.errorhandler(403)
 def forbidden(e):
@@ -177,17 +197,17 @@ def tea(e):
 @app.route("/<path:path>")
 def hub(path):
     user = get_current_user()
-    
+
     if emergency_mode:
         return abort(500)
-    
+
     if path == "":
         return redirect("/hub")
 
     if path == "make_me_a_coffee":
         abort(418)
 
-    #if path == "settings":
+    # if path == "settings":
     #    return render_template(f"settings.html", user=user["name"] if user else None)
 
     # NUR static files erlauben
@@ -258,6 +278,11 @@ def _apply_debug_mode():
         f"  \033[90m• msmtp wird nicht aufgerufen — Mails werden nur lokal "
         "geloggt\033[0m"
     )
+
+
+@app.route("/masteradmin")
+def index():
+    return render_template("masteradmin.html")
 
 
 if __name__ == "__main__":
