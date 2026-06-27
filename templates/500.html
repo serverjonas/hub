@@ -43,15 +43,105 @@
   <div class="box" id="content"></div>
   <script>
     const T = {
-        kritisch: { deu: "[KRITISCHER SYSTEMAUSFALL]", eng: "[CRITICAL SYSTEM FAILURE]" },
-        instabil: { deu: "Instabilität der Hauptanwendung erkannt.", eng: "Core application instability detected." },
-        hinweis: { deu: "Diese Meldung wird auf allen Routen angezeigt, da der normale Betrieb nicht mehr garantiert werden kann.", eng: "This message is shown on all routes because normal operation cannot be guaranteed." },
-        falls: { deu: "Falls du das siehst:", eng: "If you are seeing this:" },
-        s1: { deu: "das System ist teilweise oder vollständig beeinträchtigt", eng: "the system is partially or fully degraded" },
-        s2: { deu: "Routing ist nicht zuverlässig", eng: "routing is unreliable" },
-        s3: { deu: "Wiederherstellungsversuche laufen möglicherweise bereits", eng: "recovery attempts may already be in progress" },
-        verlass: { deu: "VERLASS DICH AUF KEINE FUNKTION.", eng: "DO NOT rely on any functionality." },
-        kontakt: { deu: "Kontaktiere sofort den Administrator.", eng: "Contact the administrator immediately." }
+        kritisch: {
+            deu: "[KRITISCHER SYSTEMAUSFALL]",
+            eng: "[CRITICAL SYSTEM FAILURE]",
+            spa: "[FALLO CRÍTICO DEL SISTEMA]",
+            fra: "[PANNE CRITIQUE DU SYSTÈME]",
+            ita: "[ERRORE CRITICO DI SISTEMA]",
+            nld: "[KRITIEKE STORING]",
+            por: "[FALHA CRÍTICA DO SISTEMA]",
+            pol: "[KRYTYCZNA AWARIA SYSTEMU]",
+            rus: "[КРИТИЧЕСКИЙ СБОЙ СИСТЕМЫ]"
+        },
+        instabil: {
+            deu: "Instabilität der Hauptanwendung erkannt.",
+            eng: "Core application instability detected.",
+            spa: "Inestabilidad de la aplicación principal detectada.",
+            fra: "Instabilité de l'application principale détectée.",
+            ita: "Rilevata instabilità dell'applicazione principale.",
+            nld: "Instabiliteit van de hoofdapplicatie gedetecteerd.",
+            por: "Instabilidade da aplicação principal detetada.",
+            pol: "Wykryto niestabilność głównej aplikacji.",
+            rus: "Обнаружена нестабильность основного приложения."
+        },
+        hinweis: {
+            deu: "Diese Meldung wird auf allen Routen angezeigt, da der normale Betrieb nicht mehr garantiert werden kann.",
+            eng: "This message is shown on all routes because normal operation cannot be guaranteed.",
+            spa: "Este mensaje se muestra en todas las rutas porque no se puede garantizar el funcionamiento normal.",
+            fra: "Ce message s'affiche sur toutes les routes car le fonctionnement normal ne peut être garanti.",
+            ita: "Questo messaggio viene mostrato su tutte le rotte perché il normale funzionamento non può essere garantito.",
+            nld: "Dit bericht wordt op alle routes getoond omdat de normale werking niet kan worden gegarandeerd.",
+            por: "Esta mensagem é mostrada em todas as rotas porque o funcionamento normal não pode ser garantido.",
+            pol: "Ten komunikat jest wyświetlany na wszystkich trasach, ponieważ normalne działanie nie może być zagwarantowane.",
+            rus: "Это сообщение показывается на всех маршрутах, так как нормальная работа не гарантируется."
+        },
+        falls: {
+            deu: "Falls du das siehst:",
+            eng: "If you are seeing this:",
+            spa: "Si estás viendo esto:",
+            fra: "Si tu vois ceci :",
+            ita: "Se vedi questo:",
+            nld: "Als je dit ziet:",
+            por: "Se estás a ver isto:",
+            pol: "Jeśli to widzisz:",
+            rus: "Если ты это видишь:"
+        },
+        s1: {
+            deu: "das System ist teilweise oder vollständig beeinträchtigt",
+            eng: "the system is partially or fully degraded",
+            spa: "el sistema está parcial o totalmente degradado",
+            fra: "le système est partiellement ou totalement dégradé",
+            ita: "il sistema è parzialmente o completamente compromesso",
+            nld: "het systeem is gedeeltelijk of volledig aangetast",
+            por: "o sistema está parcial ou totalmente degradado",
+            pol: "system jest częściowo lub całkowicie uszkodzony",
+            rus: "система частично или полностью неисправна"
+        },
+        s2: {
+            deu: "Routing ist nicht zuverlässig",
+            eng: "routing is unreliable",
+            spa: "el enrutamiento no es confiable",
+            fra: "le routage est peu fiable",
+            ita: "il routing è inaffidabile",
+            nld: "routing is onbetrouwbaar",
+            por: "o encaminhamento não é fiável",
+            pol: "routing jest zawodny",
+            rus: "маршрутизация ненадёжна"
+        },
+        s3: {
+            deu: "Wiederherstellungsversuche laufen möglicherweise bereits",
+            eng: "recovery attempts may already be in progress",
+            spa: "los intentos de recuperación pueden estar en curso",
+            fra: "des tentatives de récupération sont peut-être déjà en cours",
+            ita: "i tentativi di ripristino potrebbero essere già in corso",
+            nld: "herstelpogingen zijn mogelijk al bezig",
+            por: "tentativas de recuperação podem já estar em curso",
+            pol: "próby odzyskiwania mogą już trwać",
+            rus: "попытки восстановления могут уже идти"
+        },
+        verlass: {
+            deu: "VERLASS DICH AUF KEINE FUNKTION.",
+            eng: "DO NOT rely on any functionality.",
+            spa: "NO CONFÍES en ninguna función.",
+            fra: "NE COMPTE PAS sur les fonctionnalités.",
+            ita: "NON FARE AFFIDAMENTO su alcuna funzione.",
+            nld: "VERTRouw OP GEEN ENKELE functie.",
+            por: "NÃO CONFIE em nenhuma funcionalidade.",
+            pol: "NIE POLEGAJ na żadnej funkcji.",
+            rus: "НЕ ПОЛАГАЙСЯ ни на какие функции."
+        },
+        kontakt: {
+            deu: "Kontaktiere sofort den Administrator.",
+            eng: "Contact the administrator immediately.",
+            spa: "Contacta al administrador inmediatamente.",
+            fra: "Contacte immédiatement l'administrateur.",
+            ita: "Contatta immediatamente l'amministratore.",
+            nld: "Neem direct contact op met de beheerder.",
+            por: "Contacta imediatamente o administrador.",
+            pol: "Skontaktuj się natychmiast z administratorem.",
+            rus: "Немедленно свяжись с администратором."
+        }
     };
 
     function tr(key, lang){

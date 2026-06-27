@@ -1,0 +1,9 @@
+{
+    "_meta": {
+        "page": "status"
+    },
+    "nav.status": "Stato",
+    "status.all_systems": "Tutti i sistemi disponibili",
+    "status.json_hint": "Dati disponibili su /status/json",
+    "status.title": "Stato · serverjonas"
+}
