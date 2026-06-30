@@ -23,13 +23,19 @@ Design choices
 * **Errors carry a stable ``code``** so routes can map to localized
   flash messages via i18n key lookup, instead of substring-matching the
   English message. Codes live on :class:`ErrorCode`.
+* **Non-seekable streams are hard-fail, not soft-pass.** A streaming
+  upload whose stream refuses ``seek(SEEK_END)`` and lacks a
+  ``Content-Length`` header raises :attr:`ErrorCode.SIZE_UNREADABLE`
+  rather than silently accepting arbitrary size — that defense
+  closes the chunk-upload blind spot before the films pipeline is
+  wired in.
 """
 
 from __future__ import annotations
 
 import mimetypes
 import os
-from typing import Iterable, Optional, Set
+from typing import Iterable, Optional, Set, Tuple
 
 from werkzeug.datastructures import FileStorage
 
@@ -126,6 +132,47 @@ def _norm_ext(filename: Optional[str]) -> str:
     return os.path.splitext(filename)[1].lower()
 
 
+def _read_content_length(file_storage) -> int:
+    """Read the multipart ``Content-Length`` header for ``file_storage``.
+
+    Werkzeug sets this on every parsed FileStorage to the size of the
+    spooled body, so trusting it for a fast pre-flight reject is safe
+    inside Werkzeug's pipeline. The defensiveness here is for callers
+    that pass test mocks / proxy responses etc.
+    """
+    headers = getattr(file_storage, "headers", None)
+    if headers is None:
+        return 0
+    try:
+        cl = headers.get("Content-Length")
+        return int(cl) if cl else 0
+    except (TypeError, ValueError):
+        return 0
+
+
+def _measure_size(file_storage) -> Tuple[int, bool]:
+    """Authoritative stream-size measurement via tell() round-trip.
+
+    Returns ``(size, known)``:
+
+    * ``known=True``:  ``size`` is the full byte count of the stream.
+    * ``known=False``: the stream was not seekable / readable enough to
+      measure; ``size`` is 0. Callers that require size validation
+      :strong:`must` treat ``known=False`` as a hard refusal — soft-
+      passing would let arbitrarily-large chunks through (cf. films
+      chunk-upload pipeline).
+    """
+    try:
+        stream = file_storage.stream
+        cur = stream.tell()
+        stream.seek(0, os.SEEK_END)
+        size = stream.tell()
+        stream.seek(cur, os.SEEK_SET)
+        return size, True
+    except Exception:
+        return 0, False
+
+
 def sniff_mime(file_storage) -> str:
     """Best-effort MIME inference for an uploaded file.
 
@@ -151,22 +198,6 @@ def sniff_mime(file_storage) -> str:
     except Exception:
         guess = None
     return (guess or "").lower()
-
-
-def _build_allow_sets(
-    allowed_exts: Optional[Iterable[str]],
-    allowed_mimes: Optional[Iterable[str]],
-):
-    if allowed_exts is not None:
-        exts = {e.lower() if e.startswith(".") else f".{e.lower()}"
-                for e in allowed_exts}
-    else:
-        exts = None
-    if allowed_mimes is not None:
-        mimes = {m.lower() for m in allowed_mimes}
-    else:
-        mimes = None
-    return exts, mimes
 
 
 # ─── Public API ─────────────────────────────────────────────────────────────
@@ -234,7 +265,7 @@ def validate_mime(
 
 def validate_size(
     file_storage,
-    max_bytes: int,
+    max_bytes: Optional[int],
 ) -> int:
     """Validate ``file_storage`` size against ``max_bytes``.
 
@@ -245,54 +276,52 @@ def validate_size(
     * **Slow**: does a ``seek(0, SEEK_END)`` round-trip on the
       underlying stream and reads ``tell()``. Authoritative.
 
-    ``max_bytes`` <= 0 disables the size check entirely; the function
-    still returns whatever size it managed to measure (0 if unreadable).
-    Returns the measured size in bytes.
+    ``max_bytes`` of ``None`` or ``<= 0`` disables the size check
+    entirely; the function still returns whatever size it managed to
+    measure (0 if unreadable). Returns the measured size in bytes.
 
-    Streaming chunks whose streams are not seekable **and** lack a
-    ``Content-Length`` header intentionally raise
+    A streaming upload whose stream refuses ``seek`` **and** lacks a
+    ``Content-Length`` header intentionally raises
     ``ErrorCode.SIZE_UNREADABLE`` rather than silently passing — a
-    soft skip would let arbitrarily-large chunks through.
-
-    Note: MIME sniffing here uses stdlib :mod:`mimetypes` plus
-    Werkzeug's claimed ``file.mimetype``, not :mod:`python-magic`.
-    Add :mod:`python-magic` to requirements and replace :func:`sniff_mime`
-    if genuine magic-byte detection becomes necessary.
+    soft skip would let arbitrarily-large chunks through during
+    chunked uploads (cf. ``modules/films/app.py`` ``/upload/chunk``).
+    This is the closing defense against the in-flight upload blind
+    spot that ``Content-Length`` usually catches but cannot guarantee.
     """
+    # Caller opted out of size validation: best-effort measure and
+    # return so quota code can still increment.
     if max_bytes is None or max_bytes <= 0:
-        max_bytes = 0
+        size, _ = _measure_size(file_storage)
+        return size
 
-    # Fast path: Content-Length from the multipart header.
-    content_length = 0
-    try:
-        headers = getattr(file_storage, "headers", {}) or {}
-        cl = headers.get("Content-Length") or headers.get(
-            "content-length"
-        )
-        if cl:
-            content_length = int(cl)
-    except Exception:
-        content_length = 0
+    # Authoritative path: Content-Length set by Werkzeug on the parsed
+    # part. When present, it IS the spooled body length -- trust it
+    # directly and return. This also means SIZE_UNREADABLE below only
+    # ever fires when the caller has *neither* a Content-Length header
+    # *nor* a seekable stream, which is exactly the chunk-upload blind
+    # spot we set out to defend.
+    content_length = _read_content_length(file_storage)
+    if content_length:
+        if content_length > max_bytes:
+            raise UploadValidationError(
+                f"Datei ist zu groß ({content_length} > {max_bytes} Bytes).",
+                code=ErrorCode.SIZE_TOO_LARGE,
+            )
+        return content_length
 
-    if content_length and max_bytes and content_length > max_bytes:
+    # No Content-Length: we MUST be able to measure from the stream
+    # itself. This is the chunk-upload blind spot -- a non-seekable
+    # stream of unknown size could be arbitrarily large, so we refuse
+    # rather than pass.
+    size, size_known = _measure_size(file_storage)
+    if not size_known:
         raise UploadValidationError(
-            f"Datei ist zu groß ({content_length} > {max_bytes} Bytes).",
-            code=ErrorCode.SIZE_TOO_LARGE,
+            "Dateigröße konnte nicht gelesen werden (Stream nicht "
+            "messbar). Bitte erneut hochladen oder kleinere Datei "
+            "verwenden.",
+            code=ErrorCode.SIZE_UNREADABLE,
         )
-
-    # Slow path: stream tell() round-trip. The seek + tell is safe
-    # because subsequent readers always re-seek to 0 before reading.
-    size = 0
-    try:
-        stream = file_storage.stream
-        cur = stream.tell()
-        stream.seek(0, os.SEEK_END)
-        size = stream.tell()
-        stream.seek(cur, os.SEEK_SET)
-    except Exception:
-        size = 0
-
-    if max_bytes and size and size > max_bytes:
+    if size > max_bytes:
         raise UploadValidationError(
             f"Datei ist zu groß ({size} > {max_bytes} Bytes).",
             code=ErrorCode.SIZE_TOO_LARGE,
@@ -305,7 +334,7 @@ def validate_upload(
     *,
     allowed_exts: Optional[Iterable[str]] = None,
     allowed_mimes: Optional[Iterable[str]] = None,
-    max_bytes: int = 0,
+    max_bytes: Optional[int] = None,
 ) -> str:
     """Combined validator: extension + MIME + size.
 
@@ -314,8 +343,8 @@ def validate_upload(
     stable :attr:`code` so routes can localize the flash via the code
     rather than the English message.
 
-    ``max_bytes <= 0`` disables the size check while still letting
-    extension and MIME checks run.
+    ``max_bytes`` of ``None`` or ``<= 0`` disables the size check
+    while still letting the extension and MIME checks run.
     """
     if file_storage is None or not getattr(file_storage, "filename", None):
         raise UploadValidationError(
@@ -325,6 +354,6 @@ def validate_upload(
     ext = validate_extension(file_storage.filename, allowed_exts or [])
     if allowed_mimes:
         validate_mime(file_storage, allowed_mimes)
-    if max_bytes:
+    if max_bytes is not None and max_bytes > 0:
         validate_size(file_storage, max_bytes)
     return ext
