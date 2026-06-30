@@ -3,19 +3,17 @@
 This package is purely additive: each submodule lands incrementally in a
 separate commit so existing code paths keep working until callers opt in.
 
-Submodules (added in this order):
+Current submodules (P1.1 .. P1.5):
 
 * ``uploads``   – MIME / extension / size validation for ``FileStorage``
-* ``files``     – cryptographically random filenames + path-traversal
-                  defence for storage paths
+* ``files``     – cryptographically random filenames + safe path-traversal
 * ``zip``       – ZIP Slip-safe extraction with per-member whitelist
 * ``limits``    – per-route upload size limits
-                  (``config/upload_limits.toml``)
 * ``antivirus`` – pluggable AV scan hook (no-op by default)
 
-Current state: :mod:`uploads` is fully landed (P1.1, P1.1b). The
-remaining helpers will re-export themselves from this ``__init__`` as
-each submodule lands.
+Public re-exports below use stable names so callers can write
+``from toolbox.security import validate_upload`` without knowing the
+submodule layout.
 """
 
 from .uploads import (
@@ -35,8 +33,28 @@ from .uploads import (
     ALLOWED_DOC_EXTS,
     ALLOWED_DOC_MIMES,
 )
+from .files import (
+    random_storage_filename,
+    safe_join_under,
+    normalize_storage_filename,
+)
+from .zip import (
+    safe_extract_zip,
+    ZipSecurityError,
+)
+from .limits import (
+    get_route_limit,
+    get_all_limits,
+)
+from .antivirus import (
+    scan_for_malware,
+    AntivirusUnavailableError,
+    register_scanner,
+    unregister_scanner,
+)
 
 __all__ = [
+    # uploads (P1.1)
     "ErrorCode",
     "UploadValidationError",
     "validate_extension",
@@ -52,4 +70,19 @@ __all__ = [
     "ALLOWED_AUDIO_MIMES",
     "ALLOWED_DOC_EXTS",
     "ALLOWED_DOC_MIMES",
+    # files (P1.2)
+    "random_storage_filename",
+    "safe_join_under",
+    "normalize_storage_filename",
+    # zip (P1.3)
+    "safe_extract_zip",
+    "ZipSecurityError",
+    # limits (P1.4)
+    "get_route_limit",
+    "get_all_limits",
+    # antivirus (P1.5)
+    "scan_for_malware",
+    "AntivirusUnavailableError",
+    "register_scanner",
+    "unregister_scanner",
 ]
