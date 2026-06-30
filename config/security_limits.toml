@@ -1,0 +1,53 @@
+# ─── security_limits.toml ───────────────────────────────────────────────────
+#
+# Per-route upload size limits, in bytes. Read on app startup by
+#   toolbox.security.limits.get_route_limit(route, key).
+#
+# A value of 0 means "no per-route cap" — fall back to the user's
+# role-based quota (`toolbox.files.get_storage_info`) and let the
+# pre-storage check decide. Per-route caps are first-line defence
+# against things like a 4 GB meme upload that would burn disk
+# before quota is even consulted.
+#
+# Editing:
+#
+# * Bytes only — no human units. `1 GB = 1073741824` bytes.
+# * A typo or non-int value triggers a fallback to the in-code
+#   `_DEFAULTS` table in `toolbox/security/limits.py`; the app
+#   continues to run rather than crash on bad config.
+# * The config file is loaded once at import time; restart the
+#   server after edits.
+
+# ─── Cloud ──────────────────────────────────────────────────────────────────
+# Owns the per-user upload-zip flow and per-file uploads.
+[cloud]
+# Per-file cap (any single uploaded file).
+max_file = 209715200            # 200 MB
+# Aggregate cap of an uploaded ZIP, uncompressed.
+max_zip_total = 1073741824      # 1 GB
+# Cap on how many entries a ZIP may contain.
+max_members = 1000
+
+# ─── Memes ──────────────────────────────────────────────────────────────────
+# Single-image / short-video uploads.
+[memes]
+max_file = 26214400             # 25 MB
+
+# ─── Films ──────────────────────────────────────────────────────────────────
+# Chunked uploads of large video files.
+[films]
+max_chunk = 8388608             # 8 MB per chunk
+max_file  = 53687091200         # 50 GB per film (matches app.py MAX_CONTENT_LENGTH)
+
+# ─── Music ──────────────────────────────────────────────────────────────────
+# MP3 / FLAC / M4A / OGG. ZIP also supported.
+[music]
+max_file = 209715200            # 200 MB per file
+max_zip_total = 1073741824      # 1 GB
+
+# ─── Avatar / Profile pictures ──────────────────────────────────────────────
+# Already capped by toolbox/avatar.py AVATAR_MAX_BYTES (10 MB); mirrored here
+# for the security.limit helper so an attacker probing limits per-route
+# sees the same number everywhere.
+[avatar]
+max_file = 10485760             # 10 MB
