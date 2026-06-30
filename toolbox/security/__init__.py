@@ -13,11 +13,13 @@ Submodules (added in this order):
                   (``config/upload_limits.toml``)
 * ``antivirus`` – pluggable AV scan hook (no-op by default)
 
-This commit ships **only** :mod:`uploads`. The remaining helpers will
-re-export themselves from this ``__init__`` as each submodule lands.
+Current state: :mod:`uploads` is fully landed (P1.1, P1.1b). The
+remaining helpers will re-export themselves from this ``__init__`` as
+each submodule lands.
 """
 
 from .uploads import (
+    ErrorCode,
     UploadValidationError,
     validate_extension,
     validate_mime,
@@ -35,6 +37,7 @@ from .uploads import (
 )
 
 __all__ = [
+    "ErrorCode",
     "UploadValidationError",
     "validate_extension",
     "validate_mime",
