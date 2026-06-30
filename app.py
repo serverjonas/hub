@@ -14,12 +14,14 @@ from flask import (
     Flask,
     abort,
     g,
+    jsonify,
     redirect,
     render_template,
     request,
     send_from_directory,
 )
 from toolbox.files import BASE_DIR
+from toolbox.i18n import build_translation_manifest
 from toolbox.user import (
     get_current_user,
     get_infos,
@@ -47,6 +49,34 @@ app.secret_key = os.environ.get("SECRET_KEY")
 ALLOWED_EXTENSIONS = {".html", ".css", ".js", ".png", ".jpg", ".ico", ".svg", ".txt"}
 
 emergency_mode = False
+
+# ─── Translation version manifest ─────────────────────────────────────────────
+# Computed ONCE at startup. The browser compares the version returned by
+# ``/i18n/manifest.json`` against the version it cached in ``localStorage`` for
+# each translation file and only refetches when they differ.
+TRANSLATION_VERSIONS = build_translation_manifest()
+print(
+    f"\033[92m[  OK  ]\033[0m i18n manifest \033[90m-> {len(TRANSLATION_VERSIONS)} "
+    f"files hashed\033[0m"
+)
+
+
+@app.route("/i18n/manifest.json")
+def i18n_manifest():
+    """Version manifest for every translation file.
+
+    Registered explicitly so Werkzeug's URL routing prefers this rule
+    over the catch-all ``/<path:path>`` below (static path segments win
+    over parameter captures regardless of registration order).
+
+    ``Cache-Control: no-cache`` makes browsers re-validate on each load
+    (cheap, the response is tiny) so the client always sees the current
+    server-side hash and can decide whether a translation needs to be
+    refetched.
+    """
+    resp = jsonify(TRANSLATION_VERSIONS)
+    resp.headers["Cache-Control"] = "no-cache"
+    return resp
 
 
 def load_modules():

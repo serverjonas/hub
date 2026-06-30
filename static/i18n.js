@@ -2,10 +2,20 @@
  *  serverjonas i18n
  *  Loads <page>_<lang>.json + base_<lang>.json and swaps DOM text.
  *  Public API: window.t(key, vars), window.i18n.setLanguage(lang)
+ *
+ *  Translations are cached in localStorage and verified against the
+ *  server-side version manifest (``/i18n/manifest.json``). A file is
+ *  only refetched when its hash differs from the cached one, so the
+ *  vast majority of page loads use cached data after the first one.
  * ──────────────────────────────────────────────────────────────── */
 (function () {
     const STORAGE_KEY = "serverjonas_lang";
     const DEFAULT_LANG = "deu";
+
+    // localStorage keys take the shape `i18n/<name>/version` and
+    // `i18n/<name>/data` — matching the layout in the spec.
+    const CACHE_PREFIX = "i18n";
+    const MANIFEST_URL = "/i18n/manifest.json";
 
     // Code (ISO 639-2) → {htmlLang, label, nativeLabel, flag}.
     // flag is shown in the dropdown, label is used for screen-reader i18n.
@@ -27,6 +37,10 @@
     let translations = {};
     let fallback = {}; // German/English strings, used when a key is missing in target lang
     let inflightToken = 0; // guards against concurrent setLanguage calls resolving out of order
+
+    // Manifest is fetched once per page load and shared across files.
+    let manifestCache = null;
+    let manifestPromise = null;
 
     /* ─── Public helpers (exported early) ─── */
     window.i18nLanguages = SUPPORTED;
@@ -51,10 +65,78 @@
         return DEFAULT_LANG;
     }
 
+    /* ─── Manifest loading ───
+     * Returns a `{filename: version}` object. Failures fall back to {}
+     * so the cache check below degrades gracefully to "always fetch".
+     * The promise is memoised so concurrent loaders share the request. */
+    async function loadManifest() {
+        if (manifestCache) return manifestCache;
+        if (manifestPromise) return manifestPromise;
+        manifestPromise = (async () => {
+            try {
+                const res = await fetch(MANIFEST_URL, { cache: "no-cache" });
+                if (!res.ok) return {};
+                const data = await res.json();
+                manifestCache = (data && typeof data === "object") ? data : {};
+                return manifestCache;
+            } catch (e) {
+                console.warn("[i18n] manifest fetch failed", e);
+                return {};
+            } finally {
+                manifestPromise = null;
+            }
+        })();
+        return manifestPromise;
+    }
+
+    /* ─── localStorage cache helpers ─── */
+    function cacheKeys(name) {
+        return [
+            CACHE_PREFIX + "/" + name + "/version",
+            CACHE_PREFIX + "/" + name + "/data",
+        ];
+    }
+
+    function getCachedVersion(name) {
+        try {
+            return localStorage.getItem(cacheKeys(name)[0]);
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function getCachedData(name) {
+        try {
+            const raw = localStorage.getItem(cacheKeys(name)[1]);
+            if (raw === null) return null;
+            return JSON.parse(raw);
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function saveToCache(name, version, data) {
+        try {
+            // Store data first; if storage is full and the data write fails
+            // the version write is skipped so we never end up with a version
+            // pointing at a missing/incomplete payload.
+            localStorage.setItem(cacheKeys(name)[1], JSON.stringify(data));
+            localStorage.setItem(cacheKeys(name)[0], version);
+        } catch (_) {
+            // localStorage full / disabled / quota exceeded — silently
+            // degrade to network-only; the next load will retry.
+        }
+    }
+
     /* ─── File loading ─── */
     async function fetchJSON(name) {
         try {
-            const res = await fetch("/static/" + name, { cache: "no-store" });
+            // We intentionally drop the legacy `cache: "no-store"` (a
+            // leftover from the pre-manifest era). The client-side
+            // version check in fetchWithCache() decides whether we refetch
+            // at all; when we DO fetch, default browser caching is fine
+            // and would let Flask serve a 304 if ETags are enabled.
+            const res = await fetch("/static/" + name);
             if (!res.ok) return {};
             return await res.json();
         } catch (e) {
@@ -63,20 +145,42 @@
         }
     }
 
+    // Cache-aware variant: returns the parsed JSON for ``name``, using the
+    // cached payload when the version reported by the manifest matches what
+    // we previously stored. Falls back to a network fetch otherwise.
+    async function fetchWithCache(name) {
+        const manifest = await loadManifest();
+        const version = manifest && Object.prototype.hasOwnProperty.call(manifest, name)
+            ? manifest[name]
+            : null;
+        const cachedVersion = getCachedVersion(name);
+
+        if (version && cachedVersion === version) {
+            const cached = getCachedData(name);
+            if (cached && typeof cached === "object") return cached;
+        }
+
+        const fresh = await fetchJSON(name);
+        if (version && fresh && typeof fresh === "object") {
+            saveToCache(name, version, fresh);
+        }
+        return fresh || {};
+    }
+
     // Fallback chain (last wins): base_deu, page_deu, base_eng, page_<lang>, base_<lang>
     // → German never breaks anything; English fills missing keys; target language overrides last.
     async function loadTranslations(lang) {
         const page = (document.body && document.body.dataset.page) || "base";
         const needPage = page && page !== "base";
         const requests = [
-            fetchJSON("base_deu.json"),
-            needPage ? fetchJSON(page + "_deu.json") : Promise.resolve({}),
-            fetchJSON("base_eng.json"),
-            needPage ? fetchJSON(page + "_eng.json") : Promise.resolve({}),
+            fetchWithCache("base_deu.json"),
+            needPage ? fetchWithCache(page + "_deu.json") : Promise.resolve({}),
+            fetchWithCache("base_eng.json"),
+            needPage ? fetchWithCache(page + "_eng.json") : Promise.resolve({}),
         ];
         // Always try base_<lang>; only request page_<lang> when it likely exists.
-        requests.push(fetchJSON("base_" + lang + ".json"));
-        if (needPage) requests.push(fetchJSON(page + "_" + lang + ".json"));
+        requests.push(fetchWithCache("base_" + lang + ".json"));
+        if (needPage) requests.push(fetchWithCache(page + "_" + lang + ".json"));
 
         // querySelectorAll on the way: need to know which page we're on
         const results = await Promise.all(requests);
