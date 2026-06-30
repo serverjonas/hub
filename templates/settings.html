@@ -367,8 +367,25 @@
     transform: translateY(-6px);
     transition: opacity 0.2s ease, transform 0.2s ease;
     z-index: 50;
-    max-height: 340px;
+    /* Tall enough to fit the 9 supported options (≈ 49 px each ≈ 441 px);
+       a tiny bit of breathing room keeps the last row from kissing the
+       border. The dropdown still scrolls inside if the viewport is shorter. */
+    max-height: 480px;
     overflow-y: auto;
+}
+
+/* The language card's dropdown menu opens downward and would otherwise
+   be hidden behind the next .settings-card. The reason: each card runs
+   animation: fadeInUp … both, whose final keyframe is
+   transform: translateY(0). Any non-none transform establishes its own
+   stacking context, so the card and all of its children compete against
+   the *next* card on document order alone — and the next card wins,
+   painting over the dropdown menu. Lifting this specific card with an
+   explicit z-index floats the whole card (and its overflowing menu)
+   above all subsequent cards wherever they sit in the markup
+   (Profile, "not logged in" hint, Account, Security, About). */
+.settings-card.lang-card {
+    z-index: 50;
 }
 .lang-dropdown.open .lang-dropdown-menu {
     opacity: 1;
@@ -764,7 +781,7 @@
     </div>
 
     <!-- Language Settings -->
-    <div class="settings-card">
+    <div class="settings-card lang-card">
         <div class="settings-section">
             <h2 class="settings-title">
                 <div class="settings-title-icon lang">
