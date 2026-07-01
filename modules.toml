@@ -82,24 +82,22 @@ url = "/hub"
 description = "einfach ein hub"
 active = true
 
-["api-v1-status"]
-pfad = "api/v1/status"
-url = "/api/v1/status"
+["api-v1"]
+pfad = "api/v1"
+url = "/api/v1"
+description = "Public REST API v1 (filme upload, …). Schlüsselverwaltung in /account/api-keys."
 active = true
 
-["api-v1-mkkey"]
-pfad = "api/v1/mkkey"
-url = "/api/v1/mkkey"
+["api-internal-status"]
+pfad = "api/internal/status"
+url = "/api/internal/status"
+description = "Server-Monitoring für Admins/Mods (vorher /api/v1/status)."
 active = true
 
-["api-v1-listkeys"]
-pfad = "api/v1/listkeys"
-url = "/api/v1/listkeys"
-active = true
-
-["api-v1-rmkey"]
-pfad = "api/v1/rmkey"
-url = "/api/v1/rmkey"
+["api-keys-gui"]
+pfad = "api_keys_gui"
+url = "/account/api-keys"
+description = "Browser-GUI zum Erstellen/Löschen persönlicher API-Schlüssel."
 active = true
 
 [news]

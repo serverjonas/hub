@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+
+{% block page_id %}account_api_keys{% endblock %}
+{% block title_i18n %}api_keys.page_title{% endblock %}
+{% block title %}API-Schlüssel · serverjonas{% endblock %}
+
+{% block extra_style %}
+.api-keys-shell {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 16px 64px;
+}
+
+.api-keys-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.api-keys-header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.api-keys-header p {
+    margin: 4px 0 0;
+    color: var(--text-dim);
+    max-width: 56ch;
+}
+
+.api-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.api-card h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    letter-spacing: 0.2px;
+}
+
+.api-new-key-banner {
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 8px;
+}
+
+.api-new-key-banner strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #6366f1;
+}
+
+.api-new-key-banner code {
+    display: block;
+    font-family: "JetBrains Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    word-break: break-all;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 12px 14px;
+    border-radius: 10px;
+    user-select: all;
+}
+
+.api-new-key-banner .api-new-key-meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 8px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+.form-row label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.form-row input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-hover);
+    color: var(--text);
+    font: inherit;
+    transition: var(--transition);
+}
+
+.form-row input[type="text"]:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: var(--surface);
+}
+
+.scopes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.scope-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: var(--transition);
+    background: var(--surface-hover);
+}
+
+.scope-chip input { margin: 0; }
+
+.scope-chip:hover { border-color: #6366f1; }
+
+.scope-chip .scope-chip-name {
+    font-family: "JetBrains Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn {
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font: inherit;
+}
+
+.btn-primary {
+    background: #6366f1;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: transparent;
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.keys-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.keys-table th,
+.keys-table td {
+    text-align: left;
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+}
+
+.keys-table th {
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.key-label {
+    font-weight: 600;
+}
+
+.key-scopes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.scope-tag {
+    font-family: "JetBrains Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    background: rgba(99, 102, 241, 0.12);
+    color: #6366f1;
+    border-radius: 999px;
+}
+
+.delete-form {
+    display: inline;
+    margin: 0;
+}
+
+.flash {
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.flash.error { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+.flash.success { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+
+.empty-state {
+    text-align: center;
+    padding: 32px 12px;
+    color: var(--text-dim);
+}
+{% endblock %}
+
+{% block content %}
+<div class="api-keys-shell">
+    <div class="api-keys-header">
+        <div>
+            <h1>API-Schlüssel</h1>
+            <p>
+                Verwalte die persönlichen API-Schlüssel, mit denen externe
+                Anwendungen auf deinen Account zugreifen. Der vollständige
+                Schlüssel wird aus Sicherheitsgründen <strong>nur einmal</strong>
+                bei der Erstellung angezeigt – kopiere ihn sofort.
+            </p>
+        </div>
+        <a href="/hub" class="btn btn-primary" style="background:transparent;color:var(--text);border:1px solid var(--border)">← Zurück</a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <div class="flash {{ category }}">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if raw_token %}
+        <div class="api-new-key-banner">
+            <strong>Neuer API-Schlüssel</strong>
+            <code id="raw-key">{{ raw_token }}</code>
+            <div class="api-new-key-meta">
+                „{{ new_meta.label }}" · {{ new_meta.scopes|join(', ') }} ·
+                {{ new_meta.created_at|strftime }}
+                <br><br>
+                Bitte jetzt kopieren. Diese Anzeige verschwindet beim nächsten
+                Seitenaufruf dauerhaft.
+            </div>
+            <div class="btn-row">
+                <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('raw-key').innerText)">
+                    In Zwischenablage kopieren
+                </button>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="api-card">
+        <h2>Neuen Schlüssel erstellen</h2>
+        <form method="POST" action="{{ url_for('api_keys_gui.index') }}">
+            <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+            <div class="form-row">
+                <div>
+                    <label for="label">Name / Zweck</label>
+                    <input type="text" id="label" name="label" maxlength="80" required placeholder="z.B. Mein Backup-Script">
+                </div>
+                <div>
+                    <label>Scopes</label>
+                    <div class="scopes-grid">
+                        {% for scope in scopes %}
+                        <label class="scope-chip">
+                            <input type="checkbox" name="scopes" value="{{ scope.value }}" {% if scope.value == 'films:upload' %}checked{% endif %}>
+                            <div>
+                                <div>{{ scope.label }}</div>
+                                <div class="scope-chip-name">{{ scope.value }}</div>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="btn-row">
+                <button type="submit" class="btn btn-primary">Schlüssel erzeugen</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="api-card">
+        <h2>Deine Schlüssel ({{ keys|length }})</h2>
+        {% if keys %}
+            <table class="keys-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>ID</th>
+                        <th>Scopes</th>
+                        <th>Erstellt</th>
+                        <th>Zuletzt benutzt</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for k in keys %}
+                    <tr>
+                        <td class="key-label">{{ k.label }}</td>
+                        <td><code>#{{ k.id }}</code></td>
+                        <td class="key-scopes">
+                            {% for s in k.scopes %}<span class="scope-tag">{{ s }}</span>{% endfor %}
+                        </td>
+                        <td>{{ k.created_at_human }}</td>
+                        <td>{{ k.last_used_at_human }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('api_keys_gui.delete', key_id=k.id) }}" class="delete-form"
+                                  onsubmit="return confirm('Schlüssel „{{ k.label|e }}” wirklich löschen? Externe Anwendungen verlieren sofort den Zugriff.');">
+                                <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+                                <button type="submit" class="btn btn-danger">Löschen</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                Du hast noch keine API-Schlüssel. Leg oben einen an, um externe
+                Werkzeuge anzubinden.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Clipboard fallback for browsers without navigator.clipboard in iframes
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('button[onclick*="clipboard"]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            try { await navigator.clipboard.writeText(document.getElementById('raw-key').innerText); } catch (_) {}
+        });
+    });
+});
+</script>
+{% endblock %}

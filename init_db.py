@@ -126,6 +126,25 @@ cur.executescript(
         ON permission_suggestions(target_user_id, role)
         WHERE status = 'pending';
 
+    -- API v1 Schlüssel.
+    -- ``prefix`` wird im Klartext gespeichert und ist UNIQUE indiziert
+    -- → O(1)-Lookup bei jedem API-Call (DoS-resistent, siehe auth.py).
+    -- ``key_hash`` ist SHA-256(secret) — kein langsamer Algorithmus nötig,
+    -- weil die Secret-Komponente mit 320 Bit System-Entropy generiert wird.
+    CREATE TABLE IF NOT EXISTS api_keys (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id      INTEGER NOT NULL,
+        prefix       TEXT    NOT NULL UNIQUE,
+        key_hash     TEXT    NOT NULL,
+        label        TEXT    NOT NULL DEFAULT '',
+        scopes       TEXT    NOT NULL DEFAULT '[]', -- JSON-array
+        created_at   INTEGER NOT NULL,
+        last_used_at INTEGER,
+        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    );
+    CREATE INDEX IF NOT EXISTS idx_api_keys_user
+        ON api_keys(user_id, created_at DESC);
+
 """
 )
 
