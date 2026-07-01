@@ -96,7 +96,7 @@ active = true
 
 ["api-keys-gui"]
 pfad = "api_keys_gui"
-url = "/account/api-keys"
+url = "/settings/api-keys"
 description = "Browser-GUI zum Erstellen/Löschen persönlicher API-Schlüssel."
 active = true
 
