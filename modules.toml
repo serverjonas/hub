@@ -88,9 +88,9 @@ url = "/api/v1"
 description = "Public REST API v1 (filme upload, …). Schlüsselverwaltung in /account/api-keys."
 active = true
 
-["api-internal-status"]
+["api-v1-status"]
 pfad = "api/internal/status"
-url = "/api/internal/status"
+url = "/api/v1/status"
 description = "Server-Monitoring für Admins/Mods (vorher /api/v1/status)."
 active = true
 
