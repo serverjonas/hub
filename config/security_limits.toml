@@ -51,3 +51,12 @@ max_zip_total = 1073741824      # 1 GB
 # sees the same number everywhere.
 [avatar]
 max_file = 10485760             # 10 MB
+
+# ─── Notes ──────────────────────────────────────────────────────────────────
+# Markdown notes are stored in the user's cloud folder (data/cloud/<id>/).
+# Default cap keeps the live preview responsive — the goal of 5 MB is
+# roughly a million words of markdown, more than any single note in
+# practice, while staying below the threshold where the browser starts
+# to lag on marked.js rendering.
+[notes]
+max_note = 5242880              # 5 MB per note
