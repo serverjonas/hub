@@ -1,138 +1,1111 @@
 {% extends "base.html" %}
 
 {% block page_id %}cloud{% endblock %}
-{% block content %}
+{% block title_i18n %}cloud.title{% endblock %}
+{% block title %}<span data-i18n="nav.cloud">Cloud</span> · serverjonas{% endblock %}
 
-<h1>☁️ <span data-i18n="nav.cloud">Cloud</span></h1>
+{% block extra_style %}
+/* ─── Cloud tools ───────────────────────────────────────────────────── */
+.cloud-shell { max-width: 1100px; margin: 0 auto; }
 
-<!-- Speicher-Auslastung -->
-{% if storage %}
-<div class="storage-bar" style="margin: 16px 0; padding: 12px 16px; border-radius: 12px; background: var(--surface, #1c1c1c); border: 1px solid var(--border, #333);">
-  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-dim, #aaa); margin-bottom: 8px;">
-    <span>💾 Speicher</span>
-    <span>
-      {{ storage.used_human }} / {{ storage.limit_human }}
-      <span style="opacity:0.7;">({{ storage.percent }}%)</span>
-    </span>
-  </div>
-  <div style="height: 8px; background: var(--input, #222); border-radius: 999px; overflow: hidden;">
-    <div style="
-      height: 100%;
-      width: {{ storage.percent if storage.percent <= 100 else 100 }}%;
-      background: {% if storage.exceeded %}#ef4444{% elif storage.percent > 85 %}#f59e0b{% else %}#10b981{% endif %};
-      transition: width 0.4s ease;
-    "></div>
-  </div>
-</div>
-{% endif %}
-
-<!-- EIN Upload-Feld statt zwei -->
-<form id="uploadForm">
-  <input type="file" name="files" multiple id="fileInput">
-  <button class="btn btn-primary" type="submit"><span data-i18n="films.upload_label">Upload</span></button>
-</form>
-
-<div id="fileInfo" style="margin-top:10px; opacity:0.8;"></div>
-
-<hr>
-
-<ul>
-{% for i in items %}
-  <li>
-    {% if i.is_dir %}
-      📁 {{ i.name }}
-    {% else %}
-      📄 <a href="/cloud/download/{{ i.name }}">{{ i.name }}</a>
-    {% endif %}
-    <a href="/cloud/delete/{{ i.name }}" data-i18n-title="cloud.delete" title="🗑">🗑</a>
-  </li>
-{% endfor %}
-</ul>
-
-<style>
-ul { margin-top: 20px; padding: 0; }
-li {
-  padding: 8px;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #333;
+.cloud-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 14px; margin-bottom: 22px;
+    animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
-li:hover { background: #222; }
-button { cursor: pointer; }
-</style>
+.cloud-header h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2.1rem, 4.4vw, 2.7rem);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    display: flex; align-items: center; gap: 14px;
+}
+.cloud-header h1 .cloud-emoji { transform: rotate(-6deg); }
+
+.cloud-toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    align-items: center;
+}
+
+/* ─── Storage bar ───────────────────────────────────────────────────── */
+.cloud-storage {
+    margin-bottom: 22px;
+    padding: 14px 18px;
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-2);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    animation: fadeInUp 0.5s 0.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.cloud-storage-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; flex-wrap: wrap;
+    font-size: 0.95rem; color: var(--text-secondary);
+    margin-bottom: 9px;
+}
+.cloud-storage-row .role-badge {
+    font-family: var(--font-heading); font-weight: 700;
+    padding: 3px 9px; border: 1.5px solid var(--border);
+    border-radius: 9999px;
+    background: var(--postit); font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+}
+.cloud-storage-bar {
+    height: 10px;
+    background: var(--muted);
+    border: 2px solid var(--border);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+.cloud-storage-fill {
+    height: 100%;
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cloud-storage-fill.ok      { background: #10b981; }
+.cloud-storage-fill.warn    { background: #f59e0b; }
+.cloud-storage-fill.over    { background: var(--accent); }
+
+/* ─── Breadcrumb ────────────────────────────────────────────────────── */
+.cloud-breadcrumb {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+    padding: 9px 14px;
+    border: 2.5px dashed var(--border);
+    border-radius: var(--wobbly-3);
+    background: var(--surface-hover);
+    margin-bottom: 18px;
+    font-family: var(--font-body);
+    font-size: 0.99rem;
+    box-shadow: var(--shadow-sm);
+}
+.cloud-breadcrumb a, .cloud-breadcrumb button.crumb {
+    background: transparent; border: none; cursor: pointer;
+    padding: 4px 10px;
+    color: var(--text-secondary);
+    border-radius: var(--wobbly-3);
+    transition: var(--transition-fast);
+    font-family: inherit; font-size: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.cloud-breadcrumb a:hover, .cloud-breadcrumb button.crumb:hover {
+    background: var(--postit); color: var(--accent);
+    transform: translateY(-1px);
+}
+.cloud-breadcrumb .crumb-sep { color: var(--text-dim); }
+.cloud-breadcrumb .crumb-current {
+    font-family: var(--font-heading); font-weight: 700;
+    color: var(--text-main);
+    padding: 4px 10px; background: var(--postit);
+    border: 2px solid var(--border); border-radius: var(--wobbly-3);
+    box-shadow: 1px 1px 0 0 var(--border);
+}
+
+/* ─── Drop zone ─────────────────────────────────────────────────────── */
+.cloud-dropzone {
+    border: 3px dashed var(--border);
+    border-radius: var(--wobbly-2);
+    padding: 26px 18px;
+    text-align: center;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+    cursor: pointer;
+    margin-bottom: 22px;
+    position: relative;
+    user-select: none;
+}
+.cloud-dropzone:hover { background: var(--surface-hover); transform: translateY(-2px); }
+.cloud-dropzone.is-dragging {
+    background: var(--accent-lighter);
+    border-color: var(--accent);
+    border-style: solid;
+    box-shadow: var(--shadow-md);
+}
+.cloud-dropzone input[type="file"] { display: none; }
+.cloud-dropzone.dz-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin-bottom: 4px;
+}
+.cloud-dropzone .dz-hint {
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+}
+.cloud-dropzone .dz-actions {
+    display: flex; gap: 8px; justify-content: center;
+    flex-wrap: wrap; margin-top: 12px;
+}
+
+/* ─── File / folder grid ────────────────────────────────────────────── */
+.cloud-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 14px;
+}
+.cloud-tile {
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-3);
+    padding: 16px 14px 12px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-fast);
+    position: relative;
+    display: flex; flex-direction: column; gap: 8px;
+    cursor: pointer;
+    min-height: 144px;
+    text-align: center;
+    user-select: none;
+}
+.cloud-tile:hover {
+    transform: translate(-2px, -2px) rotate(-1deg);
+    box-shadow: var(--shadow-md);
+    background: var(--surface-hover);
+}
+.cloud-tile.is-hidden { opacity: 0.55; }
+
+.cloud-tile-icon {
+    width: 64px; height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto;
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-circle);
+    background: var(--postit);
+    box-shadow: var(--shadow-sm);
+    transform: rotate(-4deg);
+    transition: var(--transition);
+}
+.cloud-tile:hover .cloud-tile-icon {
+    transform: rotate(0deg) scale(1.05);
+}
+.cloud-tile[data-kind="folder"] .cloud-tile-icon { background: #ffe7b3; }
+.cloud-tile[data-kind="image"] .cloud-tile-icon { background: #dde8ff; }
+.cloud-tile[data-kind="video"] .cloud-tile-icon { background: #ffd6d6; }
+.cloud-tile[data-kind="audio"] .cloud-tile-icon { background: #d4f5e9; }
+.cloud-tile[data-kind="markdown"] .cloud-tile-icon { background: #fff9c4; }
+.cloud-tile[data-kind="text"] .cloud-tile-icon { background: #e8e0ff; }
+.cloud-tile[data-kind="code"] .cloud-tile-icon { background: #ffe0cc; }
+.cloud-tile[data-kind="archive"] .cloud-tile-icon { background: #b3e0ff; }
+
+.cloud-tile-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.99rem;
+    word-break: break-word;
+    line-height: 1.2;
+}
+.cloud-tile-meta {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    font-family: var(--font-body);
+}
+
+.cloud-tile-actions {
+    display: flex; gap: 4px;
+    justify-content: center;
+    margin-top: auto;
+    padding-top: 8px;
+    flex-wrap: wrap;
+}
+.cloud-tile-action {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--wobbly-3);
+    padding: 4px 7px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px;
+    transition: var(--transition-fast);
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    line-height: 1;
+}
+.cloud-tile-action:hover {
+    background: var(--postit);
+    color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+.cloud-tile-action.danger:hover {
+    background: var(--accent);
+    color: #ffffff;
+}
+
+/* ─── Empty state ───────────────────────────────────────────────────── */
+.cloud-empty {
+    text-align: center;
+    padding: 46px 18px;
+    border: 3px dashed var(--border);
+    border-radius: var(--wobbly-2);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+}
+.cloud-empty .empty-icon {
+    width: 84px; height: 84px;
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-circle);
+    background: var(--postit);
+    box-shadow: var(--shadow-sm);
+    transform: rotate(-3deg);
+}
+.cloud-empty h2 {
+    font-family: var(--font-heading);
+    margin-bottom: 6px;
+    font-size: 1.5rem;
+}
+
+/* ─── Modal (preview/delete confirmation) ───────────────────────────── */
+.cloud-modal-mask {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 9000;
+    padding: 24px;
+    animation: fadeInUp 0.2s ease;
+}
+.cloud-modal-mask.open { display: flex; }
+.cloud-modal {
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-2);
+    box-shadow: var(--shadow-xl);
+    max-width: min(1200px, 96vw);
+    max-height: 92vh;
+    width: 100%;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    animation: fadeInUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cloud-modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 2.5px dashed var(--border);
+    background: var(--surface);
+    gap: 10px;
+}
+.cloud-modal-title {
+    font-family: var(--font-heading);
+    font-weight: 700; font-size: 1.15rem;
+    display: flex; align-items: center; gap: 10px;
+    word-break: break-word;
+}
+.cloud-modal-title .badge {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    font-weight: 400;
+    padding: 3px 9px;
+    border: 1.5px solid var(--border);
+    border-radius: 9999px;
+    background: var(--postit);
+}
+.cloud-modal-close {
+    background: transparent; border: 2px solid transparent;
+    border-radius: var(--wobbly-circle);
+    width: 38px; height: 38px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: var(--transition-fast);
+}
+.cloud-modal-close:hover {
+    background: var(--accent-lighter); color: var(--accent);
+    transform: rotate(90deg);
+}
+.cloud-modal-body {
+    padding: 18px;
+    overflow: auto;
+    display: flex; flex-direction: column;
+    gap: 14px;
+    flex: 1 1 auto;
+    min-height: 160px;
+}
+
+/* Image / video / audio previews */
+.preview-media {
+    width: 100%;
+    display: flex; align-items: center; justify-content: center;
+}
+.preview-media img,
+.preview-media video {
+    max-width: 100%;
+    max-height: 78vh;
+    border: 2px solid var(--border);
+    border-radius: var(--wobbly-3);
+    background: var(--bg);
+    display: block;
+}
+.preview-media audio { width: 100%; max-width: 480px; }
+
+/* Text preview */
+.preview-text {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: var(--wobbly-3);
+    padding: 16px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 70vh;
+    overflow: auto;
+    color: var(--text-main);
+}
+.preview-text-meta {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    display: flex; justify-content: space-between; gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Markdown preview body */
+.preview-md {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--wobbly-3);
+    padding: 18px 22px;
+    color: var(--text-main);
+    line-height: 1.6;
+    max-height: 72vh;
+    overflow: auto;
+}
+.preview-md h1, .preview-md h2, .preview-md h3 {
+    font-family: var(--font-heading); letter-spacing: -0.3px;
+}
+.preview-md code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    padding: 2px 5px;
+    background: var(--muted);
+    border-radius: 4px;
+}
+.preview-md pre {
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: var(--wobbly-3);
+    overflow: auto;
+}
+.preview-md pre code { background: transparent; padding: 0; }
+.preview-md blockquote {
+    border-left: 4px solid var(--accent);
+    padding-left: 14px;
+    color: var(--text-dim);
+    margin: 12px 0;
+}
+.preview-md a { color: var(--accent); text-decoration: underline; text-decoration-style: dashed; }
+.preview-md table { border-collapse: collapse; margin: 12px 0; }
+.preview-md th, .preview-md td {
+    border: 2px solid var(--border); padding: 6px 10px;
+}
+.preview-md img { max-width: 100%; }
+
+/* ─── Toasts (cloud-specific) ───────────────────────────────────────── */
+.cloud-toast-stack {
+    position: fixed; bottom: 26px; right: 26px;
+    z-index: 9500;
+    display: flex; flex-direction: column; gap: 10px;
+    pointer-events: none;
+    max-width: min(420px, calc(100vw - 40px));
+}
+.cloud-toast {
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-2);
+    padding: 11px 16px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    box-shadow: var(--shadow-md);
+    pointer-events: auto;
+    display: flex; align-items: flex-start; gap: 10px;
+    animation: fadeInUp 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: rotate(-1deg);
+}
+.cloud-toast.is-success { color: var(--secondary); }
+.cloud-toast.is-error   { color: var(--accent); }
+.cloud-toast.is-info    { color: var(--text-main); }
+.cloud-toast.is-leaving {
+    opacity: 0;
+    transform: translateY(8px) rotate(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .cloud-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    .cloud-toolbar { width: 100%; }
+    .cloud-tile { min-height: 132px; padding: 12px 10px; }
+    .cloud-tile-icon { width: 56px; height: 56px; }
+}
+{% endblock %}
+
+{% block banner_extra %}{% endblock %}
+
+{% block content %}
+<div class="cloud-shell">
+    <div class="cloud-header">
+        <h1>
+            <span class="cloud-emoji" aria-hidden="true">☁️</span>
+            <span data-i18n="cloud.title">Cloud</span>
+        </h1>
+        <div class="cloud-toolbar">
+            <button class="btn" id="cloudNewFolderBtn"
+                    data-i18n-title="cloud.new_folder" title="+ New folder">
+                <i data-lucide="folder-plus" style="width: 16px; height: 16px;"></i>
+                <span data-i18n="cloud.new_folder">New folder</span>
+            </button>
+            <button class="btn btn-primary" id="cloudRefreshBtn"
+                    data-i18n-title="cloud.refresh" title="Refresh">
+                <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                <span data-i18n="cloud.refresh">Refresh</span>
+            </button>
+        </div>
+    </div>
+
+    {% if storage %}
+    <div class="cloud-storage" id="cloudStorage">
+        <div class="cloud-storage-row">
+            <span style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="hard-drive" style="width: 18px; height: 18px;"></i>
+                <span data-i18n="cloud.storage">Storage</span>
+                <span class="role-badge">{{ storage.role }}</span>
+            </span>
+            <span data-storage-text>
+              {{ storage.used_human }} / {{ storage.limit_human }}
+              <span style="opacity: 0.7;">({{ storage.percent }}%)</span>
+            </span>
+        </div>
+        <div class="cloud-storage-bar">
+            <div class="cloud-storage-fill {% if storage.exceeded %}over{% elif storage.percent > 85 %}warn{% else %}ok{% endif %}"
+                 style="width: {{ storage.percent if storage.percent <= 100 else 100 }}%;"></div>
+        </div>
+    </div>
+    {% endif %}
+
+    <nav class="cloud-breadcrumb" id="cloudBreadcrumb" aria-label="Breadcrumb"></nav>
+
+    <label class="cloud-dropzone" id="cloudDropzone">
+        <input type="file" id="cloudFileInput" multiple
+               accept=".png,.jpg,.jpeg,.gif,.webp,.avif,.heic,.heif,.mp4,.webm,.mp3,.m4a,.flac,.wav,.ogg,.opus,.txt,.md,.pdf,.csv,.json,.xml,.yaml,.yml,.toml,.ini,.cfg,.conf,.log,.html,.htm,.css,.scss,.sass,.less,.js,.mjs,.cjs,.ts,.jsx,.tsx,.py,.rb,.go,.rs,.java,.kt,.swift,.c,.h,.cpp,.hpp,.cs,.m,.sh,.bash,.php,.pl,.lua,.r,.sql,.svg,.zip,.tar,.gz,.tgz,.bz2,.7z,.rar">
+        <div class="dz-title">
+            <i data-lucide="upload-cloud" style="width: 30px; height: 30px;"></i>
+            <span data-i18n="cloud.dropzone.title">Click or drop files here</span>
+        </div>
+        <div class="dz-hint" data-i18n="cloud.dropzone.hint">Per file up to 200 MB · ZIP up to 1 GB / 1000 files</div>
+        <div class="dz-actions">
+            <span class="setting-action" style="cursor: default; background: var(--postit);">
+                <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+                <span data-i18n="cloud.security_on">Security checks enabled</span>
+            </span>
+        </div>
+        <div id="cloudSelection" class="dz-hint" style="margin-top: 9px; font-style: italic;"></div>
+        <div id="cloudUploadProgress" style="margin-top: 9px; display: none;">
+            <div class="cloud-storage-bar"><div class="cloud-storage-fill ok" id="cloudUploadProgressFill" style="width: 0%;"></div></div>
+            <div id="cloudUploadProgressLabel" class="dz-hint">0%</div>
+        </div>
+    </label>
+
+    <div id="cloudContent">
+        <div class="cloud-empty" id="cloudEmpty">
+            <div class="empty-icon"><i data-lucide="folder-open" style="width: 36px; height: 36px;"></i></div>
+            <h2 data-i18n="cloud.loading">Loading…</h2>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Modal ──────────────────────────────────────────────────────── -->
+<div class="cloud-modal-mask" id="cloudModalMask" role="dialog" aria-modal="true">
+    <div class="cloud-modal" id="cloudModal" role="document">
+        <div class="cloud-modal-head">
+            <div class="cloud-modal-title" id="cloudModalTitle">
+                <i data-lucide="file" id="cloudModalTitleIcon" style="width: 22px; height: 22px;"></i>
+                <span id="cloudModalTitleText">file</span>
+                <span class="badge" id="cloudModalMeta"></span>
+            </div>
+            <button class="cloud-modal-close" id="cloudModalCloseBtn" aria-label="Close">
+                <i data-lucide="x" style="width: 22px; height: 22px;"></i>
+            </button>
+        </div>
+        <div class="cloud-modal-body" id="cloudModalBody"></div>
+    </div>
+</div>
+
+<!-- ─── Toast stack ───────────────────────────────────────────────── -->
+<div class="cloud-toast-stack" id="cloudToastStack"></div>
+
+<!-- marked.js + DOMPurify for safe markdown rendering.
+     matched integrity hashes in package would be better, but for a
+     locally-loaded CDN these are good enough for the threat model:
+     the markdown we render is the user's OWN upload, not third
+     party content. -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js" crossorigin="anonymous"></script>
 
 <script>
-const form = document.getElementById("uploadForm");
-const fileInput = document.getElementById("fileInput");
-const fileInfo = document.getElementById("fileInfo");
+(function () {
+    const root = document.getElementById("cloudContent");
+    const dropzone = document.getElementById("cloudDropzone");
+    const fileInput = document.getElementById("cloudFileInput");
+    const breadcrumbEl = document.getElementById("cloudBreadcrumb");
+    const selectionEl = document.getElementById("cloudSelection");
+    const modalMask = document.getElementById("cloudModalMask");
+    const modalTitleText = document.getElementById("cloudModalTitleText");
+    const modalTitleIcon = document.getElementById("cloudModalTitleIcon");
+    const modalMeta = document.getElementById("cloudModalMeta");
+    const modalBody = document.getElementById("cloudModalBody");
+    const modalCloseBtn = document.getElementById("cloudModalCloseBtn");
+    const toastStack = document.getElementById("cloudToastStack");
+    const uploadProgress = document.getElementById("cloudUploadProgress");
+    const uploadProgressFill = document.getElementById("cloudUploadProgressFill");
+    const uploadProgressLabel = document.getElementById("cloudUploadProgressLabel");
 
-// Zeigt ausgewählte Dateien an
-fileInput.addEventListener("change", () => {
-  const files = [...fileInput.files];
+    const STORAGE_USED = {{ storage.used if storage else 0 }};
+    const STORAGE_LIMIT = {{ storage.limit if storage else 0 }};
 
-  if (files.length === 0) {
-    fileInfo.innerText = "";
-    return;
-  }
-
-  const tmpl = (window.t && window.t('cloud.selected_template')) || '📦 Ausgewählt: {files}';
-  fileInfo.innerText = tmpl.replace(/\{files\}/g, files.map(f => f.name).join(", "));
-
-  // Vorab-Check gegen das Server-Limit (wenn storage-Variablen vorhanden)
-{% if storage %}
-  const limitBytes = {{ storage.limit }};
-  const usedBytes = {{ storage.used }};
-  const incomingBytes = files.reduce((s, f) => s + (f.size || 0), 0);
-  if (usedBytes + incomingBytes > limitBytes) {
-    const over = (usedBytes + incomingBytes) - limitBytes;
-    const overStr = over > 1024 * 1024 * 1024
-      ? (over / 1024 / 1024 / 1024).toFixed(2) + ' GB'
-      : (over / 1024 / 1024).toFixed(1) + ' MB';
-    fileInfo.innerText += `  ⚠️ ca. ${overStr} zu viel für dein Limit`;
-  }
-{% endif %}
-});
-
-form.onsubmit = async (e) => {
-  e.preventDefault();
-
-  const data = new FormData();
-
-  // alle Dateien unter EINEM Key
-  for (const file of fileInput.files) {
-    data.append("files", file);
-  }
-
-  try {
-    const res = await fetch("/cloud/upload", {
-      method: "POST",
-      body: data
-    });
-
-    if (!res.ok) {
-      let msg;
-      try {
-        const err = await res.json();
-        if (err && err.error === "storage_limit_exceeded") {
-          msg = `Speicherlimit überschritten: belegt ${err.used_human} / Limit ${err.limit_human} (verfügbar: ${err.remaining_human}).`;
-        } else {
-          msg = (window.t && window.t('cloud.upload_failed')) || 'Upload fehlgeschlagen';
-        }
-      } catch {
-        msg = (window.t && window.t('cloud.upload_failed')) || 'Upload fehlgeschlagen';
-      }
-      console.error(msg);
-      alert(msg);
-      return;
+    // ─── i18n helper ───────────────────────────────────────────────
+    function t(key, fallback) {
+        return (window.t && window.t(key)) || fallback || key;
+    }
+    function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, c => (
+            { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]
+        ));
     }
 
-    location.reload();
-  } catch (err) {
-    console.error(err);
-    const msg = (window.t && window.t('cloud.network_error')) || 'Netzwerkfehler';
-    alert(msg);
-  }
-};
-</script>
+    // ─── Toast ─────────────────────────────────────────────────────
+    function toast(message, kind) {
+        kind = kind || "info";
+        const el = document.createElement("div");
+        el.className = "cloud-toast is-" + kind;
+        const iconMap = {
+            success: "check-circle",
+            error: "alert-triangle",
+            info: "info"
+        };
+        const icon = iconMap[kind] || "info";
+        el.innerHTML =
+            '<i data-lucide="' + icon + '" style="width: 18px; height: 18px; flex: 0 0 auto;"></i>' +
+            '<span>' + esc(message) + '</span>';
+        toastStack.appendChild(el);
+        if (window.lucide) {
+            try { lucide.createIcons({ attrs: { "stroke-width": 2.5 }, nameAttr: "data-lucide" }); } catch(_) {}
+        }
+        setTimeout(() => {
+            el.classList.add("is-leaving");
+            setTimeout(() => el.remove(), 320);
+        }, 5500);
+    }
+    window.cloudToast = toast;
 
+    // ─── Path helpers ──────────────────────────────────────────────
+    let currentPath = ""; // slash-separated, NEVER starts with /
+
+    function splitPath(p) {
+        return (p || "").split("/").filter(Boolean);
+    }
+    function joinPath(parts) {
+        return parts.join("/");
+    }
+    function parentOf(p) {
+        const parts = splitPath(p);
+        parts.pop();
+        return parts.join("/");
+    }
+
+    // ─── Breadcrumb ────────────────────────────────────────────────
+    function renderBreadcrumb() {
+        const parts = [{ label: "🏠 " + t("cloud.breadcrumb.root", "Home"), rel: "" }];
+        const acc = [];
+        for (const seg of splitPath(currentPath)) {
+            acc.push(seg);
+            parts.push({ label: seg, rel: acc.join("/") });
+        }
+        breadcrumbEl.innerHTML = parts.map((p, i) => {
+            const isLast = i === parts.length - 1;
+            if (isLast) {
+                return '<span class="crumb-current">' + esc(p.label) + '</span>';
+            }
+            return (
+                '<button class="crumb" data-crumb="' + esc(p.rel) +
+                '" type="button">' + esc(p.label) + '</button>' +
+                '<span class="crumb-sep">›</span>'
+            );
+        }).join("");
+        breadcrumbEl.querySelectorAll("[data-crumb]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                currentPath = btn.getAttribute("data-crumb") || "";
+                loadCurrent();
+            });
+        });
+    }
+
+    // ─── File type classification (mirrors backend toolboxes) ──────
+    const IMG_EXT  = new Set(["png","jpg","jpeg","gif","webp","avif","heic","heif","bmp"]);
+    const VID_EXT  = new Set(["mp4","webm","mov","mkv","avi"]);
+    const AUD_EXT  = new Set(["mp3","m4a","flac","wav","ogg","opus"]);
+    const MD_EXT   = new Set(["md","markdown"]);
+    const TXT_EXT  = new Set(["txt","csv","json","xml","yaml","yml","toml","ini","cfg","conf","log"]);
+    const CODE_EXT = new Set(["html","htm","css","scss","sass","less","js","mjs","cjs","ts","jsx","tsx","py","rb","go","rs","java","kt","swift","c","h","cpp","hpp","cs","m","sh","bash","php","pl","lua","r","sql","svg"]);
+    const ARCH_EXT = new Set(["zip","tar","gz","tgz","bz2","7z","rar"]);
+
+    function classOf(ext, isDir) {
+        if (isDir) return "folder";
+        if (IMG_EXT.has(ext))  return "image";
+        if (VID_EXT.has(ext))  return "video";
+        if (AUD_EXT.has(ext))  return "audio";
+        if (MD_EXT.has(ext))   return "markdown";
+        if (TXT_EXT.has(ext))  return "text";
+        if (CODE_EXT.has(ext)) return "code";
+        if (ARCH_EXT.has(ext)) return "archive";
+        return "binary";
+    }
+    function iconFor(kind, ext) {
+        switch (kind) {
+            case "folder":   return "folder";
+            case "image":    return "image";
+            case "video":    return "film";
+            case "audio":    return "music";
+            case "markdown": return "book-open";
+            case "text":     return "file-text";
+            case "code":     return "file-code";
+            case "archive":  return "file-archive";
+            default:         return "file";
+        }
+    }
+
+    // ─── Folder listing ────────────────────────────────────────────
+    async function loadCurrent() {
+        renderBreadcrumb();
+        root.innerHTML = `
+            <div class="cloud-empty">
+                <div class="empty-icon"><i data-lucide="loader" style="width: 36px; height: 36px;"></i></div>
+                <h2 data-i18n="cloud.loading">Loading…</h2>
+            </div>`;
+        if (window.lucide) {
+            try { lucide.createIcons({ attrs: { "stroke-width": 2.5 } }); } catch(_) {}
+        }
+        try {
+            const res = await fetch("/cloud/list/" + encodeURIComponent(currentPath), {
+                headers: { "Accept": "application/json" }
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                toast(data.message || t("cloud.error.network", "Network error"), "error");
+                return;
+            }
+            const data = await res.json();
+            renderListing(data);
+        } catch (e) {
+            toast(t("cloud.error.network", "Network error"), "error");
+        }
+    }
+    window.cloudLoad = loadCurrent;
+
+    function renderListing(data) {
+        const items = data.items || [];
+        if (items.length === 0) {
+            root.innerHTML = `
+                <div class="cloud-empty">
+                    <div class="empty-icon"><i data-lucide="folder-open" style="width: 36px; height: 36px;"></i></div>
+                    <h2 data-i18n="cloud.empty.title">This folder is empty</h2>
+                    <p class="dz-hint" data-i18n="cloud.empty.hint">Drop files here, or use the buttons above.</p>
+                </div>`;
+            if (window.lucide) {
+                try { lucide.createIcons({ attrs: { "stroke-width": 2.5 } }); } catch(_) {}
+            }
+            return;
+        }
+        const tiles = items.map(item => {
+            const ext = (item.ext || "").replace(".", "").toLowerCase();
+            const isDir = !!item.is_dir;
+            const kind = classOf(ext, isDir);
+            const icon = iconFor(kind, ext);
+            const meta = isDir
+                ? t("cloud.tile.folder", "Folder")
+                : (item.size_human || "?");
+            const previewAllowed = !isDir && (
+                kind === "image" || kind === "video" || kind === "audio" ||
+                kind === "text"  || kind === "code" || kind === "markdown"
+            );
+            return `
+                <div class="cloud-tile ${item.hidden ? "is-hidden" : ""}" data-rel="${esc(item.rel)}" data-is-dir="${isDir ? "1" : "0"}" data-kind="${kind}" data-name="${esc(item.name)}">
+                    <div class="cloud-tile-icon"><i data-lucide="${icon}"></i></div>
+                    <div class="cloud-tile-name">${esc(item.name)}</div>
+                    <div class="cloud-tile-meta">${esc(meta)}</div>
+                    <div class="cloud-tile-actions">
+                        ${previewAllowed
+                            ? `<button class="cloud-tile-action" data-action="preview" data-i18n-title="cloud.preview" title="Preview"><i data-lucide="eye" style="width: 13px; height: 13px;"></i></button>`
+                            : ""}
+                        <a class="cloud-tile-action" href="/cloud/download/${encodeURI(item.rel)}" data-action="download" data-i18n-title="cloud.download" title="Download"><i data-lucide="download" style="width: 13px; height: 13px;"></i></a>
+                        <button class="cloud-tile-action" data-action="rename" data-i18n-title="cloud.rename" title="Rename"><i data-lucide="pencil" style="width: 13px; height: 13px;"></i></button>
+                        <button class="cloud-tile-action danger" data-action="delete" data-i18n-title="cloud.delete" title="Delete"><i data-lucide="trash-2" style="width: 13px; height: 13px;"></i></button>
+                    </div>
+                </div>`;
+        }).join("");
+        root.innerHTML = `<div class="cloud-grid">${tiles}</div>`;
+        if (window.lucide) {
+            try { lucide.createIcons({ attrs: { "stroke-width": 2.5 } }); } catch(_) {}
+        }
+        bindTiles();
+    }
+
+    function bindTiles() {
+        root.querySelectorAll(".cloud-tile").forEach(tile => {
+            const rel = tile.getAttribute("data-rel");
+            const isDir = tile.getAttribute("data-is-dir") === "1";
+            const name = tile.getAttribute("data-name");
+            // Click the tile body -> folder navigation or preview
+            tile.addEventListener("click", (e) => {
+                // Skip if an inner action button handled it already.
+                if (e.target.closest(".cloud-tile-action")) return;
+                if (isDir) {
+                    currentPath = rel;
+                    loadCurrent();
+                } else {
+                    const kind = tile.getAttribute("data-kind");
+                    if (kind === "image" || kind === "video" || kind === "audio"
+                        || kind === "text" || kind === "code" || kind === "markdown") {
+                        openPreview(rel, name, kind);
+                    }
+                }
+            });
+            tile.querySelectorAll("[data-action]").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const action = btn.getAttribute("data-action");
+                    if (action === "preview") openPreview(rel, name, tile.getAttribute("data-kind"));
+                    else if (action === "delete") confirmDelete(rel, isDir, name);
+                    else if (action === "rename") promptRename(rel, name, isDir);
+                    else if (action === "download") {
+                        window.location.href = "/cloud/download/" + encodeURI(rel);
+                    }
+                });
+            });
+        });
+    }
+
+    // ─── Modals ────────────────────────────────────────────────────
+    function openModal()      { modalMask.classList.add("open"); }
+    function closeModal()     { modalMask.classList.remove("open"); modalBody.innerHTML = ""; }
+    modalCloseBtn.addEventListener("click", closeModal);
+    modalMask.addEventListener("click", (e) => { if (e.target === modalMask) closeModal(); });
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modalMask.classList.contains("open")) closeModal();
+    });
+
+    async function openPreview(rel, name, kind) {
+        modalTitleText.textContent = name;
+        modalTitleIcon.setAttribute("data-lucide", iconFor(kind, ""));
+        modalMeta.textContent = "";
+        modalBody.innerHTML = `
+            <div class="cloud-empty" style="padding: 24px;">
+                <div class="empty-icon"><i data-lucide="loader" style="width: 36px; height: 36px;"></i></div>
+                <h2 data-i18n="cloud.loading">Loading…</h2>
+            </div>`;
+        if (window.lucide) {
+            try { lucide.createIcons({ attrs: { "stroke-width": 2.5 } }); } catch(_) {}
+        }
+        openModal();
+
+        try {
+            const res = await fetch("/cloud/preview/" + encodeURI(rel), {
+                headers: { "Accept": "application/json" }
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                modalBody.innerHTML = `<div class="dz-hint">${esc(data.message || t("cloud.error.preview_failed", "Preview failed"))}</div>`;
+                return;
+            }
+            const data = await res.json();
+            modalMeta.textContent = (data.bytes != null) ? formatBytes(data.bytes) : "";
+            renderPreview(data, name);
+        } catch (e) {
+            modalBody.innerHTML = `<div class="dz-hint">${esc(t("cloud.error.network", "Network error"))}</div>`;
+        }
+    }
+
+    function renderPreview(data, name) {
+        // ``data.download_url`` is already the server-built absolute
+        // URL (`/cloud/download/<encoded>`); no further path massage
+        // needed.
+        const downloadHref = data.download_url || "";
+
+        if (data.type === "image") {
+            modalBody.innerHTML = `
+                <div class="preview-media">
+                    <img src="${esc(data.url)}" alt="${esc(name)}" loading="lazy">
+                </div>
+                <div class="d-flex" style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <a class="btn" href="${esc(downloadHref)}">
+                        <i data-lucide="download" style="width:16px;height:16px;"></i>
+                        <span data-i18n="cloud.preview.download">Download</span>
+                    </a>
+                </div>`;
+        } else if (data.type === "video") {
+            modalBody.innerHTML = `
+                <div class="preview-media">
+                    <video controls preload="metadata" src="${esc(data.url)}"></video>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <a class="btn" href="${esc(downloadHref)}">
+                        <i data-lucide="download" style="width:16px;height:16px;"></i>
+                        <span data-i18n="cloud.preview.download">Download</span>
+                    </a>
+                </div>`;
+        } else if (data.type === "audio") {
+            modalBody.innerHTML = `
+                <div class="preview-media"><audio controls preload="metadata" src="${esc(data.url)}"></audio></div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <a class="btn" href="${esc(downloadHref)}">
+                        <i data-lucide="download" style="width:16px;height:16px;"></i>
+                        <span data-i18n="cloud.preview.download">Download</span>
+                    </a>
+                </div>`;
+        } else if (data.type === "text") {
+            const flagged = data.truncated ? '<span style="color: var(--accent);">' +
+                t("cloud.preview.truncated", "Preview truncated") + '</span>' : "";
+            modalBody.innerHTML = `
+                <div class="preview-text-meta">
+                    <span>${flagged}</span>
+                    <span>${esc(formatBytes(data.bytes))}</span>
+                </div>
+                <pre class="preview-text">${esc(data.content)}</pre>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <a class="btn" href="${esc(downloadHref)}">
+                        <i data-lucide="download" style="width:16px;height:16px;"></i>
+                        <span data-i18n="cloud.preview.download">Download</span>
+                    </a>
+                </div>`;
+        } else if (data.type === "markdown") {
+            // Server returns raw markdown. We render to safe HTML
+            // BEFORE injecting, sanitise via DOMPurify to neutralise
+            // any <script>/on*-handlers in uploaded files.
+            try {
+                const rawHtml = (window.marked && window.marked.parse)
+                    ? window.marked.parse(data.content, { mangle: false, headerIds: false })
+                    : "<pre>" + esc(data.content) + "</pre>";
+                // DOMPurify's default html profile already strips ALL
+                // on* handlers and javascript: URIs; we only forbid a
+                // few extra embed-bearing tags so a hostile markdown
+                // can't side-load content even if DOMPurify ever
+                // loosens its defaults.
+                const safe = (window.DOMPurify && window.DOMPurify.sanitize)
+                    ? DOMPurify.sanitize(rawHtml, {
+                        USE_PROFILES: { html: true },
+                        FORBID_TAGS: ["script", "style", "iframe", "object", "embed", "form", "meta", "link"]
+                    })
+                    : "<pre>" + esc(data.content) + "</pre>";
+                modalBody.innerHTML = `
+                    <div class="preview-md">${safe}</div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <a class="btn" href="${esc(downloadHref)}">
+                            <i data-lucide="download" style="width:16px;height:16px;"></i>
+                            <span data-i18n="cloud.preview.download">Download</span>
+                        </a>
+                    </div>`;
+            } catch (e) {
+                modalBody.innerHTML = `<pre class="preview-text">${esc(data.content)}</pre>`;
+            }
+        } else {
+            modalBody.innerHTML = `
+                <div class="cloud-empty">
+                    <div class="empty-icon"><i data-lucide="file-question" style="width: 36px; height: 36px;"></i></div>
+                    <h2 data-i18n="cloud.preview.unsupported.title">Preview not available</h2>
+                    <p class="dz-hint" data-i18n="cloud.preview.unsupported.hint">Download this file to view it.</p>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <a class="btn btn-primary" href="${esc(downloadHref)}">
+                        <i data-lucide="download" style="width:16px;height:16px;"></i>
+                        <span data-i18n="cloud.preview.download">Download</span>
+                    </a>
+                </div>`;
+        }
+        if (window.lucide) {
+            try { lucide.createIcons({ attrs: { "stroke-width": 2.5 } }); } catch(_) {}
+        }
+    }
+
+    function formatBytes(n) {
+        n = Number(n) || 0;
+        const units = ["B", "KB", "MB", "GB", "TB"];
+        let i = 0;
+        while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+        return n.toFixed(1) + " " + units[i];
+    }
+
+    // ─── Delete confirmation ───────────────────────────────────────
+    async function confirmDelete(rel, isDir, name) {
+        const confirmKey = isDir ? "cloud.confirm.delete_folder" : "cloud.confirm.delete_file";
+        const msg = t(confirmKey, "Delete this?").replace("{name}", name);
+        if (!window.confirm(msg)) return;
+        try {
+            const res = await fetch("/cloud/delete", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json" },
+                body: "path=" + encodeURIComponent(rel)
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.status === "ok") {
+                toast(t("cloud.success.deleted", "Deleted").replace("{name}", name), "success");
+                loadCurrent();
+            } else {
+                toast((data && data.message) || t("cloud.error.delete_failed", "Delete failed"), "error");
+            }
+        } catch (e) {
+            toast(t("cloud.error.network", "Network error"), "error");
+        }
+    }
+
+    // ─── Rename ────────────────────────────────────────────────────
+    async function promptRename(rel, currentName, isDir) {
+        const newName = window.prompt(
+            t(isDir ? "cloud.rename.folder_prompt" : "cloud.rename.file_prompt",
+              "New name:"),
+            currentName
+        );
+        if (!newName || newName === currentName) return;
+        try {
+            const res = await fetch("/cloud/rename", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json" },
+                body: "path=" + encodeURIComponent(rel) +
+                      "&new_name=" + encodeURIComponent(newName)
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.status === "ok") {
+                toast(t("cloud.success.renamed", "Renamed").replace("{name}", currentName), "success");
+                loadCurrent();
+            } else {
+                toast((data && data.message) || t("cloud.error.rename_failed", "Rename failed"), "error");
+            }
+        } catch (e) {
+            toast(t("cloud.error.network", "Network error"), "error");
+        }
+    }
+
+    // ─── New folder ────────────────────────────────────────────────
+    document.getElementById("cloudNewFolderBtn").addEventListener("click", async () => {
+        const name = window.prompt(t("cloud.new_folder_prompt", "Folder name:"), "");
+        if (!name) return;
+        try {
+            const res = await fetch("/cloud/mkdir", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json" },
+                body: "parent=" + encodeURIComponent(currentPath) +
+                      "&name=" + encodeURIComponent(name)
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.status === "ok") {
+                toast(t("cloud.success.created", "Folder created").replace("{name}", data.name || name), "success");
+                loadCurrent();
+            } else {
+                toast((data && data.message) || t("cloud.error.folder_create_failed", "Could not create folder"), "error");
+            }
+        } catch (e) {
+            toast(t("cloud.error.network", "Network error"), "error");
+        }
+    });
+
+    document.getElementById("cloudRefreshBtn").addEventListener("click", () => loadCurrent());
+
+    // ─── File picker + drag-drop ───────────────────────────────────
+    fileInput.addEventListener("change", () => {
+        selectionEl.textContent =
+            t("cloud.selected_template", "Selected: {files}")
+                .replace("{files}", Array.from(fileInput.files).map(f => f.name).join(", "));
+    });
+
+    async function uploadFiles(files) {
+        if (!files || !files.length) return;
+        // Pre-flight quota warning (server still enforces)
+        const incomingBytes = Array.from(files).reduce((s, f) => s + f.size, 0);
+        if (STORAGE_LIMIT && STORAGE_USED + incomingBytes > STORAGE_LIMIT) {
+            const over = STORAGE_USED + incomingBytes - STORAGE_LIMIT;
+            toast(t("cloud.error.storage_overflow", "Storage limit exceeded")
+                    + " · " + formatBytes(over), "error");
+            return;
+        }
+        const data = new FormData();
+        data.append("parent", currentPath);
+        Array.from(files).forEach(f => data.append("files", f));
+
+        uploadProgress.style.display = "block";
+        uploadProgressFill.style.width = "0%";
+        uploadProgressLabel.textContent = "0%";
+
+        await new Promise((resolve) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/cloud/upload");
+            xhr.responseType = "json";
+            xhr.upload.onprogress = (e) => {
+                if (!e.lengthComputable) return;
+                const pct = Math.round((e.loaded / e.total) * 100);
+                uploadProgressFill.style.width = pct + "%";
+                uploadProgressLabel.textContent = pct + "%";
+            };
+            xhr.onload = () => {
+                let body = xhr.response;
+                if (!body && xhr.responseText) {
+                    try { body = JSON.parse(xhr.responseText); } catch(_) {}
+                }
+                uploadProgress.style.display = "none";
+                if (xhr.status >= 200 && xhr.status < 300 && body && body.status === "ok") {
+                    toast(t("cloud.success.uploaded", "Uploaded").replace("{count}", files.length), "success");
+                    selectionEl.textContent = "";
+                    fileInput.value = "";
+                    loadCurrent();
+                } else {
+                    const msgKey = (body && body.key) || (body && body.error) || "cloud.upload_failed";
+                    toast((body && body.message) || t(msgKey, body && body.message ? body.message : "Upload failed"), "error");
+                }
+                resolve();
+            };
+            xhr.onerror = () => {
+                uploadProgress.style.display = "none";
+                toast(t("cloud.error.network", "Network error"), "error");
+                resolve();
+            };
+            xhr.send(data);
+        });
+    }
+
+    // NOTE: don't add a click handler on the dropzone. The dropzone
+    // is a <label> wrapping the file input, so the browser already
+    // routes a click on the label to the hidden input -- adding a
+    // second JS click that calls fileInput.click() opens the file
+    // picker twice (label-driven click + JS-driven click).
+
+    // Drag-drop on the page (suppress browser default open-file).
+    ["dragenter","dragover"].forEach(ev => {
+        dropzone.addEventListener(ev, (e) => {
+            e.preventDefault(); e.stopPropagation();
+            dropzone.classList.add("is-dragging");
+        });
+        document.addEventListener(ev, (e) => { e.preventDefault(); });
+    });
+    ["dragleave","dragend"].forEach(ev => {
+        dropzone.addEventListener(ev, (e) => {
+            e.preventDefault(); e.stopPropagation();
+            dropzone.classList.remove("is-dragging");
+        });
+    });
+    document.addEventListener("drop", (e) => {
+        e.preventDefault(); e.stopPropagation();
+        dropzone.classList.remove("is-dragging");
+        if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+        uploadFiles(e.dataTransfer.files);
+    });
+
+    // ─── Initial load ──────────────────────────────────────────────
+    loadCurrent();
+})();
+</script>
 {% endblock %}
