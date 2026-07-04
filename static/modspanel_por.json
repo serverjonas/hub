@@ -21,5 +21,7 @@
     "mods.suggestions.empty": "Não tens sugestões abertas neste momento.",
     "mods.users.subtitle": "Os toggles de papel são sugestões — os admins analisam e decidem.",
     "mods.users.desc": "Submeter sugestões de papel.",
-    "mods.bans.desc": "Banir sem afetar mods/admins."
+    "mods.bans.desc": "Banir sem afetar mods/admins.",
+    "admin.cards.console": "Console de administração",
+    "admin.cards.console.desc": "Executar comandos a partir de um painel estilo terminal."
 }

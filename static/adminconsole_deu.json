@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "adminconsole"
+    },
+    "console.title": "Admin-Konsole",
+    "console.subtitle": "Führe Adminbefehle direkt aus einem Terminal-Panel aus.",
+    "console.input.placeholder": "Befehl eingeben und Enter drücken…",
+    "console.help.title": "Verfügbare Befehle",
+    "console.help.loading": "Lade…",
+    "console.help.none": "Keine Befehle für deine Rolle verfügbar.",
+    "console.btn.run": "Senden",
+    "console.btn.clear": "Leeren",
+    "console.btn.help": "Hilfe",
+    "console.role.admin": "Admin",
+    "console.role.mod": "Mod",
+    "console.hint.history": "Verlauf",
+    "console.hint.run": "ausführen",
+    "console.error.unknown": "Unbekannter Befehl: {cmd}. Tippe 'help' für die Liste.",
+    "console.error.usage": "Verwendung: {usage}",
+    "console.error.permission": "Zugriff verweigert. Dieser Befehl erfordert die Rolle '{required}'.",
+    "console.error.invalid": "Ungültige Eingabe: {message}",
+    "console.error.empty": "Bitte einen Befehl eingeben.",
+    "console.error.parse": "Eingabe konnte nicht verarbeitet werden: {message}",
+    "console.error.internal": "Serverfehler: {message}"
+}

@@ -21,5 +21,7 @@
     "mods.suggestions.empty": "Je hebt op dit moment geen open suggesties.",
     "mods.users.subtitle": "Rol­toggles zijn suggesties — admins beoordelen en beslissen.",
     "mods.users.desc": "Rol­suggesties indienen.",
-    "mods.bans.desc": "Bannen zonder mods/beheerders te raken."
+    "mods.bans.desc": "Bannen zonder mods/beheerders te raken.",
+    "admin.cards.console": "Beheerconsole",
+    "admin.cards.console.desc": "Commando's uitvoeren vanuit een terminal­paneel."
 }

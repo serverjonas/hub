@@ -21,5 +21,7 @@
     "mods.suggestions.empty": "No tienes sugerencias abiertas ahora mismo.",
     "mods.users.subtitle": "Los toggles de rol son sugerencias — los admins revisan y deciden.",
     "mods.users.desc": "Enviar sugerencias de rol.",
-    "mods.bans.desc": "Banear sin afectar a mods/admins."
+    "mods.bans.desc": "Banear sin afectar a mods/admins.",
+    "admin.cards.console": "Consola de administración",
+    "admin.cards.console.desc": "Ejecuta comandos desde un panel estilo terminal."
 }

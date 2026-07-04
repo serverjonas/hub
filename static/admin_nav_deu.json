@@ -19,5 +19,7 @@
     "admin.cards.logs.desc": "Serveraktivitäten einsehen und filtern.",
     "admin.cards.suggestions": "Rollen-Vorschläge",
     "admin.cards.suggestions.desc": "Offene Vorschläge von Mods prüfen.",
+    "admin.cards.console": "Admin-Konsole",
+    "admin.cards.console.desc": "Befehle aus einem Terminal-Panel ausführen.",
     "admin.nav.title": "Admin Panel · serverjonas"
 }

@@ -166,3 +166,9 @@ pfad = "notes"
 url = "/notes"
 description = "Einfacher Markdown-Editor. Jede .md-Datei im Cloud-Pfad ist automatisch eine Notiz."
 active = true
+
+[adminconsole]
+pfad = "adminconsole"
+url = "/admin/console"
+description = "Pre-defined command-line console for admins and mods. Whitelist of safe commands only."
+active = true

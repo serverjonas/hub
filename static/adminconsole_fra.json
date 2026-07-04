@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "adminconsole"
+    },
+    "console.title": "Console d'administration",
+    "console.subtitle": "Exécutez des commandes d'administration depuis un panneau de type terminal.",
+    "console.input.placeholder": "Saisissez une commande puis appuyez sur Entrée…",
+    "console.help.title": "Commandes disponibles",
+    "console.help.loading": "Chargement…",
+    "console.help.none": "Aucune commande disponible pour votre rôle.",
+    "console.btn.run": "Envoyer",
+    "console.btn.clear": "Effacer",
+    "console.btn.help": "Aide",
+    "console.role.admin": "Admin",
+    "console.role.mod": "Mod",
+    "console.hint.history": "historique",
+    "console.hint.run": "exécuter",
+    "console.error.unknown": "Commande inconnue : {cmd}. Tapez 'help' pour la liste.",
+    "console.error.usage": "Usage : {usage}",
+    "console.error.permission": "Accès refusé. Cette commande nécessite le rôle '{required}'.",
+    "console.error.invalid": "Entrée invalide : {message}",
+    "console.error.empty": "Veuillez saisir une commande.",
+    "console.error.parse": "Impossible d'analyser l'entrée : {message}",
+    "console.error.internal": "Erreur serveur : {message}"
+}

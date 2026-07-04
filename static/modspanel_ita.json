@@ -21,5 +21,7 @@
     "mods.suggestions.empty": "Non hai suggerimenti aperti al momento.",
     "mods.users.subtitle": "I toggle di ruolo sono suggerimenti — gli admin revisionano e decidono.",
     "mods.users.desc": "Invia suggerimenti di ruolo.",
-    "mods.bans.desc": "Ban senza intaccare mod/admin."
+    "mods.bans.desc": "Ban senza intaccare mod/admin.",
+    "admin.cards.console": "Console di amministrazione",
+    "admin.cards.console.desc": "Esegui comandi da un pannello stile terminale."
 }

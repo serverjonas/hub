@@ -19,5 +19,7 @@
     "admin.cards.logs.desc": "Consulta la actividad del servidor y filtra por IP, ruta o estado.",
     "admin.cards.suggestions": "Sugerencias de rol",
     "admin.cards.suggestions.desc": "Revisa sugerencias pendientes de los mods.",
+    "admin.cards.console": "Consola de administración",
+    "admin.cards.console.desc": "Ejecuta comandos desde un panel estilo terminal.",
     "admin.nav.title": "Panel de admin · serverjonas"
 }

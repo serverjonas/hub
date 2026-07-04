@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "adminconsole"
+    },
+    "console.title": "Consola de administración",
+    "console.subtitle": "Ejecuta comandos de administración desde un panel estilo terminal.",
+    "console.input.placeholder": "Escribe un comando y pulsa Intro…",
+    "console.help.title": "Comandos disponibles",
+    "console.help.loading": "Cargando…",
+    "console.help.none": "No hay comandos disponibles para tu rol.",
+    "console.btn.run": "Enviar",
+    "console.btn.clear": "Limpiar",
+    "console.btn.help": "Ayuda",
+    "console.role.admin": "Admin",
+    "console.role.mod": "Mod",
+    "console.hint.history": "historial",
+    "console.hint.run": "ejecutar",
+    "console.error.unknown": "Comando desconocido: {cmd}. Escribe 'help' para ver la lista.",
+    "console.error.usage": "Uso: {usage}",
+    "console.error.permission": "Permiso denegado. Este comando requiere el rol '{required}'.",
+    "console.error.invalid": "Entrada inválida: {message}",
+    "console.error.empty": "Introduce un comando.",
+    "console.error.parse": "No se pudo procesar la entrada: {message}",
+    "console.error.internal": "Error del servidor: {message}"
+}

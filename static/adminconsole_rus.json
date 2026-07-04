@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "adminconsole"
+    },
+    "console.title": "Консоль администратора",
+    "console.subtitle": "Запускайте команды администратора из панели в стиле терминала.",
+    "console.input.placeholder": "Введите команду и нажмите Enter…",
+    "console.help.title": "Доступные команды",
+    "console.help.loading": "Загрузка…",
+    "console.help.none": "Для вашей роли команд нет.",
+    "console.btn.run": "Отправить",
+    "console.btn.clear": "Очистить",
+    "console.btn.help": "Помощь",
+    "console.role.admin": "Админ",
+    "console.role.mod": "Модер",
+    "console.hint.history": "история",
+    "console.hint.run": "выполнить",
+    "console.error.unknown": "Неизвестная команда: {cmd}. Введите 'help' для списка.",
+    "console.error.usage": "Использование: {usage}",
+    "console.error.permission": "Доступ запрещён. Команда требует роль «{required}».",
+    "console.error.invalid": "Неверный ввод: {message}",
+    "console.error.empty": "Пожалуйста, введите команду.",
+    "console.error.parse": "Не удалось разобрать ввод: {message}",
+    "console.error.internal": "Ошибка сервера: {message}"
+}

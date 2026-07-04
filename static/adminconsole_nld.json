@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "adminconsole"
+    },
+    "console.title": "Beheerconsole",
+    "console.subtitle": "Voer beheercommando's uit vanuit een terminal-achtig paneel.",
+    "console.input.placeholder": "Typ een commando en druk op Enter…",
+    "console.help.title": "Beschikbare commando's",
+    "console.help.loading": "Laden…",
+    "console.help.none": "Geen commando's beschikbaar voor je rol.",
+    "console.btn.run": "Versturen",
+    "console.btn.clear": "Wissen",
+    "console.btn.help": "Help",
+    "console.role.admin": "Admin",
+    "console.role.mod": "Mod",
+    "console.hint.history": "geschiedenis",
+    "console.hint.run": "uitvoeren",
+    "console.error.unknown": "Onbekend commando: {cmd}. Typ 'help' voor de lijst.",
+    "console.error.usage": "Gebruik: {usage}",
+    "console.error.permission": "Toegang geweigerd. Dit commando vereist de rol '{required}'.",
+    "console.error.invalid": "Ongeldige invoer: {message}",
+    "console.error.empty": "Voer een commando in.",
+    "console.error.parse": "Invoer kon niet verwerkt worden: {message}",
+    "console.error.internal": "Serverfout: {message}"
+}

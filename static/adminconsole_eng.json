@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "adminconsole"
+    },
+    "console.title": "Admin Console",
+    "console.subtitle": "Run admin commands directly from a terminal-style panel.",
+    "console.input.placeholder": "Type a command and press Enter…",
+    "console.help.title": "Available commands",
+    "console.help.loading": "Loading…",
+    "console.help.none": "No commands available for your role.",
+    "console.btn.run": "Send",
+    "console.btn.clear": "Clear",
+    "console.btn.help": "Help",
+    "console.role.admin": "Admin",
+    "console.role.mod": "Mod",
+    "console.hint.history": "history",
+    "console.hint.run": "run",
+    "console.error.unknown": "Unknown command: {cmd}. Type 'help' for the list.",
+    "console.error.usage": "Usage: {usage}",
+    "console.error.permission": "Permission denied. This command requires the '{required}' role.",
+    "console.error.invalid": "Invalid input: {message}",
+    "console.error.empty": "Please enter a command.",
+    "console.error.parse": "Could not parse input: {message}",
+    "console.error.internal": "Server error: {message}"
+}

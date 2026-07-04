@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "adminconsole"
+    },
+    "console.title": "Konsola administratora",
+    "console.subtitle": "Uruchamiaj polecenia administracyjne z panelu w stylu terminala.",
+    "console.input.placeholder": "Wpisz polecenie i naciśnij Enter…",
+    "console.help.title": "Dostępne polecenia",
+    "console.help.loading": "Ładowanie…",
+    "console.help.none": "Brak poleceń dostępnych dla twojej roli.",
+    "console.btn.run": "Wyślij",
+    "console.btn.clear": "Wyczyść",
+    "console.btn.help": "Pomoc",
+    "console.role.admin": "Admin",
+    "console.role.mod": "Mod",
+    "console.hint.history": "historia",
+    "console.hint.run": "uruchom",
+    "console.error.unknown": "Nieznane polecenie: {cmd}. Wpisz 'help', aby zobaczyć listę.",
+    "console.error.usage": "Użycie: {usage}",
+    "console.error.permission": "Brak dostępu. To polecenie wymaga roli '{required}'.",
+    "console.error.invalid": "Nieprawidłowe dane: {message}",
+    "console.error.empty": "Wpisz polecenie.",
+    "console.error.parse": "Nie udało się przetworzyć danych: {message}",
+    "console.error.internal": "Błąd serwera: {message}"
+}

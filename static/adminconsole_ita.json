@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "page": "adminconsole"
+    },
+    "console.title": "Console di amministrazione",
+    "console.subtitle": "Esegui comandi di amministrazione direttamente da un pannello stile terminale.",
+    "console.input.placeholder": "Digita un comando e premi Invio…",
+    "console.help.title": "Comandi disponibili",
+    "console.help.loading": "Caricamento…",
+    "console.help.none": "Nessun comando disponibile per il tuo ruolo.",
+    "console.btn.run": "Invia",
+    "console.btn.clear": "Pulisci",
+    "console.btn.help": "Aiuto",
+    "console.role.admin": "Admin",
+    "console.role.mod": "Mod",
+    "console.hint.history": "cronologia",
+    "console.hint.run": "esegui",
+    "console.error.unknown": "Comando sconosciuto: {cmd}. Digita 'help' per la lista.",
+    "console.error.usage": "Uso: {usage}",
+    "console.error.permission": "Permesso negato. Questo comando richiede il ruolo '{required}'.",
+    "console.error.invalid": "Input non valido: {message}",
+    "console.error.empty": "Inserisci un comando.",
+    "console.error.parse": "Impossibile analizzare l'input: {message}",
+    "console.error.internal": "Errore del server: {message}"
+}

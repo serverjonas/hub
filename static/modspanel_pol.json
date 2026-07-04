@@ -21,5 +21,7 @@
     "mods.suggestions.empty": "Nie masz teraz otwartych sugestii.",
     "mods.users.subtitle": "Przełączniki ról to sugestie — admini przeglądają i decydują.",
     "mods.users.desc": "Wysyłaj sugestie ról.",
-    "mods.bans.desc": "Banuj bez ruszania modów/adminów."
+    "mods.bans.desc": "Banuj bez ruszania modów/adminów.",
+    "admin.cards.console": "Konsola administratora",
+    "admin.cards.console.desc": "Uruchamiaj polecenia z panelu w stylu terminala."
 }

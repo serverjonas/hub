@@ -19,5 +19,7 @@
     "admin.cards.logs.desc": "Bekijk serveractiviteit en filter op IP, route of status.",
     "admin.cards.suggestions": "Rol­suggesties",
     "admin.cards.suggestions.desc": "Beoordeel openstaande suggesties van mods.",
+    "admin.cards.console": "Beheerconsole",
+    "admin.cards.console.desc": "Commando's uitvoeren vanuit een terminal­paneel.",
     "admin.nav.title": "Beheer­paneel · serverjonas"
 }

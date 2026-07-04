@@ -19,5 +19,7 @@
     "admin.cards.logs.desc": "View server activity and filter by IP, route or status.",
     "admin.cards.suggestions": "Role suggestions",
     "admin.cards.suggestions.desc": "Review pending suggestions from mods.",
+    "admin.cards.console": "Admin Console",
+    "admin.cards.console.desc": "Run commands from a terminal-style panel.",
     "admin.nav.title": "Admin Panel · serverjonas"
 }

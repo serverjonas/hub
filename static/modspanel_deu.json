@@ -21,5 +21,7 @@
     "mods.suggestions.empty": "Du hast aktuell keine offenen Vorschläge.",
     "mods.users.subtitle": "Rollen-Toggles sind Vorschläge – Admins prüfen und entscheiden.",
     "mods.users.desc": "Rollen-Vorschläge einreichen.",
-    "mods.bans.desc": "Bannen ohne Mods/Admins."
+    "mods.bans.desc": "Bannen ohne Mods/Admins.",
+    "admin.cards.console": "Admin-Konsole",
+    "admin.cards.console.desc": "Befehle aus einem Terminal-Panel ausführen."
 }

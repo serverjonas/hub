@@ -19,5 +19,7 @@
     "admin.cards.logs.desc": "Просмотр активности сервера с фильтром по IP, маршруту или статусу.",
     "admin.cards.suggestions": "Предложения ролей",
     "admin.cards.suggestions.desc": "Просмотр ожидающих предложений модераторов.",
+    "admin.cards.console": "Консоль администратора",
+    "admin.cards.console.desc": "Запускай команды из терминальной панели.",
     "admin.nav.title": "Панель админа · serverjonas"
 }

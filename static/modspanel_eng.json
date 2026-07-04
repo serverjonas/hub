@@ -21,5 +21,7 @@
     "mods.suggestions.empty": "You have no open suggestions right now.",
     "mods.users.subtitle": "Role toggles are suggestions — admins review and decide.",
     "mods.users.desc": "Submit role suggestions.",
-    "mods.bans.desc": "Ban without affecting mods/admins."
+    "mods.bans.desc": "Ban without affecting mods/admins.",
+    "admin.cards.console": "Admin Console",
+    "admin.cards.console.desc": "Run commands from a terminal-style panel."
 }
