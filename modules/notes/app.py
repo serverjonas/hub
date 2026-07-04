@@ -263,9 +263,20 @@ def list_notes():
     return jsonify(_list_notes_recursive(user_root(user["id"])))
 
 
+@bp.route("/raw/")
 @bp.route("/raw/<path:p>")
-def raw_note(p):
-    """Return raw markdown text + metadata for a single note."""
+def raw_note(p=""):
+    """Return raw markdown text + metadata for a single note.
+
+    The empty trailing-slash form ``/raw/`` is stacked for the same
+    Werkzeug :class:`PathConverter` reason as the cloud blueprint's
+    sibling routes (``PathConverter`` requires ``[^/].*?`` and
+    therefore refuses to match an empty trailing segment). The
+    ``p=""`` default resolves to the user cloud root, which fails
+    the ``os.path.isfile`` check below and returns the same 404
+    JSON the catch-all would have produced as HTML, but with the
+    correct JSON status the in-page JS can interpret.
+    """
     user = get_current_user()
     if user is None:
         abort(401)

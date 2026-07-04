@@ -409,9 +409,23 @@ def home():
     )
 
 
+@bp.route("/list/")
 @bp.route("/list/<path:p>")
-def list_folder(p):
-    """Return a JSON listing for subfolder ``p`` (root when ``p`` empty)."""
+def list_folder(p=""):
+    """Return a JSON listing for subfolder ``p`` (root when ``p`` empty).
+
+    The empty trailing-slash form ``/list/`` is stacked explicitly
+    because Werkzeug's :class:`PathConverter` requires at least one
+    non-slash character (its regex is ``[^/].*?``). Without the
+    second rule an initial GET such as
+    ``fetch("/cloud/list/" + encodeURIComponent(""))`` falls through
+    to the catch-all ``/<path:path>`` in ``app.py`` and gets a 404
+    HTML page, which the in-page JS reads as a "network error".
+    Keeping the stacked decorator + ``p=""`` default is the most
+    surgical fix; a custom converter would be more invasive and
+    would need to be threaded through every other ``<path:p>``
+    route in the project.
+    """
     user = get_current_user()
     if user is None:
         return jsonify({"error": "not_logged_in"}), 401
@@ -870,14 +884,24 @@ def rename():
 # ─── Stream / preview ──────────────────────────────────────────────────────
 
 
+@bp.route("/raw/")
 @bp.route("/raw/<path:p>")
-def raw(p):
+def raw(p=""):
     """Stream raw bytes for ``<path:p>``.
 
     Used by the in-page ``<img>``, ``<video>``, ``<audio>`` and
     ``<iframe sandbox>`` previews. Always emits a CSP header that
     neuters JavaScript so an ``.html`` / ``.svg`` upload opened
     directly cannot execute stored XSS.
+
+    The empty trailing-slash variant ``/raw/`` is added for the same
+    reason as :func:`list_folder`: Werkzeug's :class:`PathConverter`
+    refuses to match an empty trailing segment, so the bare URL was
+    being absorbed by the catch-all ``/<path:path>`` in ``app.py``
+    and returning 404 HTML. Empty ``p`` semantically resolves to
+    the user root — which is a directory, so the
+    ``os.path.isfile(full)`` check below still answers with the
+    correct 404 JSON.
     """
     user = get_current_user()
     if user is None:
@@ -924,16 +948,23 @@ def raw(p):
     return resp
 
 
+@bp.route("/preview/")
 @bp.route("/preview/<path:p>")
-def preview(p):
+def preview(p=""):
     """Return a JSON preview payload for ``p``.
 
-    * ``text`` (txt, code, csv, log) -> ``{type: 'text', content, truncated, bytes}``
-    * ``markdown`` (md)              -> ``{type: 'markdown', content}`` (raw md; client renders)
-    * ``image``                      -> ``{type: 'image', url: '/cloud/raw/<p>'}``
-    * ``video``                      -> ``{type: 'video', url: '/cloud/raw/<p>'}``
-    * ``audio``                      -> ``{type: 'audio', url: '/cloud/raw/<p>'}``
-    * else                           -> ``{type: 'binary', url: '/cloud/download/<p>'}``
+    The empty trailing-slash form ``/preview/`` is stacked for the
+    same reason as :func:`list_folder` and :func:`raw` — see the
+    comment there for the Werkzeug :class:`PathConverter` reason.
+    Empty ``p`` resolves to the user root, which fails the
+    ``os.path.isfile(full)`` check below and answers with the
+    correct 404 JSON instead of falling through to ``app.py``'s
+    static catch-all (which would return HTML and confuse JS
+    callers expecting JSON).
+
+    Returns one of ``text``, ``markdown``, ``image``,
+    ``video``, ``audio`` or ``binary`` — see the original preview
+    payload contract below the empty-path comment block.
     """
     user = get_current_user()
     if user is None:
@@ -1042,9 +1073,17 @@ def _read_capped(path: str, limit: int) -> dict:
     return {"text": text, "truncated": truncated}
 
 
+@bp.route("/download/")
 @bp.route("/download/<path:p>")
-def download(p):
-    """Send ``p`` as an attachment download."""
+def download(p=""):
+    """Send ``p`` as an attachment download.
+
+    Empty trailing-slash form ``/download/`` is stacked for the
+    same Werkzeug :class:`PathConverter` reason as
+    :func:`list_folder`, :func:`raw` and :func:`preview` — without
+    it the bare URL silently fell through to the static-file
+    catch-all in ``app.py`` and surfaced as a 404 HTML page.
+    """
     user = get_current_user()
     if user is None:
         abort(401)
