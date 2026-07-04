@@ -131,7 +131,26 @@ def gate_unverified_email():
 def hub():
     user_array = get_current_user()
     user = user_array["name"] if user_array else None
-    return render_template("hub.html", user=user, flashes=_pop_flashes())
+    # Auth state is exposed to the JS engine via data-auth on <body>; set
+    # here so render_template can thread it through.
+    return render_template(
+        "hub.html",
+        user=user,
+        user_id=(user_array or {}).get("id"),
+        flashes=_pop_flashes(),
+    )
+
+
+@bp.route("/customize")
+def customize():
+    """Hub customization page: pick widgets, position them, configure them."""
+    user_array = get_current_user()
+    user = user_array["name"] if user_array else None
+    return render_template(
+        "hub_customizer.html",
+        user=user,
+        user_id=(user_array or {}).get("id"),
+    )
 
 
 # ─── E-Mail-Setup & Verifizierung ────────────────────────────────────────────

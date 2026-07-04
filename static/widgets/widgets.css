@@ -1,0 +1,502 @@
+/* ─────────────────────────────────────────────────────────────
+ *  Widget styles — uses the existing CSS variables, so widgets
+ *  automatically adapt to all 7 themes (paper / paper-dark /
+ *  neuromorph / neuromorph-dark / win95-silver / win95-amber /
+ *  synthwave). Theme-specific tweaks go at the bottom of this file.
+ * ───────────────────────────────────────────────────────────── */
+
+/* ─── Grid container on /hub ─── */
+.hub-widget-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 26px;
+    margin-bottom: 48px;
+}
+.hub-widget-grid > .wgt-slot {
+    min-height: 0; /* avoid min-content forcing extra rows */
+}
+/* size mapping */
+.wgt-slot[data-size="small"]  { grid-column: span 1; }
+.wgt-slot[data-size="medium"] { grid-column: span 2; }
+.wgt-slot[data-size="large"]  { grid-column: span 4; }
+
+/* ─── Floating "Customize" button on the hub ─── */
+.hub-customize-fab {
+    position: fixed;
+    bottom: 26px;
+    right: 26px;
+    z-index: 950;
+    padding: 12px 18px;
+    background: var(--accent);
+    color: #ffffff;
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-2);
+    box-shadow: var(--shadow-md);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+    text-decoration: none;
+    transform: rotate(2deg);
+}
+.hub-customize-fab:hover {
+    transform: translate(-2px, -2px) rotate(0deg);
+    color: #ffffff;
+    box-shadow: var(--shadow-lg);
+}
+.hub-customize-fab:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+/* ─── Empty-state on hub if user clears all widgets ─── */
+.hub-widget-empty {
+    grid-column: span 4;
+    text-align: center;
+    padding: 56px 24px;
+    background: var(--surface);
+    border: 2.5px dashed var(--border);
+    border-radius: var(--wobbly-1);
+    color: var(--text-dim);
+    font-family: var(--font-body);
+}
+.hub-widget-empty .em-icon {
+    display: inline-flex;
+    width: 56px; height: 56px;
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-circle);
+    background: var(--postit);
+    color: var(--text-main);
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+.hub-widget-empty h3 {
+    font-family: var(--font-heading);
+    font-size: 1.45rem;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+}
+.hub-widget-empty p {
+    font-size: 1rem;
+    color: var(--text-dim);
+    margin-bottom: 18px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+ *  Individual widgets — they look "at home" because they
+ *  borrow the .card aesthetic (border, wobbly radius, shadow,
+ *  hover lift) plus the postit + accent color tokens.
+ * ───────────────────────────────────────────────────────────── */
+.wgt-card {
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-1);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    transition: var(--transition);
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+.wgt-card:nth-of-type(2n)   { transform: rotate(-1deg); }
+.wgt-card:nth-of-type(2n+1) { transform: rotate(1deg); }
+.wgt-card:hover {
+    transform: translate(-3px, -3px) rotate(0deg);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+}
+.wgt-card > * { position: relative; }
+
+/* ─── Clock ─── */
+.wgt-clock {
+    background: var(--postit);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-1);
+    box-shadow: var(--shadow-md);
+    padding: 28px 22px;
+    text-align: center;
+    color: var(--text-main);
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    transform: rotate(-1deg);
+    transition: var(--transition);
+}
+.wgt-clock:hover { transform: rotate(0deg) translate(-2px, -2px); box-shadow: var(--shadow-lg); }
+.wgt-clock-greeting {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.wgt-clock-time {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -1px;
+    color: var(--text-main);
+}
+.wgt-clock-date {
+    font-family: var(--font-body);
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* ─── Route-button ─── */
+.wgt-rbtn {
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-1);
+    box-shadow: var(--shadow-md);
+    padding: 26px 22px 22px;
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+.wgt-rbtn[data-tint="memes"]   .wgt-rbtn-icon-wrap { background: var(--postit);     color: var(--accent); }
+.wgt-rbtn[data-tint="media"]   .wgt-rbtn-icon-wrap { background: #dde8ff;          color: var(--secondary); }
+.wgt-rbtn[data-tint="friends"] .wgt-rbtn-icon-wrap { background: #d4f5e9;          color: var(--secondary); }
+.wgt-rbtn[data-tint="chat"]    .wgt-rbtn-icon-wrap { background: var(--postit);     color: var(--accent); }
+.wgt-rbtn[data-tint="default"],
+.wgt-rbtn:not([data-tint])     .wgt-rbtn-icon-wrap {
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+}
+.wgt-rbtn:hover {
+    transform: translate(-3px, -3px);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-lg);
+    color: inherit;
+}
+.wgt-rbtn-icon-wrap {
+    width: 56px; height: 56px;
+    flex-shrink: 0;
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-circle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+.wgt-rbtn:hover .wgt-rbtn-icon-wrap {
+    transform: rotate(-12deg) scale(1.06);
+}
+.wgt-rbtn-icon-wrap i { width: 26px; height: 26px; }
+.wgt-rbtn-content {
+    flex: 1;
+    min-width: 0;
+}
+.wgt-rbtn-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text-main);
+    letter-spacing: -0.3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.wgt-rbtn-desc {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    font-family: var(--font-body);
+}
+.wgt-rbtn-arrow {
+    width: 38px; height: 38px;
+    flex-shrink: 0;
+    border-radius: var(--wobbly-circle);
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+.wgt-rbtn-arrow i { width: 18px; height: 18px; }
+.wgt-rbtn:hover .wgt-rbtn-arrow {
+    background: var(--accent);
+    border-color: var(--border);
+    color: #ffffff;
+    transform: translateX(2px) rotate(-4deg);
+}
+
+/* ─── Welcome ─── */
+.wgt-welcome {
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-1);
+    box-shadow: var(--shadow-md);
+    padding: 36px 28px;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transform: rotate(-0.5deg);
+    transition: var(--transition);
+}
+.wgt-welcome:hover { transform: rotate(0deg) translate(-2px, -2px); box-shadow: var(--shadow-lg); }
+.wgt-welcome-icon {
+    width: 64px; height: 64px;
+    border-radius: var(--wobbly-circle);
+    background: var(--postit);
+    border: 2.5px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    margin-bottom: 12px;
+    transform: rotate(-6deg);
+}
+.wgt-welcome-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    line-height: 1.15;
+    color: var(--text-main);
+}
+.wgt-welcome-sub {
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+/* ─── Post-it ─── */
+.wgt-postit {
+    background: var(--postit);
+    position: relative;
+    padding: 32px 24px 26px;
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-1);
+    box-shadow: var(--shadow-md);
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    transform: rotate(-1.5deg);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: var(--text-main);
+}
+.wgt-postit:hover { transform: rotate(0deg) translate(-2px, -2px); box-shadow: var(--shadow-lg); }
+.wgt-postit-pin {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    width: 14px; height: 14px;
+    background: var(--accent);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-circle);
+    box-shadow: var(--shadow-sm);
+}
+.wgt-postit-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    margin-top: 4px;
+}
+.wgt-postit-body {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+/* ─── User-Badge ─── */
+.wgt-user-badge {
+    background: var(--postit);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-2);
+    box-shadow: var(--shadow-md);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    transform: rotate(-1deg);
+    transition: var(--transition);
+    color: var(--text-main);
+}
+.wgt-user-badge:hover { transform: rotate(0deg) translate(-2px, -2px); box-shadow: var(--shadow-lg); }
+.wgt-user-avatar {
+    width: 56px; height: 56px;
+    border-radius: var(--wobbly-circle);
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+}
+.wgt-user-avatar i { width: 28px; height: 28px; }
+.wgt-user-info {
+    flex: 1;
+    min-width: 0;
+}
+.wgt-user-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.2rem;
+    line-height: 1.15;
+    letter-spacing: -0.2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.wgt-user-greeting {
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+}
+.wgt-user-action {
+    width: 40px; height: 40px;
+    border-radius: var(--wobbly-circle);
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+.wgt-user-action:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--border);
+    transform: rotate(-6deg);
+}
+
+/* ─── Theme-specific tweaks ─── */
+[data-theme="neuromorph"] .wgt-clock,
+[data-theme="neuromorph-dark"] .wgt-clock,
+[data-theme="neuromorph"] .wgt-welcome,
+[data-theme="neuromorph-dark"] .wgt-welcome,
+[data-theme="neuromorph"] .wgt-user-badge,
+[data-theme="neuromorph-dark"] .wgt-user-badge,
+[data-theme="neuromorph"] .wgt-rbtn,
+[data-theme="neuromorph-dark"] .wgt-rbtn,
+[data-theme="neuromorph"] .wgt-postit,
+[data-theme="neuromorph-dark"] .wgt-postit {
+    border-color: transparent;
+}
+[data-theme^="neuromorph"] .wgt-clock,
+[data-theme^="neuromorph"] .wgt-welcome,
+[data-theme^="neuromorph"] .wgt-user-badge,
+[data-theme^="neuromorph"] .wgt-rbtn,
+[data-theme^="neuromorph"] .wgt-postit {
+    transform: none;
+}
+[data-theme^="neuromorph"] .wgt-clock:hover,
+[data-theme^="neuromorph"] .wgt-welcome:hover,
+[data-theme^="neuromorph"] .wgt-user-badge:hover,
+[data-theme^="neuromorph"] .wgt-rbtn:hover,
+[data-theme^="neuromorph"] .wgt-postit:hover {
+    transform: translateY(-2px);
+}
+[data-theme="win95-silver"] .wgt-clock,
+[data-theme="win95-silver"] .wgt-welcome,
+[data-theme="win95-silver"] .wgt-user-badge,
+[data-theme="win95-silver"] .wgt-rbtn,
+[data-theme="win95-silver"] .wgt-postit {
+    border-radius: 0;
+    transform: none;
+}
+[data-theme="win95-silver"] .wgt-clock:hover,
+[data-theme="win95-silver"] .wgt-welcome:hover,
+[data-theme="win95-silver"] .wgt-user-badge:hover,
+[data-theme="win95-silver"] .wgt-rbtn:hover,
+[data-theme="win95-silver"] .wgt-postit:hover {
+    transform: translate(-2px, -2px);
+}
+[data-theme="win95-amber"] .wgt-clock,
+[data-theme="win95-amber"] .wgt-welcome,
+[data-theme="win95-amber"] .wgt-user-badge,
+[data-theme="win95-amber"] .wgt-rbtn,
+[data-theme="win95-amber"] .wgt-postit {
+    border-radius: 0;
+    transform: none;
+}
+[data-theme="win95-amber"] .wgt-clock:hover,
+[data-theme="win95-amber"] .wgt-welcome:hover,
+[data-theme="win95-amber"] .wgt-user-badge:hover,
+[data-theme="win95-amber"] .wgt-rbtn:hover,
+[data-theme="win95-amber"] .wgt-postit:hover {
+    transform: none;
+    box-shadow: var(--shadow-glow);
+}
+[data-theme="synthwave"] .wgt-clock,
+[data-theme="synthwave"] .wgt-welcome,
+[data-theme="synthwave"] .wgt-user-badge,
+[data-theme="synthwave"] .wgt-rbtn,
+[data-theme="synthwave"] .wgt-postit {
+    transform: none;
+}
+[data-theme="synthwave"] .wgt-clock:hover,
+[data-theme="synthwave"] .wgt-welcome:hover,
+[data-theme="synthwave"] .wgt-user-badge:hover,
+[data-theme="synthwave"] .wgt-rbtn:hover,
+[data-theme="synthwave"] .wgt-postit:hover {
+    transform: none;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+    .hub-widget-grid { grid-template-columns: 1fr; gap: 18px; }
+    .wgt-slot[data-size="small"],
+    .wgt-slot[data-size="medium"],
+    .wgt-slot[data-size="large"] { grid-column: span 1; }
+    .hub-customize-fab { bottom: 18px; right: 18px; padding: 10px 14px; font-size: 0.95rem; }
+}
+@media (max-width: 600px) {
+    .wgt-rbtn { padding: 18px 16px; }
+    .wgt-clock { padding: 22px 16px; }
+    .wgt-welcome { padding: 28px 18px; }
+}

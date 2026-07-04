@@ -234,7 +234,21 @@
     box-shadow: var(--shadow-md);
 }
 
-/* ─── Stats Row ─── */
+/* ─── Stats Row ─── *//* ─── Widget grid (rendered by /static/widgets/widgets.js) ─── */
+.hub-widget-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+.hub-widget-toolbar .hint {
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+}
+
 .stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -260,9 +274,7 @@
     margin: 0 auto 14px;
     border: 2.5px solid var(--border);
     border-radius: var(--wobbly-circle);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     color: var(--accent);
     background: var(--postit);
     box-shadow: var(--shadow-sm);
@@ -390,51 +402,23 @@
     <p data-i18n="hub.section.subtitle">Alles an einem Ort – dein digitales Zuhause.</p>
 </div>
 
-<div class="grid">
-    <a href="/memes" class="card animate-in delay-2">
-        <div class="card-icon-wrap memes">
-            <i data-lucide="image" style="width: 32px; height: 32px;"></i>
-        </div>
-        <h3 data-i18n="nav.memes">Memes</h3>
-        <p data-i18n="hub.cards.memes.desc">Die beste Sammlung kuratierter Internet-Kultur. Teile und entdecke.</p>
-        <div class="card-arrow">
-            <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-        </div>
-    </a>
-
-    <a href="/films" class="card animate-in delay-3">
-        <div class="card-icon-wrap media">
-            <i data-lucide="clapperboard" style="width: 32px; height: 32px;"></i>
-        </div>
-        <h3 data-i18n="nav.media">Media</h3>
-        <p data-i18n="hub.cards.media.desc">Filme und Serien streamen – in höchster Qualität, jederzeit.</p>
-        <div class="card-arrow">
-            <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-        </div>
-    </a>
-
-    <a href="/friends" class="card animate-in delay-4">
-        <div class="card-icon-wrap friends">
-            <i data-lucide="users" style="width: 32px; height: 32px;"></i>
-        </div>
-        <h3 data-i18n="nav.friends">Freunde</h3>
-        <p data-i18n="hub.cards.friends.desc">Vernetze dich mit der Community und bleibe in Kontakt.</p>
-        <div class="card-arrow">
-            <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-        </div>
-    </a>
-
-    <a href="/chat" class="card animate-in delay-5">
-        <div class="card-icon-wrap chat">
-            <i data-lucide="message-circle" style="width: 32px; height: 32px;"></i>
-        </div>
-        <h3 data-i18n="nav.chat">Chat</h3>
-        <p data-i18n="hub.cards.chat.desc">Schreibe direkt mit deinen Freunden – schnell, privat und in Echtzeit.</p>
-        <div class="card-arrow">
-            <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-        </div>
+<div class="hub-widget-toolbar animate-in delay-2">
+    <div class="hint" data-i18n="hub.widget_grid.hint">Ordne deinen Hub mit Widgets nach deinem Geschmack.</div>
+    <a href="/hub/customize" class="btn">
+        <i data-lucide="sliders-horizontal" style="width: 18px; height: 18px;"></i>
+        <span data-i18n="hub.customize.open">Hub anpassen</span>
     </a>
 </div>
+
+<div id="hubWidgetGrid" class="hub-widget-grid animate-in delay-3"{% if user %} data-user="{{ user }}"{% endif %}></div>
+
+<a href="/hub/customize" class="hub-customize-fab" aria-label="Hub anpassen">
+    <i data-lucide="sliders-horizontal" style="width: 18px; height: 18px;"></i>
+    <span data-i18n="hub.customize.fab">Anpassen</span>
+</a>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='widgets/widgets.css') }}" />
+<script src="{{ url_for('static', filename='widgets/widgets.js') }}" defer></script>
 
 {% if not user %}
 <div class="cta-banner animate-in delay-3">

@@ -13,5 +13,15 @@
     "hub.cards.chat.desc": "Schreibe direkt mit deinen Freunden – schnell, privat und in Echtzeit.",
     "hub.cta.title": "Bereit loszulegen?",
     "hub.cta.body": "Werde Teil unserer Plattform und erlebe Community wie sie sein sollte.",
-    "hub.cta.button": "Jetzt entdecken"
+    "hub.cta.button": "Jetzt entdecken",
+    "hub.widget_grid.hint": "Ordne deinen Hub mit Widgets nach deinem Geschmack.",
+    "hub.customize.open": "Hub anpassen",
+    "hub.customize.fab": "Anpassen",
+    "hub.customize.empty_title": "Dein Hub ist leer",
+    "hub.customize.empty_body": "Füge dein erstes Widget hinzu, um zu beginnen.",
+    "hub.customize.empty_cta": "Widget hinzufügen",
+    "hub.widget.greeting.morning": "Guten Morgen",
+    "hub.widget.greeting.day": "Hallo",
+    "hub.widget.greeting.evening": "Guten Abend",
+    "hub.widget.greeting.night": "Gute Nacht"
 }

@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}Hub anpassen · serverjonas{% endblock %}
+{% block page_id %}hub_customizer{% endblock %}
+{% block title_i18n %}hub.customize.page_title{% endblock %}
+
+{% block extra_style %}
+.customize-header {
+    text-align: center;
+    margin-bottom: 32px;
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.customize-header h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    margin-bottom: 10px;
+    line-height: 1.1;
+}
+.customize-header p {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    font-family: var(--font-body);
+    max-width: 580px;
+    margin: 0 auto;
+}
+
+/* ─── Two-pane layout: live preview on top, editor + catalog below ─── */
+.customize-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 26px;
+    margin-bottom: 64px;
+}
+@media (max-width: 900px) {
+    .customize-layout { grid-template-columns: 1fr; }
+}
+
+.customize-pane {
+    background: var(--surface);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-1);
+    box-shadow: var(--shadow-md);
+    padding: 22px 22px 26px;
+}
+.customize-pane h2 {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.customize-pane h2 i { width: 22px; height: 22px; }
+.customize-pane .pane-sub {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    font-family: var(--font-body);
+    margin-bottom: 18px;
+}
+
+/* ─── Active widget list (editor) ─── */
+.active-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.active-item {
+    background: var(--surface-hover);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-3);
+    padding: 14px 14px 12px;
+    transition: var(--transition-fast);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    align-items: start;
+}
+.active-item:hover { border-color: var(--accent); }
+.active-item .ai-head {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+.ai-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.2px;
+}
+.ai-title i { width: 18px; height: 18px; color: var(--accent); }
+.ai-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.ai-btn {
+    width: 32px; height: 32px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--wobbly-3);
+    cursor: pointer;
+    color: var(--text-main);
+    transition: var(--transition-fast);
+    font-family: var(--font-body);
+}
+.ai-btn i { width: 16px; height: 16px; }
+.ai-btn:hover:not(:disabled) {
+    background: var(--postit);
+    color: var(--text-main);
+    box-shadow: var(--shadow-sm);
+    transform: rotate(-3deg);
+}
+.ai-btn:disabled,
+.ai-btn[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+.ai-btn-remove:hover:not(:disabled) {
+    background: var(--accent-lighter);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+.ai-body {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 2px dashed var(--border);
+    padding-top: 12px;
+    margin-top: 4px;
+}
+.ai-row {
+    display: grid;
+    grid-template-columns: minmax(110px, max-content) 1fr;
+    gap: 10px;
+    align-items: center;
+}
+.ai-row label {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+.ai-row .form-control {
+    padding: 8px 12px;
+    font-size: 0.95rem;
+    border-radius: var(--wobbly-3);
+    background: var(--surface);
+}
+.ai-row select.form-control { cursor: pointer; }
+.ai-row textarea.form-control { min-height: 60px; resize: vertical; }
+.ai-row .check {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-body);
+}
+.empty-list {
+    text-align: center;
+    padding: 26px 18px;
+    border: 2px dashed var(--border);
+    border-radius: var(--wobbly-3);
+    color: var(--text-dim);
+    font-family: var(--font-body);
+}
+
+/* ─── Catalog gallery ─── */
+.catalog {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+@media (max-width: 600px) {
+    .catalog { grid-template-columns: 1fr; }
+}
+.catalog-card {
+    background: var(--surface-hover);
+    border: 2.5px solid var(--border);
+    border-radius: var(--wobbly-3);
+    padding: 14px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: var(--transition-fast);
+    cursor: default;
+    transform: rotate(-0.5deg);
+}
+.catalog-card:nth-of-type(2n) { transform: rotate(0.5deg); }
+.catalog-card:hover { transform: rotate(0deg) translate(-2px, -2px); border-color: var(--accent); box-shadow: var(--shadow-sm); }
+.catalog-card .cc-icon {
+    width: 44px; height: 44px;
+    border-radius: var(--wobbly-circle);
+    background: var(--postit);
+    border: 2.5px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+}
+.catalog-card .cc-icon i { width: 22px; height: 22px; }
+.catalog-card .cc-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.2px;
+}
+.catalog-card .cc-desc {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    line-height: 1.45;
+    font-family: var(--font-body);
+}
+.catalog-card .cc-action {
+    margin-top: 4px;
+}
+.catalog-card .cc-action .btn {
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.customize-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 24px;
+}
+[data-theme="neuromorph"] .customize-pane,
+[data-theme^="neuromorph"] .active-item,
+[data-theme^="neuromorph"] .catalog-card,
+[data-theme^="neuromorph"] .ai-btn {
+    border-color: transparent;
+    transform: none;
+}
+[data-theme="win95-silver"] .customize-pane,
+[data-theme="win95-silver"] .active-item,
+[data-theme="win95-silver"] .catalog-card,
+[data-theme="win95-silver"] .ai-btn,
+[data-theme="win95-amber"] .customize-pane,
+[data-theme="win95-amber"] .active-item,
+[data-theme="win95-amber"] .catalog-card,
+[data-theme="win95-amber"] .ai-btn {
+    border-radius: 0;
+    transform: none;
+}
+[data-theme="synthwave"] .customize-pane,
+[data-theme="synthwave"] .active-item,
+[data-theme="synthwave"] .catalog-card,
+[data-theme="synthwave"] .ai-btn {
+    transform: none;
+}
+
+/* The preview area is just a scaled-down hub grid */
+.live-preview {
+    background: var(--bg);
+    border: 2.5px dashed var(--border);
+    border-radius: var(--wobbly-3);
+    padding: 14px;
+    min-height: 220px;
+}
+.live-preview .hub-widget-grid {
+    margin-bottom: 0;
+}
+{% endblock %}
+
+{% block content %}
+<div class="customize-header">
+    <h1 data-i18n="hub.customize.title">Hub anpassen</h1>
+    <p data-i18n="hub.customize.subtitle">
+        Wähle Widgets aus dem Katalog, ordne sie um, ändere ihre Größe und konfiguriere sie frei.
+    </p>
+</div>
+
+<div class="customize-actions">
+    <a href="/hub" class="btn">
+        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+        <span data-i18n="hub.customize.back">Zurück zum Hub</span>
+    </a>
+    <button type="button" class="btn btn-danger" id="hubResetLayout">
+        <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+        <span data-i18n="hub.customize.reset">Auf Standard zurücksetzen</span>
+    </button>
+</div>
+
+<div class="customize-layout" style="margin-top: 28px;">
+    <div class="customize-pane">
+        <h2>
+            <i data-lucide="layout-template"></i>
+            <span data-i18n="hub.customize.preview_title">Vorschau deines Hubs</span>
+        </h2>
+        <div class="pane-sub" data-i18n="hub.customize.preview_sub">
+            So sieht dein Hub gerade aus.
+        </div>
+        <div class="live-preview">
+            <div id="hubWidgetGrid" class="hub-widget-grid"></div>
+        </div>
+    </div>
+
+    <div class="customize-pane">
+        <h2>
+            <i data-lucide="package-plus"></i>
+            <span data-i18n="hub.customize.catalog_title">Widget-Katalog</span>
+        </h2>
+        <div class="pane-sub" data-i18n="hub.customize.catalog_sub">
+            Klicke „Hinzufügen", um ein Widget in deinen Hub einzubauen.
+        </div>
+        <div class="catalog" id="hubCatalog"></div>
+    </div>
+</div>
+
+<div class="customize-pane" style="margin-top: 12px;">
+    <h2>
+        <i data-lucide="sliders-horizontal"></i>
+        <span data-i18n="hub.customize.active_title">Aktive Widgets</span>
+    </h2>
+    <div class="pane-sub" data-i18n="hub.customize.active_sub">
+        Hier kannst du Reihenfolge, Größe und Konfiguration jedes Widgets ändern.
+    </div>
+    <div class="active-list" id="hubActiveList"></div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='widgets/widgets.css') }}" />
+<script src="/static/widgets/widgets.js" defer></script>
+<script src="/static/widgets/customizer.js" defer></script>
+{% endblock %}

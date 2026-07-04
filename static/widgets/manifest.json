@@ -1,0 +1,102 @@
+{
+    "version": 1,
+    "widgets": [
+        {
+            "id": "clock",
+            "name": "Uhr",
+            "description": "Aktuelle Zeit und Datum auf deinem Hub.",
+            "icon": "clock",
+            "default_size": "medium",
+            "sizes": ["small", "medium", "large"],
+            "default_config": {
+                "show_seconds": true,
+                "show_date": true,
+                "show_greeting": true,
+                "format": "24h"
+            },
+            "config_schema": [
+                { "key": "format", "label": "Zeitformat", "type": "select", "options": [
+                    { "value": "24h", "label": "24-Stunden" },
+                    { "value": "12h", "label": "12-Stunden" }
+                ], "default": "24h" },
+                { "key": "show_seconds", "label": "Sekunden anzeigen", "type": "boolean", "default": true },
+                { "key": "show_date", "label": "Datum anzeigen", "type": "boolean", "default": true },
+                { "key": "show_greeting", "label": "Tagesgruß anzeigen", "type": "boolean", "default": true }
+            ]
+        },
+        {
+            "id": "route-button",
+            "name": "Navigations-Button",
+            "description": "Verlinkt zu einer beliebigen Route im Hub.",
+            "icon": "square-arrow-out-up-right",
+            "default_size": "small",
+            "sizes": ["small", "medium", "large"],
+            "default_config": {
+                "url": "/memes",
+                "label": "Memes",
+                "description": "",
+                "icon": "image",
+                "tint": "default"
+            },
+            "config_schema": [
+                { "key": "label", "label": "Titel", "type": "text", "default": "Memes" },
+                { "key": "url",   "label": "URL (relativ)", "type": "text", "default": "/memes" },
+                { "key": "description", "label": "Beschreibung", "type": "text", "default": "" },
+                { "key": "icon",  "label": "Lucide-Icon",   "type": "text", "default": "image" },
+                { "key": "tint",  "label": "Farbton",       "type": "select", "options": [
+                    { "value": "default", "label": "Standard" },
+                    { "value": "memes",   "label": "Memes (rot)" },
+                    { "value": "media",   "label": "Media (blau)" },
+                    { "value": "friends", "label": "Freunde (grün)" },
+                    { "value": "chat",    "label": "Chat (rot)" }
+                ], "default": "default" }
+            ]
+        },
+        {
+            "id": "welcome",
+            "name": "Willkommens-Karte",
+            "description": "Große Begrüßung im Hub-Stil.",
+            "icon": "hand-wave",
+            "default_size": "large",
+            "sizes": ["medium", "large"],
+            "default_config": {
+                "title": "Willkommen bei serverjonas!",
+                "subtitle": "Dein digitales Zuhause für Memes, Filme und Freunde."
+            },
+            "config_schema": [
+                { "key": "title", "label": "Titel", "type": "text", "default": "Willkommen!" },
+                { "key": "subtitle", "label": "Untertitel", "type": "text", "default": "Bearbeite mich im Hub-Customizer." }
+            ]
+        },
+        {
+            "id": "postit",
+            "name": "Notiz (Post-it)",
+            "description": "Eine gelbe Notiz für eigene Erinnerungen oder Hinweise.",
+            "icon": "sticky-note",
+            "default_size": "medium",
+            "sizes": ["small", "medium", "large"],
+            "default_config": {
+                "title": "Notiz",
+                "body": "Tipp: Bearbeite mich im Hub-Customizer."
+            },
+            "config_schema": [
+                { "key": "title", "label": "Titel", "type": "text", "default": "Notiz" },
+                { "key": "body",  "label": "Inhalt", "type": "textarea", "default": "Schreib hier hin, was du nicht vergessen willst." }
+            ]
+        },
+        {
+            "id": "user-badge",
+            "name": "Profil-Karte",
+            "description": "Zeigt den angemeldeten Nutzer mit Schnellzugriff auf das Profil.",
+            "icon": "user-round",
+            "default_size": "medium",
+            "sizes": ["small", "medium", "large"],
+            "default_config": {
+                "show_settings_link": true
+            },
+            "config_schema": [
+                { "key": "show_settings_link", "label": "Link zu Einstellungen", "type": "boolean", "default": true }
+            ]
+        }
+    ]
+}
