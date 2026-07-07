@@ -1,4 +1,5 @@
 import os
+import subprocess
 import tomllib
 
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -8,6 +9,87 @@ LOGS_DIR = os.path.join(BASE_DIR, "logs")
 DATA_DIR = os.path.join(BASE_DIR, "data")
 DATA_PATH = DATA_DIR
 CONFIG_DIR = os.path.join(BASE_DIR, "config")  # heir sind die verschidenen tomls
+
+
+# ─── Git info ───────────────────────────────────────────────────────────────
+# Reads the short hash and commit subject of ``HEAD`` from ``$BASE_DIR/.git``
+# when the project root is a git checkout. The result is computed **once at
+# import time** (mirrors how ``TRANSLATION_VERSIONS`` works in ``app.py``),
+# so it costs zero CPU on every request. The value therefore reflects the
+# commit the running server was started from; deployments need a restart to
+# pick up a new commit, which is consistent with how this app is normally
+# deployed (Flask debug auto-reload, systemd restart, …).
+_GIT_TIMEOUT_S = 5
+
+
+def _is_git_repo() -> bool:
+    """``True`` iff ``$BASE_DIR/.git`` exists."""
+    try:
+        return os.path.isdir(os.path.join(BASE_DIR, ".git"))
+    except (TypeError, ValueError):
+        return False
+
+
+def _run_git(*args):
+    """Run a git command in ``BASE_DIR`` and return its trimmed stdout.
+
+    Returns ``None`` if git is unavailable, the command exits non-zero, or the
+    timeout (5 s) fires. We never raise — git info is purely a UI nicety.
+    """
+    try:
+        result = subprocess.run(
+            ["git", *args],
+            cwd=BASE_DIR,
+            capture_output=True,
+            text=True,
+            timeout=_GIT_TIMEOUT_S,
+            check=False,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+        return None
+    if result.returncode != 0:
+        return None
+    return (result.stdout or "").strip() or None
+
+
+def _compute_git_info():
+    """Return ``{"version": str, "message": str}`` or ``None``.
+
+    ``version`` is the short commit hash; ``message`` is the first line of
+    the commit message (``git log -1 --pretty=%s``). If ``BASE_DIR`` is not
+    a git repo, git is missing, or the command fails for any reason, this
+    returns ``None`` so callers can fall back to a placeholder.
+    """
+    if not _is_git_repo():
+        return None
+    version = _run_git("rev-parse", "--short", "HEAD")
+    # Always read the message even if rev-parse failed (some refs are weird);
+    # but if version is empty there's nothing useful to show.
+    message = _run_git("log", "-1", "--pretty=%s")
+    if not version:
+        return None
+    return {
+        "version": version,
+        "message": message or "",
+    }
+
+
+_GIT_INFO = _compute_git_info()
+if _GIT_INFO:
+    print(
+        f"\033[92m[  OK  ]\033[0m git info \033[90m-> {_GIT_INFO['version']}"
+        f" ({_GIT_INFO['message'][:40]})\033[0m"
+    )
+else:
+    print(
+        "\033[33m[WARN ]\033[0m \033[90mno git repo at BASE_DIR; "
+        "settings.about will show placeholders\033[0m"
+    )
+
+
+def get_git_info():
+    """Cached ``{version, message}`` from the latest commit, or ``None``."""
+    return _GIT_INFO
 
 
 # ─── Storage config ────────────────────────────────────────────────────────

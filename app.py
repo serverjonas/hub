@@ -20,7 +20,7 @@ from flask import (
     request,
     send_from_directory,
 )
-from toolbox.files import BASE_DIR
+from toolbox.files import BASE_DIR, get_git_info
 from toolbox.i18n import build_translation_manifest
 from toolbox.user import (
     get_current_user,
@@ -135,6 +135,20 @@ def check_ban():
 
     if not is_user_active(user["id"]):
         return render_template("activation_pending.html")
+
+
+@app.context_processor
+def inject_git_info():
+    """Expose the latest commit hash + subject to every template.
+
+    Returned as ``git_version`` (short hash) and ``git_message`` (commit
+    subject). Both are ``None`` when ``BASE_DIR`` is not a git repo or git
+    is unavailable — templates can decide whether to render placeholders.
+    """
+    info = get_git_info()
+    if info:
+        return {"git_version": info["version"], "git_message": info["message"]}
+    return {"git_version": None, "git_message": None}
 
 
 @app.context_processor

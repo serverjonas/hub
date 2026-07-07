@@ -23,6 +23,7 @@
     "settings.about.desc": "Informatie over het platform.",
     "settings.about.version": "Versie",
     "settings.about.platform": "Platform",
+    "settings.about.latest_changes": "Laatste wijzigingen",
     "settings.toast.theme_changed": "Uiterlijk bijgewerkt",
     "settings.toast.lang_changed": "Taal bijgewerkt",
     "settings.toast.fill_all": "Vul alle velden in",

@@ -522,6 +522,29 @@
     font-family: var(--font-heading);
 }
 
+/* Make the latest-commits row span both grid columns on wide layouts and
+   soften the long commit-subject styling so it doesn't read like a heading. */
+.info-item-wide {
+    grid-column: 1 / -1;
+}
+.info-item-message {
+    font-size: 1.05rem;
+    font-weight: 400;
+    line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    font-family: var(--font-body);
+}
+/* Cap the subject to two lines so a very long commit message doesn't
+   push everything below it around. The full text is still readable on
+   hover via the native ``title`` attribute on the span. */
+.info-item-message-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 /* ─── Avatar / Profile editor ─── */
 .avatar-row {
     display: flex;
@@ -1066,11 +1089,15 @@
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-item-label" data-i18n="settings.about.version">Version</div>
-                    <div class="info-item-value">5.3</div>
+                    <div class="info-item-value">{{ git_version or '—' }}</div>
                 </div>
                 <div class="info-item">
                     <div class="info-item-label" data-i18n="settings.about.platform">Plattform</div>
                     <div class="info-item-value">Web</div>
+                </div>
+                <div class="info-item info-item-wide">
+                    <div class="info-item-label" data-i18n="settings.about.latest_changes">Letzte Änderungen</div>
+                    <div class="info-item-value info-item-message info-item-message-clamp" title="{{ git_message or '' }}">{{ git_message or '—' }}</div>
                 </div>
             </div>
         </div>

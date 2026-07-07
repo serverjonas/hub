@@ -23,6 +23,7 @@
     "settings.about.desc": "Informações sobre a plataforma.",
     "settings.about.version": "Versão",
     "settings.about.platform": "Plataforma",
+    "settings.about.latest_changes": "Últimas alterações",
     "settings.toast.theme_changed": "Aparência atualizada",
     "settings.toast.lang_changed": "Idioma atualizado",
     "settings.toast.fill_all": "Preenche todos os campos",
