@@ -14,6 +14,7 @@ follows the format `[YYYY-MM-DD]` followed by typed bullet points
 
 ### Change
 - `[2026-07-03]` Change: `modules.toml` — registered the new `notes` module at `/notes`.
+- `[2026-07-08]` Change: `app.py` - moved load_modules() to if __name__ == "__main__" 
 
 ## earlier history
 
