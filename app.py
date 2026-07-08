@@ -111,12 +111,6 @@ def load_modules():
             print(f"\033[91m[FAILED]\033[0m {name} \033[90m-> {e}\033[0m")
 
 
-try:
-    load_modules()
-except Exception as e:
-    print(str(e))
-    emergency_mode = True
-
 
 @app.before_request
 def check_ban():
@@ -251,8 +245,6 @@ def hub(path):
     if path == "make_me_a_coffee":
         abort(418)
 
-    # if path == "settings":
-    #    return render_template(f"settings.html", user=user["name"] if user else None)
 
     # NUR static files erlauben
     ext = os.path.splitext(path)[1].lower()
@@ -315,7 +307,7 @@ def _apply_debug_mode():
     """Mark debug mode for the email subsystem and the rest of the app."""
     os.environ[DEBUG_NO_EMAIL_ENV] = "1"
     print(
-        "\033[33m[DEBUG]\033[0m \033[90mDebug-Modus aktiv\033[0m\n"
+        "\033[33m[DEBUG ]\033[0m \033[90mDebug-Modus aktiv\033[0m\n"
         f"  \033[90m• Flask reload + Tracebacks aktiv\033[0m\n"
         f"  \033[90m• E-Mail-Versand deaktiviert "
         f"(env ${DEBUG_NO_EMAIL_ENV} = 1)\033[0m\n"
@@ -330,6 +322,11 @@ def index():
 
 
 if __name__ == "__main__":
+    try:
+        load_modules()
+    except Exception as e:
+        print(str(e))
+        emergency_mode = True
     args = _parse_cli_args()
     if args.debug:
         _apply_debug_mode()
