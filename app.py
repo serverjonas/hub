@@ -321,12 +321,14 @@ def index():
     return render_template("masteradmin.html")
 
 
+try:
+    load_modules()
+except Exception as e:
+    print(str(e))
+    emergency_mode = True
+
 if __name__ == "__main__":
-    try:
-        load_modules()
-    except Exception as e:
-        print(str(e))
-        emergency_mode = True
+
     args = _parse_cli_args()
     if args.debug:
         _apply_debug_mode()
