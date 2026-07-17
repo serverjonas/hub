@@ -45,8 +45,11 @@ app = Flask(
 )
 
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024 * 1024  # 50GB
-app.secret_key = os.environ.get("SECRET_KEY")
-ALLOWED_EXTENSIONS = {".html", ".css", ".js", ".png", ".jpg", ".ico", ".svg", ".txt"}
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "development-only-change-me"
+)
+ALLOWED_EXTENSIONS = {".html", ".css", ".js", ".png", ".jpg", ".ico", ".svg", ".txt", ".md"}
 
 emergency_mode = False
 
@@ -206,7 +209,7 @@ def internal_error(e):
 
 
 @app.errorhandler(501)
-def internal_error(e):
+def not_omplementet(e):
     user_array = get_current_user()
     user = user_array["name"] if user_array else None
     return render_template("501.html", user=user), 500
@@ -243,8 +246,10 @@ def hub(path):
         return redirect("/hub")
 
     if path == "make_me_a_coffee":
-        abort(418)
+        return abort(418)
 
+    if path.startswith("data"):
+        return abort(404)
 
     # NUR static files erlauben
     ext = os.path.splitext(path)[1].lower()

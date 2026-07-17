@@ -121,17 +121,6 @@
                     <a href="/cloud" data-i18n="nav.cloud">Cloud</a>
                 </div>
 
-                <!-- Language switcher (desktop) -->
-                <div class="nav-lang-wrap" id="navbarLangWrap">
-                    <button type="button" class="icon-btn" id="navbarLangBtn"
-                            aria-haspopup="listbox" aria-expanded="false"
-                            aria-controls="navbarLangMenu"
-                            data-i18n-title="nav.language" title="Sprache">
-                        <i data-lucide="languages" style="width: 20px; height: 20px;"></i>
-                    </button>
-                    <div class="navbar-lang-menu" id="navbarLangMenu" role="listbox"></div>
-                </div>
-
                 <a href="/news" class="icon-btn" data-i18n-title="nav.notifications" title="Benachrichtigungen">
                     <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
                     {% if unread_count > 0 %}
@@ -195,16 +184,7 @@
                 ">{{ unread_count }}</span>
                 {% endif %}
             </a>
-            <div class="mobile-nav-lang-block" id="navbarMobileLangBlock">
-                <button type="button" class="mobile-nav-link" id="navbarMobileLangBtn"
-                        aria-expanded="false" aria-controls="navbarMobileLangList">
-                    <i data-lucide="languages" style="width: 20px;"></i>
-                    <span data-i18n="nav.language">Sprache</span>
-                    <i data-lucide="chevron-down" class="chevron" style="width: 18px;"></i>
-                    <span class="mobile-lang-badge" id="navbarMobileLangCode">deu</span>
-                </button>
-                <div class="mobile-nav-lang-list" id="navbarMobileLangList" role="listbox"></div>
-            </div>
+
             <a href="/settings" class="mobile-nav-link" style="margin-top: auto;">
                 <i data-lucide="settings" style="width: 20px;"></i> <span data-i18n="nav.settings">Einstellungen</span>
             </a>
