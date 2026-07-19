@@ -1,0 +1,1076 @@
+{% extends "base.html" %}
+
+{% block page_id %}sjn_ai{% endblock %}
+{% block title_i18n %}sjn_ai.title{% endblock %}
+{% block title %}SJN-AI · serverjonas{% endblock %}
+
+{% block extra_style %}
+/* ─── SJN-AI Layout (wobbly paper, hand-drawn aesthetic) ─── */
+.sjnai-shell {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    height: calc(100vh - 200px);
+    min-height: 560px;
+    max-width: 1140px;
+    margin: 0 auto;
+}
+
+/* ─── Sidebar ─── */
+.sjnai-sidebar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+    padding: 20px 20px 16px;
+    gap: 16px;
+}
+
+.sjnai-sidebar h1 {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.15;
+}
+
+.sjnai-brand-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent-gradient);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.sjnai-subtitle {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.sjnai-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--accent-lighter);
+    border: 1px dashed rgba(108, 99, 255, 0.30);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.4;
+}
+.sjnai-tip i {
+    width: 14px; height: 14px;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.sjnai-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-warm);
+}
+.sjnai-contact-row .contact-avatar {
+    width: 36px; height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(108, 99, 255, 0.30);
+}
+.sjnai-contact-row .contact-avatar i { width: 18px; height: 18px; }
+
+.sjnai-contact-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.sjnai-contact-body b {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 700;
+}
+.sjnai-contact-body small {
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.sjnai-online-dot {
+    width: 7px; height: 7px;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.55);
+}
+
+.sjnai-clear-btn {
+    appearance: none;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.sjnai-clear-btn:hover {
+    background: rgba(239, 68, 68, 0.06);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #ef4444;
+}
+.sjnai-clear-btn i { width: 16px; height: 16px; }
+
+.sjnai-model-row {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.sjnai-model-row code {
+    background: var(--bg-warm);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    color: var(--accent);
+    word-break: break-all;
+}
+
+/* ─── Main pane ─── */
+.sjnai-pane {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+    position: relative;
+}
+
+.sjnai-header {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.sjnai-header .contact-avatar {
+    width: 40px; height: 40px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(108, 99, 255, 0.30);
+}
+.sjnai-header .contact-avatar i { width: 20px; height: 20px; }
+.sjnai-header b {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    font-weight: 700;
+    display: block;
+    line-height: 1.2;
+}
+.sjnai-header small {
+    color: var(--text-dim);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ─── Messages ─── */
+.sjnai-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px 22px 12px;
+    background:
+        radial-gradient(800px 400px at 50% 0%, var(--pastel-lavender) 0%, transparent 60%),
+        var(--bg);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scroll-behavior: smooth;
+}
+[data-theme="dark"] .sjnai-body {
+    background:
+        radial-gradient(800px 400px at 50% 0%, rgba(108, 99, 255, 0.08) 0%, transparent 60%),
+        var(--bg);
+}
+[data-theme="oled"] .sjnai-body {
+    background: var(--bg);
+}
+[data-theme="paper"] .sjnai-body {
+    background:
+        radial-gradient(800px 400px at 50% 0%, rgba(217, 119, 6, 0.07) 0%, transparent 60%),
+        var(--bg);
+}
+
+.sjnai-empty {
+    margin: auto;
+    text-align: center;
+    color: var(--text-dim);
+    max-width: 460px;
+    padding: 32px 22px;
+}
+.sjnai-empty .empty-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 18px;
+    background: var(--accent-lighter);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    box-shadow: 3px 3px 0 0 var(--border);
+}
+.sjnai-empty h3 {
+    font-family: var(--font-heading);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+.sjnai-empty p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+.sjnai-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+.sjnai-suggestion {
+    appearance: none;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 8px 14px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 2px 2px 0 0 var(--border);
+}
+.sjnai-suggestion:hover {
+    background: var(--accent-lighter);
+    border-color: rgba(108, 99, 255, 0.35);
+    color: var(--accent);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 0 var(--border);
+}
+.sjnai-suggestion:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 0 var(--border);
+}
+
+.sjnai-msg-row {
+    display: flex;
+    flex-direction: column;
+    max-width: 76%;
+    position: relative;
+    animation: sjnaiFadeInUp 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes sjnaiFadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.sjnai-msg-row.mine { align-self: flex-end; align-items: flex-end; }
+.sjnai-msg-row.theirs { align-self: flex-start; align-items: flex-start; }
+
+.sjnai-bubble {
+    padding: 11px 15px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    line-height: 1.55;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid transparent;
+}
+.sjnai-msg-row.mine .sjnai-bubble {
+    background: var(--accent-gradient);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+.sjnai-msg-row.theirs .sjnai-bubble {
+    background: var(--surface);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+}
+.sjnai-bubble.thinking::after {
+    content: "●●●";
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    animation: sjnaiDots 1.4s infinite ease-in-out;
+}
+@keyframes sjnaiDots {
+    0%, 20% { opacity: 0.2; }
+    50% { opacity: 1; }
+    80%, 100% { opacity: 0.2; }
+}
+
+.sjnai-meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.sjnai-token-count {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.sjnai-day {
+    align-self: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin: 6px 0;
+}
+
+.sjnai-error-bar {
+    padding: 8px 18px;
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    border-top: 1px solid rgba(239, 68, 68, 0.15);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: pre-wrap;
+}
+.sjnai-error-bar.visible { display: flex; }
+
+/* ─── Composer ─── */
+.sjnai-composer {
+    padding: 14px 18px 18px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+.sjnai-input {
+    flex: 1;
+    background: var(--bg-warm);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 14px;
+    resize: none;
+    min-height: 44px;
+    max-height: 160px;
+    line-height: 1.45;
+    transition: var(--transition);
+}
+.sjnai-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+}
+.sjnai-input:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.sjnai-send,
+.sjnai-stop {
+    width: 44px; height: 44px;
+    border: none;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: white;
+}
+.sjnai-send {
+    background: var(--accent-gradient);
+    box-shadow: 0 4px 14px rgba(108, 99, 255, 0.35);
+}
+.sjnai-send:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(108, 99, 255, 0.45);
+}
+.sjnai-send:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+
+.sjnai-stop {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+    display: none;
+}
+.sjnai-stop:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
+}
+.sjnai-stop i, .sjnai-send i { width: 18px; height: 18px; }
+
+/* When streaming, hide send and show stop. */
+.sjnai-shell.is-streaming .sjnai-send { display: none; }
+.sjnai-shell.is-streaming .sjnai-stop { display: flex; }
+
+/* ─── Confirm modal ─── */
+.sjnai-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+.sjnai-modal-backdrop.open { display: flex; }
+.sjnai-modal {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md), 4px 4px 0 0 var(--border);
+    padding: 24px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+}
+.sjnai-modal h3 {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.sjnai-modal p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 18px;
+}
+.sjnai-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.sjnai-btn {
+    appearance: none;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 10px 18px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 2px 2px 0 0 var(--border);
+}
+.sjnai-btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 0 var(--border); }
+.sjnai-btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 0 var(--border); }
+.sjnai-btn.primary {
+    background: var(--accent-gradient);
+    color: white;
+    border-color: rgba(108, 99, 255, 0.45);
+}
+.sjnai-btn.primary:hover { box-shadow: 3px 3px 0 0 rgba(108, 99, 255, 0.45); }
+.sjnai-btn.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    color: white;
+    border-color: rgba(239, 68, 68, 0.45);
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 900px) {
+    .sjnai-shell { grid-template-columns: 1fr; height: calc(100vh - 180px); }
+    .sjnai-msg-row { max-width: 88%; }
+}
+@media (max-width: 600px) {
+    .sjnai-shell { gap: 16px; min-height: 480px; }
+    .sjnai-body { padding: 14px 14px 10px; }
+    .sjnai-composer { padding: 10px 12px 14px; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="sjnai-shell" id="sjnaiShell">
+    <aside class="sjnai-sidebar">
+        <h1>
+            <span class="sjnai-brand-dot"></span>
+            <span data-i18n="sjn_ai.title">SJN-AI</span>
+        </h1>
+        <p class="sjnai-subtitle" data-i18n="sjn_ai.subtitle">
+            Lokaler KI-Assistent (Ollama)
+        </p>
+
+        <div class="sjnai-tip">
+            <i data-lucide="shield-check"></i>
+            <span data-i18n="sjn_ai.local_tip">
+                Läuft lokal über Ollama · Gespräche bleiben auf deinem Server.
+            </span>
+        </div>
+
+        <div class="sjnai-contact-row">
+            <div class="contact-avatar">
+                <i data-lucide="sparkles"></i>
+            </div>
+            <div class="sjnai-contact-body">
+                <b>SJN-AI</b>
+                <small>
+                    <span class="sjnai-online-dot"></span>
+                    <span data-i18n="sjn_ai.online">online</span>
+                </small>
+            </div>
+        </div>
+
+        <button class="sjnai-clear-btn" id="clearBtn" type="button">
+            <i data-lucide="trash-2"></i>
+            <span data-i18n="sjn_ai.action.clear">Verlauf löschen</span>
+        </button>
+
+        <div class="sjnai-model-row">
+            <span data-i18n="sjn_ai.model_label">Modell:</span>
+            <code id="modelTag">{{ ollama_model }}</code>
+            <span data-i18n="sjn_ai.host_label">Host:</span>
+            <code id="hostTag">{{ ollama_host }}</code>
+        </div>
+    </aside>
+
+    <section class="sjnai-pane">
+        <header class="sjnai-header">
+            <div class="contact-avatar">
+                <i data-lucide="sparkles"></i>
+            </div>
+            <div>
+                <b data-i18n="sjn_ai.title">SJN-AI</b>
+                <small>
+                    <span class="sjnai-online-dot"></span>
+                    <span data-i18n="sjn_ai.header_status">online · bereit zu antworten</span>
+                </small>
+            </div>
+        </header>
+
+        <div class="sjnai-body" id="sjnaiBody">
+            <div class="sjnai-empty" id="sjnaiEmpty">
+                <div class="empty-icon">
+                    <i data-lucide="sparkles"></i>
+                </div>
+                <h3 data-i18n="sjn_ai.welcome.title">Hi, ich bin SJN-AI</h3>
+                <p data-i18n="sjn_ai.welcome.body">
+                    Frag mich alles — ich laufe lokal auf deinem Server über Ollama.
+                </p>
+                <div class="sjnai-suggestions">
+                    <button class="sjnai-suggestion" type="button">
+                        <span data-i18n="sjn_ai.suggestion_code">
+                            Schreib mir eine Python-Funktion, die eine Liste invertiert.
+                        </span>
+                    </button>
+                    <button class="sjnai-suggestion" type="button">
+                        <span data-i18n="sjn_ai.suggestion_explain">
+                            Erklär mir in 3 Sätzen, was Ollama ist.
+                        </span>
+                    </button>
+                    <button class="sjnai-suggestion" type="button">
+                        <span data-i18n="sjn_ai.suggestion_joke">
+                            Erzähl mir einen kurzen Witz.
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sjnai-error-bar" id="sjnaiErrorBar">
+            <i data-lucide="alert-triangle" style="width:14px;height:14px;"></i>
+            <span id="sjnaiErrorText"></span>
+        </div>
+
+        {% if banned %}
+        <div class="sjnai-error-bar visible" style="border-top: 1px solid rgba(239, 68, 68, 0.15);">
+            <i data-lucide="shield-x" style="width:14px;height:14px;"></i>
+            <span data-i18n="sjn_ai.error.banned">
+                Du bist gebannt und kannst keine Nachrichten senden.
+            </span>
+        </div>
+        <form class="sjnai-composer" id="sjnaiForm" autocomplete="off">
+            <textarea class="sjnai-input" id="sjnaiInput" rows="1"
+                      data-i18n-placeholder="sjn_ai.placeholder.banned"
+                      placeholder="Du kannst momentan nicht senden…"
+                      disabled></textarea>
+            <button type="submit" class="sjnai-send" disabled>
+                <i data-lucide="send"></i>
+            </button>
+        </form>
+        {% else %}
+        <form class="sjnai-composer" id="sjnaiForm" autocomplete="off">
+            <textarea class="sjnai-input" id="sjnaiInput" rows="1"
+                      data-i18n-placeholder="sjn_ai.placeholder"
+                      placeholder="Frag SJN-AI…"
+                      required></textarea>
+            <button type="submit" class="sjnai-send" id="sjnaiSend"
+                    data-i18n-title="sjn_ai.action.send" title="Senden">
+                <i data-lucide="send"></i>
+            </button>
+            <button type="button" class="sjnai-stop" id="sjnaiStop"
+                    data-i18n-title="sjn_ai.action.stop" title="Stop">
+                <i data-lucide="square"></i>
+            </button>
+        </form>
+        {% endif %}
+    </section>
+</div>
+
+<div class="sjnai-modal-backdrop" id="clearModal">
+    <div class="sjnai-modal" role="dialog" aria-modal="true">
+        <h3 data-i18n="sjn_ai.confirm_clear.title">Verlauf wirklich löschen?</h3>
+        <p data-i18n="sjn_ai.confirm_clear.body">
+            Alle bisherigen Nachrichten mit SJN-AI werden aus der Datenbank entfernt.
+        </p>
+        <div class="sjnai-modal-actions">
+            <button type="button" class="sjnai-btn" id="clearCancel"
+                    data-i18n="sjn_ai.confirm_clear.cancel">Abbrechen</button>
+            <button type="button" class="sjnai-btn danger" id="clearConfirm"
+                    data-i18n="sjn_ai.confirm_clear.confirm">Ja, löschen</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var shell   = document.getElementById("sjnaiShell");
+    var body    = document.getElementById("sjnaiBody");
+    var empty   = document.getElementById("sjnaiEmpty");
+    var form    = document.getElementById("sjnaiForm");
+    var input   = document.getElementById("sjnaiInput");
+    var sendBtn = document.getElementById("sjnaiSend");
+    var stopBtn = document.getElementById("sjnaiStop");
+    var errBar  = document.getElementById("sjnaiErrorBar");
+    var errText = document.getElementById("sjnaiErrorText");
+
+    var clearBtn   = document.getElementById("clearBtn");
+    var clearModal = document.getElementById("clearModal");
+    var clearCancel  = document.getElementById("clearCancel");
+    var clearConfirm = document.getElementById("clearConfirm");
+
+    var BASE = "/sjn-ai";
+    var isStreaming = false;
+    var abortCtrl = null;
+    var lastDayTs = null;
+
+    function t(key, vars) {
+        return (window.t ? window.t(key, vars) : ("[i18n: " + key + "]"));
+    }
+
+    function escHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+            return ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[c];
+        });
+    }
+
+    function formatTime(ts) {
+        var d = new Date((ts || 0) * 1000);
+        var now = new Date();
+        var sameDay = d.toDateString() === now.toDateString();
+        if (sameDay) {
+            return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        }
+        var yest = new Date(now); yest.setDate(now.getDate() - 1);
+        if (d.toDateString() === yest.toDateString()) {
+            return t("sjn_ai.day.yesterday") + " " +
+                d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        }
+        return d.toLocaleDateString([], { day: "2-digit", month: "2-digit" });
+    }
+
+    function dayBucket(ts) {
+        var d = new Date((ts || 0) * 1000);
+        return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+    }
+
+    function dayLabel(ts) {
+        var d = new Date((ts || 0) * 1000);
+        var now = new Date();
+        var yest = new Date(now); yest.setDate(now.getDate() - 1);
+        if (d.toDateString() === now.toDateString()) return t("sjn_ai.day.today");
+        if (d.toDateString() === yest.toDateString()) return t("sjn_ai.day.yesterday");
+        return d.toLocaleDateString([], { weekday: "long", day: "2-digit", month: "2-digit" });
+    }
+
+    function scrollToBottom(smooth) {
+        if (!body) return;
+        body.scrollTop = body.scrollHeight + (smooth ? 200 : 0);
+    }
+
+    function showError(text) {
+        if (!errBar || !errText) return;
+        errText.textContent = text;
+        errBar.classList.add("visible");
+    }
+    function hideError() {
+        if (!errBar) return;
+        errBar.classList.remove("visible");
+    }
+
+    function buildRow(role, content, msgId, time, tokens) {
+        var row = document.createElement("div");
+        row.className = "sjnai-msg-row " + (role === "user" ? "mine" : "theirs");
+
+        var bubble = document.createElement("div");
+        bubble.className = "sjnai-bubble";
+        bubble.textContent = content || "";
+
+        row.appendChild(bubble);
+
+        var meta = document.createElement("div");
+        meta.className = "sjnai-meta";
+        var tsSpan = document.createElement("span");
+        tsSpan.setAttribute("data-time", String(time || 0));
+        tsSpan.textContent = formatTime(time);
+        meta.appendChild(tsSpan);
+        if (tokens) {
+            var tk = document.createElement("span");
+            tk.className = "sjnai-token-count";
+            tk.textContent = tokens + " " + t("sjn_ai.tokens");
+            meta.appendChild(tk);
+        }
+        row.appendChild(meta);
+
+        return { row: row, bubble: bubble };
+    }
+
+    function appendHistoryRow(m) {
+        var bucket = dayBucket(m.time);
+        if (lastDayTs !== bucket) {
+            var day = document.createElement("div");
+            day.className = "sjnai-day";
+            day.textContent = dayLabel(m.time);
+            body.appendChild(day);
+            lastDayTs = bucket;
+        }
+        var built = buildRow(m.role, m.content, m.id, m.time, null);
+        body.appendChild(built.row);
+    }
+
+    async function loadHistory() {
+        try {
+            var res = await fetch(BASE + "/history", { credentials: "same-origin", cache: "no-store" });
+            if (!res.ok) return;
+            var data = await res.json();
+            var msgs = (data && data.messages) || [];
+            if (msgs.length === 0) return;
+            if (empty) empty.remove();
+            msgs.forEach(appendHistoryRow);
+            scrollToBottom(false);
+        } catch (e) {
+            // Silent — empty state still visible.
+            console.warn("history load failed", e);
+        }
+    }
+
+    function appendUserOptimistic(text) {
+        if (empty) empty.remove();
+        var bucket = dayBucket(Math.floor(Date.now() / 1000));
+        if (lastDayTs !== bucket) {
+            var day = document.createElement("div");
+            day.className = "sjnai-day";
+            day.textContent = dayLabel(Math.floor(Date.now() / 1000));
+            body.appendChild(day);
+            lastDayTs = bucket;
+        }
+        var built = buildRow("user", text, null, Math.floor(Date.now() / 1000), null);
+        built.row.setAttribute("data-pending", "1");
+        body.appendChild(built.row);
+        scrollToBottom(true);
+        return built;
+    }
+
+    function appendAssistantPlaceholder() {
+        var placeholder = buildRow("assistant", "", null, Math.floor(Date.now() / 1000), null);
+        placeholder.bubble.classList.add("thinking");
+        body.appendChild(placeholder.row);
+        scrollToBottom(true);
+        return placeholder;
+    }
+
+    function setStreaming(state) {
+        isStreaming = state;
+        if (state) {
+            shell.classList.add("is-streaming");
+            input.disabled = true;
+        } else {
+            shell.classList.remove("is-streaming");
+            input.disabled = false;
+            input.focus();
+        }
+    }
+
+    async function sendMessage(text) {
+        hideError();
+        if (isStreaming || !text) return;
+
+        var userRow = appendUserOptimistic(text);
+        var placeholder = appendAssistantPlaceholder();
+        var accumulated = "";
+
+        setStreaming(true);
+        abortCtrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+
+        // The function that fully unrolls a failed send: removes both the
+        // optimistic user bubble and the empty assistant placeholder, restores
+        // the composer text, and shows the error message.
+        var undoSend = function (friendlyText) {
+            userRow.remove();
+            placeholder.row.remove();
+            input.value = text;
+            input.style.height = "auto";
+            showError(friendlyText || t("sjn_ai.error.generic"));
+        };
+
+        try {
+            var opts = {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: text }),
+            };
+            if (abortCtrl) opts.signal = abortCtrl.signal;
+
+            var res = await fetch(BASE + "/send", opts);
+
+            // Fast-fail path: server did NOT stream (banned/empty/etc.).
+            var ct = (res.headers.get("content-type") || "").toLowerCase();
+            if (ct.indexOf("text/event-stream") === -1) {
+                var errData = await res.json().catch(function () { return {}; });
+                var label = (errData && errData.error) || "generic";
+                var friendly =
+                    label === "banned"    ? t("sjn_ai.error.banned")    :
+                    label === "empty"     ? t("sjn_ai.error.empty")     :
+                    label === "too_long"  ? t("sjn_ai.error.too_long")  :
+                                            t("sjn_ai.error.generic");
+                setStreaming(false);
+                undoSend(friendly);
+                return;
+            }
+
+            if (!res.ok || !res.body) {
+                setStreaming(false);
+                undoSend(t("sjn_ai.error.ollama"));
+                return;
+            }
+
+            // ── Parse SSE ───────────────────────────────────────
+            var reader = res.body.getReader();
+            var decoder = new TextDecoder();
+            var buffer = "";
+
+            while (true) {
+                var read = await reader.read();
+                if (read.done) break;
+                buffer += decoder.decode(read.value, { stream: true });
+                var idx;
+                while ((idx = buffer.indexOf("\n\n")) >= 0) {
+                    var evt = buffer.slice(0, idx);
+                    buffer = buffer.slice(idx + 2);
+                    var line = evt.split("\n").find(function (l) {
+                        return l.indexOf("data: ") === 0;
+                    });
+                    if (!line) continue;
+                    var payload;
+                    try { payload = JSON.parse(line.slice(6)); } catch (_) { continue; }
+
+                    if (payload.type === "user_saved") {
+                        var pending = body.querySelector('[data-pending="1"]');
+                        if (pending) {
+                            pending.removeAttribute("data-pending");
+                        }
+                    } else if (payload.type === "delta") {
+                        placeholder.bubble.classList.remove("thinking");
+                        accumulated += payload.text || "";
+                        placeholder.bubble.textContent = accumulated;
+                        scrollToBottom(false);
+                    } else if (payload.type === "done") {
+                        placeholder.bubble.classList.remove("thinking");
+                        if (payload.tokens) {
+                            var meta = placeholder.row.querySelector(".sjnai-meta");
+                            if (meta && !meta.querySelector(".sjnai-token-count")) {
+                                var tk = document.createElement("span");
+                                tk.className = "sjnai-token-count";
+                                tk.textContent = payload.tokens + " " + t("sjn_ai.tokens");
+                                meta.appendChild(tk);
+                            }
+                        }
+                    } else if (payload.type === "error") {
+                        placeholder.bubble.classList.remove("thinking");
+                        var code = payload.code || "error";
+                        var friendly =
+                            code === "ollama_unreachable" ? t("sjn_ai.error.ollama") :
+                            code === "ollama_http"        ? t("sjn_ai.error.ollama") :
+                            code === "stream_failed"      ? t("sjn_ai.error.network") :
+                                                            t("sjn_ai.error.generic");
+                        var detail = payload.detail ? " (" + String(payload.detail).slice(0, 200) + ")" : "";
+                        // If anything was already streamed, keep both bubbles
+                        // (the user typed it, the AI started answering).
+                        // If nothing was streamed, undo entirely.
+                        if (!accumulated) {
+                            setStreaming(false);
+                            undoSend(friendly + detail);
+                            return;
+                        } else {
+                            showError(friendly + detail);
+                        }
+                    }
+                }
+            }
+
+            // Stream ended normally.
+            placeholder.bubble.classList.remove("thinking");
+
+        } catch (err) {
+            if (err && err.name === "AbortError") {
+                // User pressed stop; server already aborted and persisted partial.
+                placeholder.bubble.classList.remove("thinking");
+                // Stop counts as a successful-enough send; leave both bubbles.
+            } else {
+                setStreaming(false);
+                undoSend(t("sjn_ai.error.network"));
+            }
+        } finally {
+            setStreaming(false);
+            abortCtrl = null;
+        }
+    }
+
+    /* ─── Event wiring ─── */
+    if (input) {
+        input.addEventListener("input", function () {
+            input.style.height = "auto";
+            input.style.height = Math.min(input.scrollHeight, 160) + "px";
+        });
+        input.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter" && !ev.shiftKey) {
+                ev.preventDefault();
+                if (form) form.requestSubmit();
+            }
+        });
+    }
+
+    if (form) {
+        form.addEventListener("submit", function (ev) {
+            ev.preventDefault();
+            var text = (input.value || "").trim();
+            if (!text || isStreaming) return;
+            input.value = "";
+            input.style.height = "auto";
+            sendMessage(text);
+        });
+    }
+
+    if (stopBtn) {
+        stopBtn.addEventListener("click", function () {
+            if (abortCtrl) { try { abortCtrl.abort(); } catch (_) {} }
+            setStreaming(false);
+        });
+    }
+
+    /* ─── Suggestion chips ─── */
+    body.querySelectorAll(".sjnai-suggestion").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            var span = btn.querySelector("[data-i18n]") || btn;
+            var txt = (span.textContent || "").trim();
+            if (!txt) return;
+            if (empty) empty.remove();
+            sendMessage(txt);
+        });
+    });
+
+    /* ─── Clear conversation ─── */
+    function openModal() { if (clearModal) clearModal.classList.add("open"); }
+    function closeModal() { if (clearModal) clearModal.classList.remove("open"); }
+    if (clearBtn) clearBtn.addEventListener("click", openModal);
+    if (clearCancel) clearCancel.addEventListener("click", closeModal);
+    if (clearModal) clearModal.addEventListener("click", function (e) {
+        if (e.target === clearModal) closeModal();
+    });
+
+    if (clearConfirm) clearConfirm.addEventListener("click", async function () {
+        try {
+            var res = await fetch(BASE + "/clear", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ confirm: true }),
+            });
+            if (res.ok) {
+                // Wipe the message body and re-attach the original welcome
+                // panel (with its suggestion chips and event listeners intact).
+                while (body.firstChild) body.removeChild(body.firstChild);
+                lastDayTs = null;
+                body.appendChild(empty);
+                if (window.lucide) window.lucide.createIcons({ attrs: { "stroke-width": 2.5 } });
+                showError(t("sjn_ai.cleared"));
+                setTimeout(hideError, 2200);
+            }
+        } catch (e) {
+            showError(t("sjn_ai.error.generic"));
+        } finally {
+            closeModal();
+        }
+    });
+
+    /* ─── Boot ─── */
+    loadHistory();
+    if (window.lucide) window.lucide.createIcons({ attrs: { "stroke-width": 2.5 } });
+})();
+</script>
+{% endblock %}
