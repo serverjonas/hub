@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+
+{% block page_id %}casino{% endblock %}
+{% block title_i18n %}casino.page_title{% endblock %}
+{% block title %}Casino · serverjonas{% endblock %}
+
+{% block banner_extra %}{% endblock %}
+
+{% block extra_style %}
+/* ─── Casino Lobby (hand-drawn, kawaii casino vibe) ─── */
+.casino-hero {
+    max-width: 1140px;
+    margin: 28px auto 18px;
+    padding: 28px 32px;
+    background:
+        radial-gradient(800px 300px at 20% 0%, rgba(108, 99, 255, 0.10) 0%, transparent 60%),
+        radial-gradient(700px 280px at 100% 100%, rgba(217, 70, 239, 0.10) 0%, transparent 65%),
+        var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+.casino-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><circle cx='3' cy='3' r='1' fill='%23a78bfa' opacity='.25'/></svg>");
+    opacity: 0.4;
+    pointer-events: none;
+}
+.casino-hero-text {
+    position: relative;
+    z-index: 1;
+}
+.casino-hero h1 {
+    font-family: var(--font-heading);
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    color: var(--text-main);
+    margin: 0 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.casino-hero h1 .casino-dot {
+    width: 14px; height: 14px;
+    background: var(--accent-gradient);
+    border-radius: 50%;
+    box-shadow: 0 0 14px var(--accent-glow);
+    animation: casinoPulse 2.4s ease-in-out infinite;
+}
+@keyframes casinoPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 14px var(--accent-glow); }
+    50%     { transform: scale(1.18); box-shadow: 0 0 24px var(--accent-glow); }
+}
+.casino-hero p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.55;
+    max-width: 540px;
+}
+.casino-hero .hero-emoji-row {
+    margin-top: 14px;
+    font-size: 28px;
+    letter-spacing: 4px;
+    filter: drop-shadow(0 2px 0 var(--border));
+}
+
+.casino-balance-card {
+    position: relative;
+    z-index: 1;
+    background: var(--bg-warm);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 4px 4px 0 0 var(--border);
+    padding: 18px 22px;
+    min-width: 220px;
+    text-align: center;
+}
+.casino-balance-card .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.casino-balance-card .value {
+    font-family: var(--font-heading);
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -1px;
+    margin: 4px 0 2px;
+    line-height: 1.05;
+}
+.casino-balance-card .meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 600;
+}
+.casino-balance-card .coin {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+    color: white;
+    font-weight: 800;
+    font-family: var(--font-heading);
+    line-height: 22px;
+    text-align: center;
+    box-shadow: 2px 2px 0 0 var(--border);
+    border: 1.5px solid var(--border);
+}
+
+/* ─── Game grid ─── */
+.casino-grid {
+    max-width: 1140px;
+    margin: 0 auto 64px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 18px;
+}
+.casino-tile {
+    position: relative;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 4px 4px 0 0 var(--border);
+    padding: 22px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-decoration: none !important;
+    color: inherit !important;
+    transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 220ms;
+    overflow: hidden;
+    cursor: pointer;
+    animation: tileFadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes tileFadeIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.casino-tile:nth-child(1) { animation-delay: 0.04s; }
+.casino-tile:nth-child(2) { animation-delay: 0.10s; }
+.casino-tile:nth-child(3) { animation-delay: 0.16s; }
+.casino-tile:nth-child(4) { animation-delay: 0.22s; }
+.casino-tile:nth-child(5) { animation-delay: 0.28s; }
+
+.casino-tile:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 7px 7px 0 0 var(--border);
+}
+.casino-tile:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 0 var(--border);
+}
+
+.casino-tile .tile-icon {
+    height: 80px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    color: white;
+    border: 2px solid var(--border);
+    box-shadow: 3px 3px 0 0 var(--border);
+    position: relative;
+}
+.casino-tile.slots  .tile-icon { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); }
+.casino-tile.blackjack .tile-icon { background: linear-gradient(135deg, #16a34a 0%, #047857 100%); }
+.casino-tile.roulette .tile-icon { background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%); }
+.casino-tile.dice    .tile-icon { background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); }
+.casino-tile.poker   .tile-icon { background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%); }
+
+.casino-tile .tile-title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.4px;
+    margin: 0;
+}
+.casino-tile .tile-desc {
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin: 0;
+    flex: 1;
+}
+.casino-tile .tile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.casino-tile .tile-meta span {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 9px;
+    background: var(--bg-warm);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-full);
+    color: var(--text-dim);
+    letter-spacing: 0.3px;
+}
+.casino-tile .tile-arrow {
+    align-self: flex-end;
+    background: var(--accent-gradient);
+    color: white;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--border);
+    box-shadow: 2px 2px 0 0 var(--border);
+    transition: var(--transition);
+}
+.casino-tile .tile-arrow i { width: 18px; height: 18px; }
+.casino-tile:hover .tile-arrow {
+    transform: translateX(2px) rotate(-3deg);
+}
+
+/* ─── Fairness footer card ─── */
+.casino-fairness {
+    max-width: 1140px;
+    margin: 0 auto 64px;
+    background: var(--bg-warm);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+}
+.casino-fairness i {
+    width: 28px; height: 28px;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+.casino-fairness b {
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+@media (max-width: 700px) {
+    .casino-hero {
+        grid-template-columns: 1fr;
+        padding: 22px 22px;
+        margin: 18px 14px 12px;
+    }
+    .casino-hero h1 { font-size: 28px; }
+    .casino-balance-card { justify-self: start; }
+    .casino-grid { margin: 0 14px 40px; }
+    .casino-fairness { margin: 0 14px 40px; padding: 14px 18px; }
+}
+{% endblock %}
+
+{% block content %}
+
+<section class="casino-hero">
+    <div class="casino-hero-text">
+        <h1>
+            <span class="casino-dot" aria-hidden="true"></span>
+            <span data-i18n="casino.title">Casino</span>
+            <span class="hero-emoji-row" aria-hidden="true">🎰 🃏 🎲 🎯 🂡</span>
+        </h1>
+        <p data-i18n="casino.subtitle">
+            Play five casino favourites with fake money. Your balance resets
+            back to 1000 every night at midnight (server time).
+        </p>
+    </div>
+
+    <div class="casino-balance-card">
+        <div class="label">
+            <i data-lucide="wallet" style="width:14px;height:14px;"></i>
+            <span data-i18n="casino.balance">Balance</span>
+        </div>
+        <div class="value">
+            <span class="coin">¢</span>
+            <span id="lobbyBalance">{{ balance }}</span>
+        </div>
+        <div class="meta">
+            <span data-i18n="casino.starts_at">Resets at midnight to</span>
+            <b id="lobbyStartVal">{{ starting_balance }}</b>
+        </div>
+    </div>
+</section>
+
+<section class="casino-grid">
+    <a class="casino-tile slots" href="/casino/slots">
+        <div class="tile-icon" aria-hidden="true">
+            <span style="font-size:32px;">🍒</span>
+            <span style="position:absolute;left:14px;top:8px;font-size:18px;opacity:.45;">🔔</span>
+            <span style="position:absolute;right:14px;bottom:8px;font-size:22px;opacity:.55;">7</span>
+        </div>
+        <h3 class="tile-title" data-i18n="casino.slots.title">Slots</h3>
+        <p class="tile-desc" data-i18n="casino.slots.desc">
+            Three spinning reels. Three 7s pays 50×
+        </p>
+        <div class="tile-meta">
+            <span data-i18n="casino.tag.rng">Provably random</span>
+            <span data-i18n="casino.tag.instant">Instant</span>
+        </div>
+        <div class="tile-arrow">
+            <i data-lucide="arrow-right"></i>
+        </div>
+    </a>
+
+    <a class="casino-tile blackjack" href="/casino/blackjack">
+        <div class="tile-icon" aria-hidden="true">
+            <span style="font-size:32px;">🃏</span>
+        </div>
+        <h3 class="tile-title" data-i18n="casino.blackjack.title">Blackjack</h3>
+        <p class="tile-desc" data-i18n="casino.blackjack.desc">
+            Beat the dealer to 21. Blackjack pays 3:2.
+        </p>
+        <div class="tile-meta">
+            <span data-i18n="casino.tag.skill">Strategy</span>
+            <span data-i18n="casino.tag.classic">Classic</span>
+        </div>
+        <div class="tile-arrow">
+            <i data-lucide="arrow-right"></i>
+        </div>
+    </a>
+
+    <a class="casino-tile roulette" href="/casino/roulette">
+        <div class="tile-icon" aria-hidden="true">
+            <span style="font-size:32px;">🎯</span>
+        </div>
+        <h3 class="tile-title" data-i18n="casino.roulette.title">Roulette</h3>
+        <p class="tile-desc" data-i18n="casino.roulette.desc">
+            European roulette · single zero · straight-up pays 35:1.
+        </p>
+        <div class="tile-meta">
+            <span data-i18n="casino.tag.european">European</span>
+            <span data-i18n="casino.tag.instant">Instant</span>
+        </div>
+        <div class="tile-arrow">
+            <i data-lucide="arrow-right"></i>
+        </div>
+    </a>
+
+    <a class="casino-tile dice" href="/casino/dice">
+        <div class="tile-icon" aria-hidden="true">
+            <span style="font-size:32px;">🎲</span>
+        </div>
+        <h3 class="tile-title" data-i18n="casino.dice.title">Dice</h3>
+        <p class="tile-desc" data-i18n="casino.dice.desc">
+            Bet on the sum of two dice · 7 is worth 5×.
+        </p>
+        <div class="tile-meta">
+            <span data-i18n="casino.tag.simple">Simple</span>
+            <span data-i18n="casino.tag.instant">Instant</span>
+        </div>
+        <div class="tile-arrow">
+            <i data-lucide="arrow-right"></i>
+        </div>
+    </a>
+
+    <a class="casino-tile poker" href="/casino/poker">
+        <div class="tile-icon" aria-hidden="true">
+            <span style="font-size:32px;">♠</span>
+        </div>
+        <h3 class="tile-title" data-i18n="casino.poker.title">Poker</h3>
+        <p class="tile-desc" data-i18n="casino.poker.desc">
+            Texas Hold'em heads-up. Best 5-of-7 hand takes the pot.
+        </p>
+        <div class="tile-meta">
+            <span data-i18n="casino.tag.classic">Classic</span>
+            <span data-i18n="casino.tag.skill">Strategy</span>
+        </div>
+        <div class="tile-arrow">
+            <i data-lucide="arrow-right"></i>
+        </div>
+    </a>
+</section>
+
+<div class="casino-fairness">
+    <i data-lucide="shield-check"></i>
+    <div>
+        <b data-i18n="casino.fairness.title">Fair by design.</b>
+        <span data-i18n="casino.fairness.body">
+            Every shuffle and spin uses the operating system's
+            cryptographic RNG (<code>secrets.SystemRandom</code>) — the same
+            source of randomness your password manager uses. No rigged
+            seeds, no predictor captures the future.
+        </span>
+    </div>
+</div>
+
+<script>
+// Keep the lobby's balance chip in sync with the server after a
+// client-side refresh triggered by returning from a game page.
+(function () {
+    var el = document.getElementById("lobbyBalance");
+    if (!el) return;
+    try {
+        fetch("/casino/api/balance", { credentials: "same-origin", cache: "no-store" })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+                if (data && typeof data.balance === "number") {
+                    el.textContent = data.balance;
+                }
+            })
+            .catch(function () { /* keep server-rendered value */ });
+    } catch (_) { /* no-op */ }
+})();
+</script>
+
+{% endblock %}

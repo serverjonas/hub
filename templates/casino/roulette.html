@@ -1,0 +1,608 @@
+{% extends "base.html" %}
+
+{% block page_id %}casino_roulette{% endblock %}
+{% block title_i18n %}casino.roulette.title{% endblock %}
+{% block title %}Roulette · Casino{% endblock %}
+
+{% block extra_style %}
+/* ─── Roulette table ─── */
+.rou-shell {
+    max-width: 980px;
+    margin: 28px auto 64px;
+    padding: 0 18px;
+}
+.rou-table {
+    background:
+        radial-gradient(700px 280px at 50% 0%, rgba(220, 38, 38, 0.14) 0%, transparent 70%),
+        radial-gradient(600px 200px at 50% 100%, rgba(127, 29, 29, 0.10) 0%, transparent 70%),
+        var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 6px 6px 0 0 var(--border);
+    padding: 26px 22px 22px;
+    position: relative;
+}
+
+/* ─── European wheel layout (0..36) — 3x12 grid + 0 cell left ─── */
+.rou-grid {
+    display: grid;
+    grid-template-columns: 56px repeat(12, 1fr);
+    gap: 4px;
+    margin: 8px 0 14px;
+    user-select: none;
+}
+.rou-num {
+    aspect-ratio: 1 / 1.05;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    border: 2px solid var(--border);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 140ms;
+    color: white;
+    box-shadow: 2px 2px 0 0 var(--border);
+    position: relative;
+}
+.rou-num:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 0 var(--border);
+    filter: brightness(1.10);
+}
+.rou-num:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 var(--border);
+}
+.rou-num.red    { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
+.rou-num.black  { background: linear-gradient(135deg, #1f2937 0%, #0f172a 100%); }
+.rou-num.zero   { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); grid-row: 1 / span 3; }
+.rou-num.winner { animation: rouWin 1.6s ease-in-out; outline: 3px solid #fbbf24; }
+@keyframes rouWin {
+    0%, 100% { transform: scale(1); }
+    25%      { transform: scale(1.15); filter: brightness(1.4); }
+    50%      { transform: scale(1.05); }
+    75%      { transform: scale(1.20); filter: brightness(1.6); }
+}
+
+/* ─── Outside bets ─── */
+.rou-outside {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin: 6px 0 16px;
+}
+.rou-out {
+    padding: 14px 10px;
+    border: 2px solid var(--border);
+    border-radius: 7px;
+    background: var(--bg-warm);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    cursor: pointer;
+    text-align: center;
+    transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 140ms;
+    box-shadow: 2px 2px 0 0 var(--border);
+}
+.rou-out small {
+    display: block;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 3px;
+    font-family: var(--font-body);
+}
+.rou-out:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 0 var(--border); }
+.rou-out:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 0 var(--border); }
+.rou-out.red  { background: linear-gradient(135deg, rgba(239,68,68,0.10) 0%, rgba(0,0,0,0.04) 100%); color: #b91c1c; }
+.rou-out.black { background: linear-gradient(135deg, rgba(31,41,55,0.10) 0%, rgba(0,0,0,0.04) 100%); color: #0f172a; }
+.rou-out.selected { outline: 3px solid var(--accent); transform: translate(-2px, -2px); box-shadow: 4px 4px 0 0 var(--accent); }
+
+/* ─── Selected bet chip ─── */
+.rou-chip {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent-gradient);
+    border: 2px solid var(--border);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 22px;
+    text-align: center;
+    box-shadow: 1px 1px 0 0 var(--border);
+    pointer-events: none;
+    animation: chipPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes chipPop {
+    0% { transform: scale(0.4) rotate(-30deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* ─── Controls ─── */
+.rou-controls {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 14px;
+    background: var(--bg-warm);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+.rou-bet-input {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    width: 100%;
+    text-align: center;
+    transition: var(--transition);
+}
+.rou-bet-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.rou-spin-btn {
+    appearance: none;
+    background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%);
+    color: white;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 800;
+    padding: 12px 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 3px 3px 0 0 var(--border);
+    transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 160ms;
+}
+.rou-spin-btn:not(:disabled):hover  { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 0 var(--border); }
+.rou-spin-btn:not(:disabled):active{ transform: translate(2px, 2px);   box-shadow: 1px 1px 0 0 var(--border); }
+.rou-spin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+/* flashing when winner */
+.rou-spin-btn.spinning {
+    animation: btnSpinPulse 0.5s ease-in-out infinite;
+}
+@keyframes btnSpinPulse {
+    0%, 100% { box-shadow: 3px 3px 0 0 var(--border); }
+    50%      { box-shadow: 3px 3px 0 0 var(--border), 0 0 0 6px rgba(220, 38, 38, 0.20); }
+}
+
+.rou-clear-btn { background: var(--surface); color: var(--text-main); }
+
+.rou-balance-chip {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px 14px;
+    box-shadow: 2px 2px 0 0 var(--border);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 8px;
+}
+.rou-balance-chip .coin-mini {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+    color: white; font-size: 11px; font-weight: 800;
+    line-height: 18px; text-align: center;
+    border: 1.5px solid var(--border);
+}
+
+/* ─── Result banner ─── */
+.rou-banner {
+    margin-top: 18px;
+    padding: 16px 22px;
+    border-radius: var(--radius-md);
+    border: 2px dashed var(--border);
+    background: var(--bg-warm);
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-dim);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    animation: bannerIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.rou-banner.visible { display: flex; }
+.rou-banner.win {
+    border-style: solid;
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.10) 0%, rgba(245, 158, 11, 0.05) 100%);
+    color: #b91c1c;
+    border-color: rgba(220, 38, 38, 0.40);
+}
+.rou-banner.lose { color: var(--text-secondary); }
+.rou-banner i { width: 22px; height: 22px; }
+@keyframes bannerIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* ─── Bet stack panel ─── */
+.rou-betstack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 6px 0 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+}
+.rou-betstack .stack-item {
+    background: var(--bg-warm);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 4px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.rou-betstack .stack-item b { color: var(--accent); }
+
+.rou-selected-status {
+    background: var(--bg-warm);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+}
+.rou-selected-status b { color: var(--accent); }
+
+@media (max-width: 760px) {
+    .rou-shell { padding: 0 14px; margin: 18px auto 40px; }
+    .rou-table { padding: 18px 14px; }
+    .rou-grid { grid-template-columns: 44px repeat(12, 1fr); }
+    .rou-num { font-size: 11px; }
+    .rou-outside { grid-template-columns: repeat(3, 1fr); }
+    .rou-controls { grid-template-columns: 1fr; }
+    .rou-controls > .rou-spin-btn, .rou-controls > .rou-balance-chip { justify-self: stretch; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="rou-shell">
+    <a href="/casino" class="back-link" style="margin-bottom:14px;display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--text-secondary);text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+        <span data-i18n="casino.back">Back to lobby</span>
+    </a>
+
+    <div class="rou-table">
+
+        <h2 style="margin:0 0 4px;font-family:var(--font-heading);font-size:22px;font-weight:800;display:flex;align-items:center;gap:8px;">
+            <i data-lucide="circle-dot" style="width:22px;height:22px;color:#dc2626;"></i>
+            <span data-i18n="casino.roulette.title">European Roulette</span>
+        </h2>
+        <p style="margin:0 0 14px;color:var(--text-secondary);font-size:13.5px;">
+            <span data-i18n="casino.roulette.hint">Tap one or more spots, set your stake, then spin.</span>
+            <b data-i18n="casino.roulette.single">Straight-up pays 35:1.</b>
+        </p>
+
+        <div class="rou-grid" id="rouGrid">
+            <!-- 0 spans rows 1-3 on the left -->
+            <div class="rou-num zero" data-bet-type="number" data-bet-value="0">0</div>
+            <!-- 36..13 (descending first column) -->
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="3">3</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="6">6</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="9">9</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="12">12</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="15">15</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="18">18</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="21">21</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="24">24</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="27">27</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="30">30</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="33">33</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="36">36</div>
+
+            <div class="rou-num black" data-bet-type="number" data-bet-value="2">2</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="5">5</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="8">8</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="11">11</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="14">14</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="17">17</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="20">20</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="23">23</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="26">26</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="29">29</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="32">32</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="35">35</div>
+
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="1">1</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="4">4</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="7">7</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="10">10</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="13">13</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="16">16</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="19">19</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="22">22</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="25">25</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="28">28</div>
+            <div class="rou-num black" data-bet-type="number" data-bet-value="31">31</div>
+            <div class="rou-num red"   data-bet-type="number" data-bet-value="34">34</div>
+        </div>
+
+        <!-- Dozens -->
+        <div class="rou-outside" id="dozenRow">
+            <div class="rou-out" data-bet-type="dozen" data-bet-value="1">
+                <span data-i18n="casino.roulette.dozen1">1st Dozen</span>
+                <small>1 – 12 · 2:1</small>
+            </div>
+            <div class="rou-out" data-bet-type="dozen" data-bet-value="2">
+                <span data-i18n="casino.roulette.dozen2">2nd Dozen</span>
+                <small>13 – 24 · 2:1</small>
+            </div>
+            <div class="rou-out" data-bet-type="dozen" data-bet-value="3">
+                <span data-i18n="casino.roulette.dozen3">3rd Dozen</span>
+                <small>25 – 36 · 2:1</small>
+            </div>
+        </div>
+
+        <div class="rou-outside">
+            <div class="rou-out" data-bet-type="range" data-bet-value="low">
+                <span data-i18n="casino.roulette.low">Low (1-18)</span>
+                <small data-i18n="casino.roulette.even_odds">1:1</small>
+            </div>
+            <div class="rou-out red"  data-bet-type="color" data-bet-value="red">
+                <span data-i18n="casino.roulette.red">RED</span>
+                <small data-i18n="casino.roulette.even_odds">1:1</small>
+            </div>
+            <div class="rou-out black" data-bet-type="color" data-bet-value="black">
+                <span data-i18n="casino.roulette.black">BLACK</span>
+                <small data-i18n="casino.roulette.even_odds">1:1</small>
+            </div>
+            <div class="rou-out" data-bet-type="parity" data-bet-value="even">
+                <span data-i18n="casino.roulette.even">EVEN</span>
+                <small data-i18n="casino.roulette.even_odds">1:1</small>
+            </div>
+            <div class="rou-out" data-bet-type="parity" data-bet-value="odd">
+                <span data-i18n="casino.roulette.odd">ODD</span>
+                <small data-i18n="casino.roulette.even_odds">1:1</small>
+            </div>
+            <div class="rou-out" data-bet-type="range" data-bet-value="high">
+                <span data-i18n="casino.roulette.high">High (19-36)</span>
+                <small data-i18n="casino.roulette.even_odds">1:1</small>
+            </div>
+        </div>
+
+        <div class="rou-selected-status" id="statusRow">
+            <i data-lucide="info" style="width:14px;height:14px;"></i>
+            <span data-i18n="casino.roulette.no_selection">No bets placed yet — pick one or more boxes above.</span>
+        </div>
+
+        <div class="rou-controls">
+            <input class="rou-bet-input" id="betInput" type="number"
+                   min="{{ min_bet }}" max="{{ max_bet }}" value="{{ min_bet * 10 }}"
+                   inputmode="numeric" pattern="[0-9]*"
+                   data-i18n-placeholder="casino.bet.placeholder" placeholder="Stake per bet">
+            <button class="rou-spin-btn" id="spinBtn" type="button" disabled>
+                <i data-lucide="rotate-cw"></i>
+                <span data-i18n="casino.roulette.spin">SPIN</span>
+            </button>
+            <div class="rou-balance-chip">
+                <span class="coin-mini">¢</span>
+                <span data-i18n="casino.balance">Balance</span>:
+                <span id="liveBalance">{{ balance }}</span>
+            </div>
+        </div>
+
+        <div class="rou-banner" id="banner">
+            <i data-lucide="info"></i>
+            <span id="bannerText">—</span>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var BASE = "/casino";
+    var betInput   = document.getElementById("betInput");
+    var spinBtn    = document.getElementById("spinBtn");
+    var banner     = document.getElementById("banner");
+    var bannerText = document.getElementById("bannerText");
+    var bannerIcon = banner.querySelector("i");
+    var balance    = document.getElementById("liveBalance");
+    var status     = document.getElementById("statusRow");
+    var nums       = document.querySelectorAll(".rou-num");
+    var outs       = document.querySelectorAll(".rou-out");
+
+    // Each "bet" is {betType, betValue, el}. Multiple can be placed; we spin
+    // all of them in a single round and credit the total winnings.
+    var bets = [];
+
+    function t(key, vars) { return window.t ? window.t(key, vars) : "[" + key + "]"; }
+
+    function setBalance(v) { balance.textContent = v; }
+
+    function refreshSpinBtn() {
+        spinBtn.disabled = bets.length === 0;
+    }
+    function refreshStatus() {
+        if (bets.length === 0) {
+            status.innerHTML = '<i data-lucide="info" style="width:14px;height:14px;"></i> ' +
+                t("casino.roulette.no_selection");
+        } else {
+            var total = bets.length * (parseInt(betInput.value || "0", 10) || 0);
+            var labels = bets.map(function (b) { return betLabel(b); }).join(" + ");
+            status.innerHTML = '<i data-lucide="list-checks" style="width:14px;height:14px;"></i> ' +
+                '<span data-i18n="casino.roulette.bets_count">{n} bets · {amt} ¢</span>'
+                    .replace("{n}", bets.length)
+                    .replace("{amt}", total);
+            status.innerHTML += ": <b>" + labels + "</b>";
+        }
+        if (window.lucide) window.lucide.createIcons({ attrs: { "stroke-width": 2.5 } });
+        spinBtn.disabled = bets.length === 0;
+    }
+
+    function betLabel(b) {
+        var map = {
+            "color:red": t("casino.roulette.red"), "color:black": t("casino.roulette.black"),
+            "parity:even": t("casino.roulette.even"), "parity:odd": t("casino.roulette.odd"),
+            "range:low": t("casino.roulette.low"), "range:high": t("casino.roulette.high"),
+            "dozen:1": t("casino.roulette.dozen1"),
+            "dozen:2": t("casino.roulette.dozen2"),
+            "dozen:3": t("casino.roulette.dozen3"),
+        };
+        var key = b.betType + ":" + b.betValue;
+        if (map[key]) return map[key];
+        if (b.betType === "number") return "№" + b.betValue;
+        return key;
+    }
+
+    function showChip(target, value) {
+        var old = target.querySelector(".rou-chip");
+        if (old) old.remove();
+        var chip = document.createElement("div");
+        chip.className = "rou-chip";
+        chip.textContent = value;
+        target.appendChild(chip);
+    }
+
+    function clearChips() {
+        document.querySelectorAll(".rou-chip").forEach(function (el) { el.remove(); });
+    }
+    function clearSelected() {
+        document.querySelectorAll(".rou-num.selected,.rou-out.selected").forEach(function (el) {
+            el.classList.remove("selected");
+        });
+        bets = [];
+        refreshStatus();
+    }
+
+    function placeBet(el) {
+        var bt = el.dataset.betType;
+        var bv = el.dataset.betValue;
+        var existing = -1;
+        for (var i = 0; i < bets.length; i++) {
+            if (bets[i].betType === bt && bets[i].betValue === bv) { existing = i; break; }
+        }
+        if (existing >= 0) {
+            // Toggle: click again to remove that bet
+            bets.splice(existing, 1);
+            el.classList.remove("selected");
+            var old = el.querySelector(".rou-chip");
+            if (old) old.remove();
+        } else {
+            bets.push({ betType: bt, betValue: bv, el: el });
+            el.classList.add("selected");
+            showChip(el, parseInt(betInput.value || "0", 10) || 0);
+        }
+        refreshStatus();
+    }
+
+    function highlightWinner(lucky, color) {
+        var cell = document.querySelector('.rou-num[data-bet-value="' + lucky + '"]');
+        if (cell) {
+            cell.classList.add("winner");
+            // bolt the underlying color (red/black/zero) for clarity
+            cell.style.outline = "3px solid " + (color === "red" ? "#fca5a5" : (color === "black" ? "#cbd5e1" : "#bbf7d0"));
+            setTimeout(function () { cell.classList.remove("winner"); cell.style.outline = ""; }, 1800);
+        }
+    }
+
+    function showBanner(kind, html) {
+        banner.className = "rou-banner visible " + (kind || "");
+        bannerText.innerHTML = html;
+        bannerIcon.setAttribute("data-lucide", kind === "win" ? "trophy" : (kind === "lose" ? "x-circle" : "info"));
+        if (window.lucide) window.lucide.createIcons({ attrs: { "stroke-width": 2.5 } });
+    }
+
+    async function doSpin() {
+        if (bets.length === 0) return;
+        var stake = parseInt((betInput.value || "0").trim(), 10);
+        if (!stake || stake < {{ min_bet }} || stake > {{ max_bet }}) {
+            showBanner("lose", t("casino.error.invalid_bet"));
+            return;
+        }
+        var totalStake = stake * bets.length;
+        if (totalStake > parseInt(balance.textContent, 10)) {
+            showBanner("lose", t("casino.error.insufficient"));
+            return;
+        }
+        spinBtn.disabled = true;
+        spinBtn.classList.add("spinning");
+        banner.classList.remove("visible");
+        // Optimistic wallet deduction = totalStake (server is authoritative)
+        setBalance(parseInt(balance.textContent, 10) - totalStake);
+
+        try {
+            var res = await fetch(BASE + "/api/roulette/spin", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: bets.map(function (b) {
+                    return "bet=" + encodeURIComponent(stake) +
+                           "&bet_type=" + encodeURIComponent(b.betType) +
+                           "&bet_value=" + encodeURIComponent(b.betValue);
+                }).join("&"),
+            });
+            var data = await res.json();
+            if (!res.ok) {
+                showBanner("lose", t("casino.error." + (data.error || "generic")));
+                setBalance(data.balance);
+                refreshStatus();
+                return;
+            }
+            var lucky = data.lucky;
+            var color = data.color;
+
+            highlightWinner(lucky, color);
+
+            setTimeout(function () {
+                spinBtn.classList.remove("spinning");
+                spinBtn.disabled = false;
+                setBalance(data.balance);
+                var won = data.won;
+                var pretty = (data.payout > 0 ? "+" + data.payout + " ¢" : "–" + (stake * bets.length) + " ¢");
+                if (won) {
+                    showBanner("win", t("casino.roulette.win_with_payout", {multiplier: data.multiplier, payout: data.payout, lucky: lucky, color: color})
+                              + " <b>" + pretty + "</b>");
+                } else {
+                    showBanner("lose", t("casino.roulette.no_win", {lucky: lucky, color: color}));
+                }
+                clearSelected();
+            }, 600);
+        } catch (err) {
+            showBanner("lose", t("casino.error.network"));
+            spinBtn.classList.remove("spinning");
+            refreshStatus();
+        }
+    }
+
+    // Wire up cells
+    nums.forEach(function (el)  { el.addEventListener("click", function () { placeBet(el); }); });
+    outs.forEach(function (el)  { el.addEventListener("click", function () { placeBet(el); }); });
+
+    spinBtn.addEventListener("click", doSpin);
+    betInput.addEventListener("input", function () {
+        // Update chip amounts when stake changes (only for placed bets).
+        var stake = parseInt((betInput.value || "0").trim(), 10) || 0;
+        bets.forEach(function (b) { showChip(b.el, stake); });
+        refreshStatus();
+    });
+})();
+</script>
+
+{% endblock %}

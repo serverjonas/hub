@@ -178,3 +178,9 @@ pfad = "sjn_ai"
 url = "/sjn-ai"
 description = "SJN-AI – lokaler KI-Chat über Ollama (Streamt Token-für-Token; bei nicht erreichbarer API wird das Modul beim Boot übersprungen)."
 active = true
+
+[casino]
+pfad = "casino"
+url = "/casino"
+description = "Casino mit Spielgeld-Münzen: Slots, Blackjack, Roulette, Würfel und Texas-Hold'em. Jede Nacht um 0:00 Uhr wird das Wallet auf 1000 Münzen zurückgesetzt."
+active = true
