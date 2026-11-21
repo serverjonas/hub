@@ -8,6 +8,8 @@
     "notifadmin.label.target": "Recipient",
     "notifadmin.label.type": "Type",
     "notifadmin.label.message": "Message",
+    "notifadmin.label.sent_at": "Sent at (optional)",
+    "notifadmin.hint.sent_at": "Leave empty to send now. A value here sets which time the notification is shown as sent at.",
     "notifadmin.target.all": "All users",
     "notifadmin.target.single": "Individual users",
     "notifadmin.type.system": "System (default)",

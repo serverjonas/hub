@@ -8,6 +8,8 @@
     "notifadmin.label.target": "Empfänger",
     "notifadmin.label.type": "Typ",
     "notifadmin.label.message": "Nachricht",
+    "notifadmin.label.sent_at": "Sendezeitpunkt (optional)",
+    "notifadmin.hint.sent_at": "Leer lassen = jetzt senden. Ein gesetzter Wert bestimmt, welcher Zeitpunkt als Sendezeit angezeigt wird.",
     "notifadmin.target.all": "Alle Benutzer",
     "notifadmin.target.single": "Einzelne Benutzer",
     "notifadmin.type.system": "System (Standard)",

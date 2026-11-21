@@ -160,7 +160,21 @@ def get_notifications(user_id):
     return notifications
 
 
-def create_notification(user_id, message, type="system", sender_id=None, group_id=None):
+def create_notification(
+    user_id,
+    message,
+    type="system",
+    sender_id=None,
+    group_id=None,
+    created_at=None,
+):
+    """Legt eine Benachrichtigung an.
+
+    ``created_at`` (Unix-Timestamp) überschreibt den Sendezeitpunkt. Wird der
+    Parameter nicht gesetzt, gilt ``time.time()``. Der Admin-Bereich nutzt das,
+    um den angezeigten Zeitstempel einer Nachricht frei zu setzen.
+    """
+    timestamp = int(time.time()) if created_at is None else int(created_at)
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
@@ -170,7 +184,7 @@ def create_notification(user_id, message, type="system", sender_id=None, group_i
         )
         VALUES (?, ?, ?, ?, 0, ?, ?)
         """,
-        (user_id, sender_id, type, message, int(time.time()), group_id),
+        (user_id, sender_id, type, message, timestamp, group_id),
     )
     notif_id = cur.lastrowid
     conn.commit()

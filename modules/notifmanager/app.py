@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import sys
+from datetime import datetime
 
 from flask import Blueprint, abort, redirect, render_template, request
 
@@ -11,6 +12,31 @@ from toolbox.news import create_notification
 from toolbox.user import get_current_user, get_infos
 
 bp = Blueprint("notification_manager", __name__, template_folder="templates")
+
+# Grenzen fuer den optionalen Sendezeitstempel (Unix-Sekunden):
+# 1970-01-01 bis 2100-01-01. Verhindert absurde Werte, die Anzeige-
+# Formatierung oder Sortierung kaputt machen.
+MIN_SENT_TS = 0
+MAX_SENT_TS = 4102444800
+
+
+def _parse_sent_at(raw):
+    """Optionaler Zeitstempel aus ``<input type="datetime-local">``.
+
+    Liefert ``(timestamp, error)``. Leer bedeutet "jetzt senden"
+    (``(None, None)``), ein nicht parsebarer Wert liefert eine Meldung.
+    """
+    raw = (raw or "").strip()
+    if not raw:
+        return None, None
+    try:
+        dt = datetime.fromisoformat(raw)
+    except ValueError:
+        return None, "Ungueltiger Zeitstempel – bitte Datum und Uhrzeit angeben."
+    ts = int(dt.timestamp())
+    if not (MIN_SENT_TS <= ts <= MAX_SENT_TS):
+        return None, "Zeitstempel muss zwischen 1970 und 2100 liegen."
+    return ts, None
 
 @bp.before_request
 def require_admin():
@@ -42,6 +68,12 @@ def send():
     message = request.form.get("message")
     notif_type = request.form.get("type", "system")
 
+    # Optionaler Sendezeitstempel: bestimmt, wann die Nachricht laut
+    # Anzeige gesendet wurde (z.B. rueckdatiert). Leer = jetzt.
+    sent_at, ts_error = _parse_sent_at(request.form.get("sent_at"))
+    if ts_error:
+        return f"Fehler: {ts_error}", 400
+
     if not message:
         return "Fehler: Nachricht darf nicht leer sein", 400
 
@@ -54,11 +86,17 @@ def send():
         conn.close()
 
         for uid in user_ids:
-            create_notification(uid, message, type=notif_type, sender_id=sender["id"])
+            create_notification(
+                uid, message, type=notif_type, sender_id=sender["id"],
+                created_at=sent_at,
+            )
     else:
         # Nachricht an einen spezifischen Benutzer senden
         try:
-            create_notification(int(target), message, type=notif_type, sender_id=sender["id"])
+            create_notification(
+                int(target), message, type=notif_type, sender_id=sender["id"],
+                created_at=sent_at,
+            )
         except (ValueError, TypeError):
             abort(400)
 
