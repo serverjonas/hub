@@ -1,20 +1,19 @@
-from urllib.parse import urlparse, urljoin
-
-from flask import Blueprint, render_template, request, redirect, url_for, abort
-import sqlite3
-import time
-import sys
 import os
+import sqlite3
+import sys
+import time
+from urllib.parse import urljoin, urlparse
+
+from flask import Blueprint, abort, redirect, render_template, request, url_for
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 from toolbox.files import DB_PATH
 from toolbox.user import (
+    create_permission_suggestion,
     get_current_user,
     get_infos,
-    require_admin_or_mod,
-    is_mod,
-    create_permission_suggestion,
     list_pending_suggestions,
+    require_admin_or_mod,
     review_permission_suggestion,
 )
 

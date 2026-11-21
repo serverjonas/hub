@@ -17,7 +17,6 @@ from flask import Blueprint, abort, jsonify, request
 
 from toolbox.user import get_current_user, is_admin_or_mod
 
-
 bp = Blueprint("internal_status", __name__)
 
 # Optional shared-secret from environment.

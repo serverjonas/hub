@@ -23,14 +23,13 @@ import secrets
 import sqlite3
 import threading
 import time
+from collections.abc import Iterable
 from functools import wraps
-from typing import Iterable, Optional
 
 from flask import g, jsonify, request
 
 from toolbox.files import DB_PATH
 from toolbox.user import get_name
-
 
 # ─── Constants ────────────────────────────────────────────────────────────
 
@@ -72,7 +71,7 @@ def _hash_secret(secret: str) -> str:
     return hashlib.sha256(secret.encode("utf-8")).hexdigest()
 
 
-def parse_authorization_header(header_value: Optional[str]) -> tuple[Optional[str], Optional[str]]:
+def parse_authorization_header(header_value: str | None) -> tuple[str | None, str | None]:
     """Extract the (prefix, secret) parts from an Authorization header.
 
     Returns ``(None, None)`` for missing, malformed, or non-Bearer-sjn tokens.
@@ -171,7 +170,7 @@ def list_api_keys(user_id: int) -> list[dict]:
         conn.close()
 
 
-def _human_ts(ts: Optional[int]) -> str:
+def _human_ts(ts: int | None) -> str:
     if not ts:
         return "—"
     return time.strftime("%Y-%m-%d %H:%M", time.localtime(int(ts)))
@@ -180,7 +179,7 @@ def _human_ts(ts: Optional[int]) -> str:
 # ─── Lookup & verification ───────────────────────────────────────────────
 
 
-def lookup_and_verify(prefix: str, secret: str) -> Optional[dict]:
+def lookup_and_verify(prefix: str, secret: str) -> dict | None:
     """O(1) lookup by prefix, then constant-time hash compare.
 
     Returns the row dict on success, ``None`` otherwise.
@@ -228,7 +227,7 @@ def lookup_and_verify(prefix: str, secret: str) -> Optional[dict]:
 
 
 class _TokenBucket:
-    __slots__ = ("tokens", "last_refill", "last_used")
+    __slots__ = ("last_refill", "last_used", "tokens")
 
     def __init__(self, capacity: int):
         self.tokens = float(capacity)
@@ -302,7 +301,7 @@ def _error(code: str, message: str, status: int):
     return resp
 
 
-def require_api_key(scopes: Optional[Iterable[str]] = None):
+def require_api_key(scopes: Iterable[str] | None = None):
     """Mark a route as requiring a valid API key with the given scopes.
 
     Usage::

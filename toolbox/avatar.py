@@ -18,7 +18,6 @@ from __future__ import annotations
 import io
 import os
 import re
-from typing import Optional
 
 try:
     from PIL import Image, ImageOps
@@ -28,8 +27,7 @@ except Exception:  # pragma: no cover - graceful degradation
     ImageOps = None  # type: ignore
     _HAVE_PILLOW = False
 
-from toolbox.files import BASE_DIR, DATA_DIR
-
+from toolbox.files import DATA_DIR
 
 AVATAR_MAX_BYTES = 10 * 1024 * 1024  # 10 MB (spec)
 AVATAR_MAX_SIDE = 512               # Down-scale very large images
@@ -55,7 +53,7 @@ def _ensure_avatar_dir() -> str:
     return AVATAR_DIR
 
 
-def avatar_path_for(user_id: int, avatar_path: Optional[str]) -> Optional[str]:
+def avatar_path_for(user_id: int, avatar_path: str | None) -> str | None:
     """Return an absolute path to the avatar file, validating against
     traversal. Returns None when the stored path is empty / unavailable.
     """
@@ -80,7 +78,7 @@ def avatar_path_for(user_id: int, avatar_path: Optional[str]) -> Optional[str]:
     return full if os.path.isfile(full) else None
 
 
-def avatar_url_for(user_id: Optional[int], avatar_path: Optional[str]) -> str:
+def avatar_url_for(user_id: int | None, avatar_path: str | None) -> str:
     """Build the URL the templates need to render ``<img src=...>``.
 
     Always returns SOMETHING so the layout doesn't shift: either the user's
@@ -205,7 +203,7 @@ def process_avatar_upload(file_storage, user_id: int) -> str:
 _SVG_CACHE: dict[str, bytes] = {}
 
 
-def _svg_fallback(user_id_str: str, label_hint: Optional[str] = None) -> bytes:
+def _svg_fallback(user_id_str: str, label_hint: str | None = None) -> bytes:
     """Generates a small inline SVG used when a user has no uploaded avatar.
 
     Cached because the URL uses the user-id as the seed and these get hit

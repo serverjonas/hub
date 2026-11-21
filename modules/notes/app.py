@@ -41,7 +41,6 @@ from __future__ import annotations
 import logging
 import os
 import uuid
-from typing import List, Tuple
 
 from flask import (
     Blueprint,
@@ -88,7 +87,7 @@ def user_root(user_id: int) -> str:
     return root
 
 
-def resolve_subpath(user_id: int, rel: str) -> Tuple[str, str]:
+def resolve_subpath(user_id: int, rel: str) -> tuple[str, str]:
     """Resolve ``rel`` against user cloud root.
 
     Returns ``(abs_path, relpath)``. Raises ``ValueError`` on traversal.
@@ -108,7 +107,7 @@ def resolve_subpath(user_id: int, rel: str) -> Tuple[str, str]:
     return full, rel_out
 
 
-def split_path(rel: str) -> List[str]:
+def split_path(rel: str) -> list[str]:
     """``"a/b/c.md"`` → ``["a", "b", "c.md"]`` (skips empty parts)."""
     return [p for p in (rel or "").split(os.sep) if p]
 
@@ -202,7 +201,7 @@ def _list_notes_recursive(root: str) -> dict:
     UI is stable. Each item has ``name``, ``rel`` (slash-joined), and
     ``size`` (bytes). Deleted-on-disk failures are skipped.
     """
-    items: List[dict] = []
+    items: list[dict] = []
     abs_root = os.path.abspath(root)
     if not os.path.isdir(abs_root):
         return {"folder": "", "items": items}

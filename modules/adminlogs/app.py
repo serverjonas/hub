@@ -7,7 +7,7 @@ from flask import Blueprint, abort, jsonify, render_template
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 from toolbox.files import LOGS_DIR
-from toolbox.user import get_current_user, get_infos, require_admin_or_mod
+from toolbox.user import get_current_user, require_admin_or_mod
 
 bp = Blueprint("adminlogs", __name__, template_folder="templates")
 

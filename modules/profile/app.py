@@ -17,10 +17,10 @@ Provides Jinja helpers used everywhere:
 """
 from __future__ import annotations
 
+import html
 import os
 import re
 import sys
-import html
 
 from flask import (
     Blueprint,
@@ -37,13 +37,19 @@ from flask import (
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from toolbox.files import DATA_DIR
+from toolbox.avatar import (
+    ALLOWED_AVATAR_EXT,
+    AVATAR_DIR,
+    AVATAR_MAX_BYTES,
+    AvatarUploadError,
+    avatar_path_for,
+    process_avatar_upload,
+    write_fallback_svg,
+)
 from toolbox.user import (
     BIO_MAX_LEN,
     PROFILE_VIS_FRIENDS,
-    PROFILE_VIS_PRIVATE,
     PROFILE_VIS_PUBLIC,
-    VALID_PROFILE_VIS,
     are_friends,
     change_password,
     get_current_user,
@@ -54,16 +60,6 @@ from toolbox.user import (
     kill_other_sessions,
     update_user_profile,
 )
-from toolbox.avatar import (
-    ALLOWED_AVATAR_EXT,
-    AVATAR_DIR,
-    AVATAR_MAX_BYTES,
-    AvatarUploadError,
-    avatar_path_for,
-    process_avatar_upload,
-    write_fallback_svg,
-)
-
 
 bp = Blueprint("profile", __name__,
                template_folder="templates",

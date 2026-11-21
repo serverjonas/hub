@@ -65,7 +65,6 @@ from flask import (
 from toolbox.files import BASE_DIR
 from toolbox.user import get_current_user, is_banned
 
-
 # ─── Configuration ──────────────────────────────────────────────────────────
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2")

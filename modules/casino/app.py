@@ -53,7 +53,6 @@ import sys
 from collections import Counter
 from contextlib import contextmanager
 from datetime import date
-from typing import Optional
 
 from flask import (
     Blueprint,
@@ -67,15 +66,13 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 )
 
-from toolbox.files import BASE_DIR
-from toolbox.user import get_current_user, is_banned
-
 from modules.casino.poker_eval import (
     best_5_of_7,
     category_name,
     make_deck,
 )
-
+from toolbox.files import BASE_DIR
+from toolbox.user import get_current_user, is_banned
 
 # ─── Configuration ──────────────────────────────────────────────────────────
 STARTING_BALANCE = 1000
@@ -747,7 +744,7 @@ def _require_active_user():
     return cu
 
 
-def _parse_bet(raw) -> Optional[int]:
+def _parse_bet(raw) -> int | None:
     """Validate the bet amount. Returns the integer value, or ``None``
     if invalid (caller should return a 400).
     """

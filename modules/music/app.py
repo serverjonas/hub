@@ -1,4 +1,3 @@
-import json
 import os
 import shutil
 import subprocess
@@ -8,9 +7,9 @@ import zipfile
 import requests
 from flask import Blueprint, abort, jsonify, render_template, request, send_file
 
-from toolbox.user import get_current_user
-from toolbox.toolbox import DATA_DIR
 from toolbox.files import _folder_size, check_storage, get_storage_info
+from toolbox.toolbox import DATA_DIR
+from toolbox.user import get_current_user
 
 bp = Blueprint("music", __name__, template_folder="templates")
 

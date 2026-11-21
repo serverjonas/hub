@@ -1,5 +1,8 @@
-from flask import Blueprint, request, redirect, url_for, session
-import json, os, time
+import json
+import os
+import time
+
+from flask import Blueprint, redirect, request, session, url_for
 
 bp = Blueprint("musikauswahl", __name__)
 

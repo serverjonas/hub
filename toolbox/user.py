@@ -1,11 +1,11 @@
-import os
+import logging
 import re
 import sqlite3
 import time
-import logging
-from typing import Optional
-from flask import request, make_response
-from werkzeug.security import generate_password_hash, check_password_hash
+
+from flask import request
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from toolbox.files import *
 
 logger = logging.getLogger(__name__)
@@ -245,7 +245,7 @@ VALID_PROFILE_VIS = (PROFILE_VIS_PUBLIC, PROFILE_VIS_FRIENDS, PROFILE_VIS_PRIVAT
 BIO_MAX_LEN = 500
 
 
-def get_user_profile(user_id: int) -> Optional[dict]:
+def get_user_profile(user_id: int) -> dict | None:
     """Vollständiges Profil-Bundle für Anzeige + Bearbeitung.
 
     Liefert ``None`` wenn der User nicht (mehr) existiert. Alle Felder sind
@@ -283,8 +283,8 @@ def get_user_profile(user_id: int) -> Optional[dict]:
     }
 
 
-def get_user_by_name(name: str) -> Optional[dict]:
-    """Wie ``get_user_profile``, aber Lookup über den Namen.
+def get_user_by_name(name: str) -> dict | None:
+    r"""Wie ``get_user_profile``, aber Lookup über den Namen.
 
     Case-insensitive – Nutzernamen werden vom Register-Modul auf
     ``[a-zA-Z0-9_-+\?!@#$%*=]{3,32}`` beschränkt, daher harmlos.
@@ -311,11 +311,11 @@ def get_user_by_name(name: str) -> Optional[dict]:
 def update_user_profile(
     user_id: int,
     *,
-    bio: Optional[str] = None,
-    avatar_path: Optional[str] = None,
+    bio: str | None = None,
+    avatar_path: str | None = None,
     avatar_clear: bool = False,
-    visibility: Optional[str] = None,
-) -> Optional[str]:
+    visibility: str | None = None,
+) -> str | None:
     """Patcht einzelne Profil-Felder. Liefert ``None`` bei Erfolg oder eine
     Fehlermeldung wenn die Validierung fehlschlägt.
     """
@@ -357,7 +357,7 @@ def update_user_profile(
     return None
 
 
-def change_password(user_id: int, current_pw: str, new_pw: str) -> Optional[str]:
+def change_password(user_id: int, current_pw: str, new_pw: str) -> str | None:
     """Setzt das Passwort nach Validierung. Liefert ``None`` bei Erfolg oder
     eine lokalisierbare Fehlermeldung (key oder Klartext).
     """
@@ -397,7 +397,7 @@ def change_password(user_id: int, current_pw: str, new_pw: str) -> Optional[str]
     return None
 
 
-def kill_other_sessions(user_id: int, keep_session_id: Optional[str]) -> int:
+def kill_other_sessions(user_id: int, keep_session_id: str | None) -> int:
     """Löscht alle Sessions des Users außer der aktuellen.
 
     Gibt die Anzahl der abgemeldeten Sessions zurück.
@@ -564,7 +564,6 @@ def mask_email(email):
 
 from flask import abort as _abort
 
-
 MOD_COOLDOWN_SECONDS = 7 * 24 * 60 * 60   # 7 Tage
 VALID_SUGGESTION_ROLES = ("admin", "vip", "mod")
 
@@ -630,7 +629,7 @@ def get_cooldown_remaining(mod_id) -> int:
     return max(0, expires_at - int(time.time()))
 
 
-def record_mod_cooldown(mod_id, reason: str = "") -> Optional[int]:
+def record_mod_cooldown(mod_id, reason: str = "") -> int | None:
     """Setzt/reaktiviert den 7-Tage-Cooldown für einen Mod.
 
     Gibt den expires_at-Zeitstempel zurück, wenn der Cooldown persistiert

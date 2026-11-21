@@ -1,7 +1,6 @@
 # main app.py
 import argparse
 import importlib.util
-import json
 import os
 import sqlite3
 import time
@@ -20,12 +19,12 @@ from flask import (
     request,
     send_from_directory,
 )
+
 from toolbox.files import BASE_DIR, get_git_info
 from toolbox.i18n import build_translation_manifest
 from toolbox.user import (
     get_current_user,
     get_infos,
-    get_lang,
     is_banned,
     is_user_active,
 )

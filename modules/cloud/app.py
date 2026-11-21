@@ -47,7 +47,6 @@ import mimetypes
 import os
 import shutil
 import uuid
-from typing import List, Optional, Tuple
 
 from flask import (
     Blueprint,
@@ -63,7 +62,6 @@ from flask import (
 from toolbox.files import (
     DATA_PATH,
     _format_bytes,
-    _folder_size,
     check_storage,
     get_storage_info,
 )
@@ -119,7 +117,7 @@ _CLOUD_EXTENSIONS: frozenset = frozenset({
     *ALLOWED_DOC_EXTS,
     # Extra documents / data formats
     ".csv", ".json", ".xml", ".yaml", ".yml", ".toml", ".ini",
-    ".ini", ".cfg", ".conf", ".log",
+    ".cfg", ".conf", ".log",
     # Code / markup / styles
     ".html", ".htm", ".css", ".scss", ".sass", ".less",
     ".js", ".mjs", ".cjs", ".ts", ".jsx", ".tsx",
@@ -194,7 +192,7 @@ def user_root(user_id: int) -> str:
     return root
 
 
-def _resolve_subpath(user_id: int, sub: str) -> Tuple[str, str]:
+def _resolve_subpath(user_id: int, sub: str) -> tuple[str, str]:
     """Resolve ``sub`` against user root.
 
     Returns ``(absolute_path, relative_to_root)``. Raises
@@ -261,7 +259,7 @@ def _validate_folder_name(name: str) -> str:
     return sanitized
 
 
-def _allowed_in_cloud(filename: str, sniffed_mime: str) -> Optional[str]:
+def _allowed_in_cloud(filename: str, sniffed_mime: str) -> str | None:
     """Check ``filename`` extension against the cloud allow-list.
 
     Returns the normalised extension on success, ``None`` if rejected.
@@ -309,7 +307,7 @@ def _list_dir(root: str, rel: str) -> dict:
     """
     abs_target, rel = _resolve_subpath_from(root, rel)
 
-    items: List[dict] = []
+    items: list[dict] = []
     if os.path.isdir(abs_target):
         with os.scandir(abs_target) as it:
             entries = list(it)
@@ -359,7 +357,7 @@ def _list_dir(root: str, rel: str) -> dict:
     }
 
 
-def _resolve_subpath_from(root: str, rel: str) -> Tuple[str, str]:
+def _resolve_subpath_from(root: str, rel: str) -> tuple[str, str]:
     """Like :func:`_resolve_subpath` but for arbitrary root (used by
     :func:`_list_dir`). Always runs the containment check.
     """
@@ -371,14 +369,14 @@ def _resolve_subpath_from(root: str, rel: str) -> Tuple[str, str]:
     return abs_target, rel
 
 
-def _breadcrumbs(rel: str) -> List[dict]:
+def _breadcrumbs(rel: str) -> list[dict]:
     """Return ``[{label, rel}, ...]`` for breadcrumb trail."""
     rel = (rel or "").strip("/")
     out = [{"label": "🏠", "rel": ""}]
     if not rel:
         return out
     parts = rel.split(os.sep)
-    acc: List[str] = []
+    acc: list[str] = []
     for p in parts:
         acc.append(p)
         out.append({"label": p, "rel": "/".join(acc)})
@@ -479,7 +477,7 @@ def upload():
     os.makedirs(CLOUD_TMP_BASE, exist_ok=True)
     tmp = os.path.join(CLOUD_TMP_BASE, f"{user['id']}_{uuid.uuid4()}")
     os.makedirs(tmp, exist_ok=True)
-    written_files: List[Tuple[str, str, int]] = []  # (tmp_path, original_rel, size)
+    written_files: list[tuple[str, str, int]] = []  # (tmp_path, original_rel, size)
     max_file_bytes = CLOUD_MAX_FILE()
 
     try:
@@ -532,8 +530,8 @@ def upload():
 
         # Handle ZIPs (if any of the saved files is a .zip, route it
         # through the safe extractor).
-        zip_targets: List[Tuple[str, str]] = []
-        non_zip_written: List[Tuple[str, str]] = []
+        zip_targets: list[tuple[str, str]] = []
+        non_zip_written: list[tuple[str, str]] = []
         for tmp_path, original_name, _ in written_files:
             if _norm_ext(original_name) == ".zip":
                 zip_targets.append((tmp_path, original_name))

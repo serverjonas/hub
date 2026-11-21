@@ -24,8 +24,8 @@ from __future__ import annotations
 
 import logging
 import os
+
 import tomllib
-from typing import Any
 
 log = logging.getLogger("security.limits")
 

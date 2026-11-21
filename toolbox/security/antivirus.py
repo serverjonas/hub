@@ -59,7 +59,7 @@ Caveats
 from __future__ import annotations
 
 import logging
-from typing import Callable, Optional, Tuple
+from collections.abc import Callable
 
 log = logging.getLogger("security.antivirus")
 
@@ -67,9 +67,9 @@ log = logging.getLogger("security.antivirus")
 # Returns (clean, threat). clean=True means "no threat found". When
 # clean=False, threat should be a short identifier suitable for logging /
 # UI (e.g. "Win.Trojan.Generic").
-ScannerFn = Callable[[str], Tuple[bool, Optional[str]]]
+ScannerFn = Callable[[str], tuple[bool, str | None]]
 
-_scanner: Optional[ScannerFn] = None
+_scanner: ScannerFn | None = None
 
 
 class AntivirusUnavailableError(RuntimeError):
@@ -95,13 +95,13 @@ def unregister_scanner() -> None:
     _scanner = None
 
 
-def _safe_name(fn: Optional[Callable[..., object]]) -> str:
+def _safe_name(fn: Callable[..., object] | None) -> str:
     if fn is None:
         return "<none>"
     return getattr(fn, "__name__", repr(fn))
 
 
-def scan_for_malware(path: str) -> Tuple[bool, Optional[str]]:
+def scan_for_malware(path: str) -> tuple[bool, str | None]:
     """Run the configured scanner on ``path``.
 
     Returns ``(clean, threat)`` where ``threat`` is ``None`` on clean
@@ -132,6 +132,6 @@ def scan_for_malware(path: str) -> Tuple[bool, Optional[str]]:
     return bool(clean), threat
 
 
-def _noop_scanner(path: str) -> Tuple[bool, Optional[str]]:
+def _noop_scanner(path: str) -> tuple[bool, str | None]:
     """Reference no-op scanner; used as a registry default in tests."""
     return True, None

@@ -1,13 +1,14 @@
 import os
 import sqlite3
 import sys
-from flask import Blueprint, render_template, request, redirect, abort
-import sqlite3
+
+from flask import Blueprint, abort, redirect, render_template, request
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from toolbox.files import DB_PATH
-from toolbox.user import get_current_user, get_infos
 from toolbox.news import create_notification
+from toolbox.user import get_current_user, get_infos
 
 bp = Blueprint("notification_manager", __name__, template_folder="templates")
 

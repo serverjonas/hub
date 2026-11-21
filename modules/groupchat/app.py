@@ -25,25 +25,19 @@ from flask import (
     redirect,
     render_template,
     request,
-    url_for,
 )
-from markupsafe import escape, Markup
+from markupsafe import Markup, escape
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from toolbox.files import DB_PATH
-from toolbox.user import get_friends
 from toolbox.news import (
-    GROUP_DESC_MAX,
     GROUP_DM,
-    GROUP_MAX_MEMBERS,
     GROUP_MSG_MAX,
-    GROUP_NAME_MAX,
     GroupError,
     add_group_member,
     create_group,
     delete_group,
-    get_chat_messages,
     get_group,
     get_group_messages,
     is_group_member,
@@ -52,17 +46,15 @@ from toolbox.news import (
     list_my_groups,
     mark_group_read,
     remove_group_member,
-    search_chat_messages,
     send_group_message,
 )
 from toolbox.user import (
     are_friends,
     get_current_user,
-    get_infos,
+    get_friends,
     get_user_by_name,
     is_banned,
 )
-
 
 bp = Blueprint("groupchat", __name__,
                template_folder="templates")

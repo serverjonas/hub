@@ -20,29 +20,27 @@ import os
 import sqlite3
 import sys
 import time
+from datetime import date, datetime
 
-from datetime import datetime, date
 from flask import (
     Blueprint,
     abort,
     jsonify,
-    redirect,
     render_template,
     request,
-    url_for,
 )
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from toolbox.toolbox import DB_PATH
-from toolbox.user import (
-    get_current_user,
-    is_banned,
-)
 from toolbox.news import (
     get_chat_messages,
     search_chat_messages,
     send_dm,
+)
+from toolbox.toolbox import DB_PATH
+from toolbox.user import (
+    get_current_user,
+    is_banned,
 )
 
 bp = Blueprint("chat", __name__, template_folder="../../templates/chat")

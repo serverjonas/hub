@@ -33,9 +33,8 @@ treat it as Ace-high and unfairly beat a 6-high straight, so we patch
 
 from __future__ import annotations
 
-from itertools import combinations
 from collections import Counter
-
+from itertools import combinations
 
 # ─── Rank helpers ────────────────────────────────────────────────────────────
 

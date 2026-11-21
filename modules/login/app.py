@@ -1,13 +1,11 @@
-import os
 import secrets
 import sqlite3
 import time
 
 from flask import Blueprint, make_response, redirect, render_template, request
 from werkzeug.security import check_password_hash
+
 from toolbox.toolbox import DB_PATH
-
-
 
 bp = Blueprint("login", __name__)
 

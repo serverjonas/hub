@@ -710,9 +710,7 @@ def api_exec():
     # 2. Role check (defense-in-depth on top of before_request)
     required = meta["min_role"]
     allowed = True
-    if required == ROLE_ADMIN and not ctx["is_admin"]:
-        allowed = False
-    elif required == ROLE_MOD and not (ctx["is_admin"] or ctx["is_mod"]):
+    if required == ROLE_ADMIN and not ctx["is_admin"] or required == ROLE_MOD and not (ctx["is_admin"] or ctx["is_mod"]):
         allowed = False
     if not allowed:
         _audit(raw, ctx["user_id"], ctx["user_name"], "permission_denied")

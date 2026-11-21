@@ -1,20 +1,18 @@
 import os
 import random
-import secrets
 import sqlite3
 import time
+
 from flask import (
     Blueprint,
     abort,
-    make_response,
     redirect,
     render_template,
     request,
-    url_for,
-    send_from_directory
+    send_from_directory,
 )
 from PIL import Image
-from toolbox.toolbox import DB_PATH
+
 from toolbox.files import check_storage, get_storage_info
 from toolbox.user import get_current_user, get_name
 

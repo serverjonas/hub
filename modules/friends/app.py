@@ -1,10 +1,9 @@
-import os
 import sqlite3
 
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, render_template, request
 
-from toolbox.user import get_current_user
 from toolbox.toolbox import DB_PATH
+from toolbox.user import get_current_user
 
 bp = Blueprint("friends", __name__, template_folder="../../templates/friends")
 
@@ -161,11 +160,7 @@ def index():
             from_id = int(request.form.get("from_id"))
             accept_request(user_id, from_id)
 
-        elif action == "decline":
-            other_id = int(request.form.get("other_id"))
-            decline_or_remove(user_id, other_id)
-
-        elif action == "remove":
+        elif action == "decline" or action == "remove":
             other_id = int(request.form.get("other_id"))
             decline_or_remove(user_id, other_id)
 

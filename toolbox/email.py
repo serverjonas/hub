@@ -22,10 +22,9 @@ import logging
 import os
 import socket
 import subprocess
-from email.utils import format_datetime
-from email.message import EmailMessage
 from datetime import datetime, timezone
-from urllib.parse import urlparse
+from email.message import EmailMessage
+from email.utils import format_datetime
 
 log = logging.getLogger("email")
 

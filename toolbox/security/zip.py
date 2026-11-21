@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import os
 import zipfile
-from typing import Iterable, Optional, Set
+from collections.abc import Iterable
 
 
 class ZipSecurityError(ValueError):
@@ -45,7 +45,7 @@ _DEFAULT_MAX_MEMBERS = 1000
 _DEFAULT_MAX_UNCOMPRESSED = 500 * 1024 * 1024 * 1024  # 500 GB
 
 
-def _norm_ext_set(exts: Optional[Iterable[str]]) -> Optional[Set[str]]:
+def _norm_ext_set(exts: Iterable[str] | None) -> set[str] | None:
     if exts is None:
         return None
     return {
@@ -96,7 +96,7 @@ def safe_extract_zip(
     zip_path: str,
     target: str,
     *,
-    allowed_exts: Optional[Iterable[str]] = None,
+    allowed_exts: Iterable[str] | None = None,
     max_members: int = _DEFAULT_MAX_MEMBERS,
     max_total_uncompressed: int = _DEFAULT_MAX_UNCOMPRESSED,
 ) -> int:

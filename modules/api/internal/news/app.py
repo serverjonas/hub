@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+
 from toolbox.news import get_notifications
 from toolbox.user import get_current_user, get_name
 

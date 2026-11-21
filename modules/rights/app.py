@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort
+from flask import Blueprint, abort, render_template
 
 bp = Blueprint("rights", __name__, template_folder="templates")
 

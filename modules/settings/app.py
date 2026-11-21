@@ -1,12 +1,13 @@
+import sqlite3
+
 from flask import (
     Blueprint,
     flash,
     redirect,
     render_template,
-    request,
     session,
 )
-import sqlite3
+
 from toolbox.files import DB_PATH
 from toolbox.user import (
     get_current_user,

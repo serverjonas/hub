@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request
+from flask import Blueprint, redirect, render_template
 
 from toolbox.user import get_current_user, is_banned
 

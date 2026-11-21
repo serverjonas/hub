@@ -33,7 +33,6 @@ import secrets
 
 from werkzeug.utils import secure_filename
 
-
 _DEFAULT_TOKEN_BYTES = 24           # 32 chars base64-ish; ~190 bits entropy
 _MAX_FILENAME_LEN = 255              # most filesystems' cap
 _MIN_TOKEN_BYTES = 8

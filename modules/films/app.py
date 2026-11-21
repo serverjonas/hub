@@ -20,8 +20,8 @@ from flask import (
     url_for,
 )
 
-from toolbox.user import get_current_user
 from toolbox.files import check_storage, get_storage_info
+from toolbox.user import get_current_user
 
 FILMS_DATA_DIR = os.path.join(
     os.path.dirname(__file__), "..", "..", "data", "films", "data"

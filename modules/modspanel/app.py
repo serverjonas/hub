@@ -3,14 +3,13 @@ import sqlite3
 import sys
 import time
 
-from flask import Blueprint, abort, render_template, request
+from flask import Blueprint, render_template
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 from toolbox.user import (
+    get_cooldown_remaining,
     get_current_user,
     get_infos,
-    get_cooldown_remaining,
-    is_admin_or_mod,
     require_admin_or_mod,
 )
 

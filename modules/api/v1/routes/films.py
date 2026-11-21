@@ -27,7 +27,6 @@ from modules.films.app import (
     write_meta,
 )
 
-
 bp = Blueprint("api_v1_films", __name__)
 
 

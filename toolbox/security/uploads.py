@@ -35,10 +35,7 @@ from __future__ import annotations
 
 import mimetypes
 import os
-from typing import Iterable, Optional, Set, Tuple
-
-from werkzeug.datastructures import FileStorage
-
+from collections.abc import Iterable
 
 # ─── Default allow-lists ────────────────────────────────────────────────────
 # These are the *defaults* used by ``validate_upload`` when a caller does
@@ -47,25 +44,25 @@ from werkzeug.datastructures import FileStorage
 # case (e.g. cloud allows everything in ``ALLOWED_DOC_EXTS``' siblings,
 # memes accepts only images & short videos).
 
-ALLOWED_IMAGE_EXTS: Set[str] = {
+ALLOWED_IMAGE_EXTS: set[str] = {
     ".png", ".jpg", ".jpeg", ".gif", ".webp",
     ".avif",                # next-gen image (AV1 still picture)
     ".heic", ".heif",       # iPhone camera since iOS 11
 }
-ALLOWED_IMAGE_MIMES: Set[str] = {
+ALLOWED_IMAGE_MIMES: set[str] = {
     "image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp",
     "image/avif",
     "image/heic", "image/heif",
 }
 
-ALLOWED_VIDEO_EXTS: Set[str] = {".mp4", ".webm"}
-ALLOWED_VIDEO_MIMES: Set[str] = {"video/mp4", "video/webm"}
+ALLOWED_VIDEO_EXTS: set[str] = {".mp4", ".webm"}
+ALLOWED_VIDEO_MIMES: set[str] = {"video/mp4", "video/webm"}
 
-ALLOWED_AUDIO_EXTS: Set[str] = {
+ALLOWED_AUDIO_EXTS: set[str] = {
     ".mp3", ".m4a", ".flac", ".wav", ".ogg",
     ".opus",                # WhatsApp / Discord / Signal voice notes
 }
-ALLOWED_AUDIO_MIMES: Set[str] = {
+ALLOWED_AUDIO_MIMES: set[str] = {
     "audio/mpeg",           # .mp3 (browser occasionally reports this)
     "audio/mp3",
     "audio/m4a",
@@ -80,8 +77,8 @@ ALLOWED_AUDIO_MIMES: Set[str] = {
     "audio/opus",
 }
 
-ALLOWED_DOC_EXTS: Set[str] = {".txt", ".md", ".pdf"}
-ALLOWED_DOC_MIMES: Set[str] = {
+ALLOWED_DOC_EXTS: set[str] = {".txt", ".md", ".pdf"}
+ALLOWED_DOC_MIMES: set[str] = {
     "text/plain", "text/markdown", "application/pdf",
 }
 
@@ -101,7 +98,7 @@ class UploadValidationError(ValueError):
     branch on ``e.code`` and never substring-match ``str(e)``.
     """
 
-    def __init__(self, message: str, *, code: Optional[str] = None):
+    def __init__(self, message: str, *, code: str | None = None):
         super().__init__(message)
         self.code = code or ErrorCode.FILE_EMPTY
 
@@ -126,7 +123,7 @@ class ErrorCode:
 # ─── Helpers ────────────────────────────────────────────────────────────────
 
 
-def _norm_ext(filename: Optional[str]) -> str:
+def _norm_ext(filename: str | None) -> str:
     if not filename:
         return ""
     return os.path.splitext(filename)[1].lower()
@@ -150,7 +147,7 @@ def _read_content_length(file_storage) -> int:
         return 0
 
 
-def _measure_size(file_storage) -> Tuple[int, bool]:
+def _measure_size(file_storage) -> tuple[int, bool]:
     """Authoritative stream-size measurement via tell() round-trip.
 
     Returns ``(size, known)``:
@@ -265,7 +262,7 @@ def validate_mime(
 
 def validate_size(
     file_storage,
-    max_bytes: Optional[int],
+    max_bytes: int | None,
 ) -> int:
     """Validate ``file_storage`` size against ``max_bytes``.
 
@@ -332,9 +329,9 @@ def validate_size(
 def validate_upload(
     file_storage,
     *,
-    allowed_exts: Optional[Iterable[str]] = None,
-    allowed_mimes: Optional[Iterable[str]] = None,
-    max_bytes: Optional[int] = None,
+    allowed_exts: Iterable[str] | None = None,
+    allowed_mimes: Iterable[str] | None = None,
+    max_bytes: int | None = None,
 ) -> str:
     """Combined validator: extension + MIME + size.
 

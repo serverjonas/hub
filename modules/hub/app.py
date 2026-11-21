@@ -1,5 +1,5 @@
-import re
 import os
+import re
 
 from flask import (
     Blueprint,
@@ -29,7 +29,6 @@ from toolbox.user import (
     record_email_sent,
     set_user_email,
 )
-
 
 bp = Blueprint("hub", __name__)
 

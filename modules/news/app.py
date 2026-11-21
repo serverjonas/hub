@@ -1,8 +1,9 @@
 import sqlite3
 import time
-from flask import Blueprint, render_template, redirect, request
 
-from toolbox.toolbox import DB_PATH 
+from flask import Blueprint, redirect, render_template, request
+
+from toolbox.toolbox import DB_PATH
 from toolbox.user import get_current_user, get_name
 
 bp = Blueprint("news", __name__)

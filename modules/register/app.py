@@ -1,10 +1,9 @@
-import json
 import os
 import re
 import sqlite3
 
-from flask import Blueprint, render_template, request
 from dotenv import load_dotenv
+from flask import Blueprint, render_template, request
 
 from toolbox.toolbox import DB_PATH
 from toolbox.user import create_user

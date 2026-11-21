@@ -44,7 +44,6 @@ import re
 import sys
 import time
 from pathlib import Path
-from typing import Optional, Tuple
 
 try:
     import requests
@@ -88,11 +87,11 @@ _PLACEHOLDER_OPEN = "\u00A0\u00B0VAR_"
 _PLACEHOLDER_CLOSE = "\u00B0\u00A0"
 
 
-def mask_vars(text: str) -> Tuple[str, dict[str, str]]:
+def mask_vars(text: str) -> tuple[str, dict[str, str]]:
     """Replace ``{var}`` placeholders with neutral tokens."""
     mapping: dict[str, str] = {}
 
-    def _sub(m: "re.Match[str]") -> str:
+    def _sub(m: re.Match[str]) -> str:
         token = f"{_PLACEHOLDER_OPEN}{len(mapping)}{_PLACEHOLDER_CLOSE}"
         mapping[token] = "{" + m.group(1) + "}"
         return token
@@ -108,7 +107,7 @@ def unmask_vars(text: str, mapping: dict[str, str]) -> str:
 
 
 # ─── File discovery ───────────────────────────────────────────────────────
-def _filename_to_page_lang(name: str) -> Optional[Tuple[str, str]]:
+def _filename_to_page_lang(name: str) -> tuple[str, str] | None:
     """Return `(page, lang)` for ``<page>_<lang>.json`` else None."""
     if not name.endswith(".json"):
         return None
@@ -147,7 +146,7 @@ def load_all(static_dir: Path) -> dict[str, dict[str, dict]]:
 # ─── Consistency checking ────────────────────────────────────────────────
 def _translation_keys(data: dict) -> set[str]:
     """Top-level translatable keys for one language of a page."""
-    return {k for k in data.keys() if k not in SKIP_TOP_LEVEL_KEYS}
+    return {k for k in data if k not in SKIP_TOP_LEVEL_KEYS}
 
 
 def compute_diffs(by_page: dict[str, dict[str, dict]]) -> list[dict]:
@@ -196,7 +195,7 @@ def compute_missing_files(by_page: dict[str, dict[str, dict]]) -> dict[str, list
 
 
 # ─── Google Translate ─────────────────────────────────────────────────────
-def translate(text: str, source: str, target: str, retries: int = 3) -> Optional[str]:
+def translate(text: str, source: str, target: str, retries: int = 3) -> str | None:
     """Translate ``text`` from ``source`` to ``target``; return None on failure."""
     if not text.strip():
         return text
@@ -210,7 +209,7 @@ def translate(text: str, source: str, target: str, retries: int = 3) -> Optional
 
     masked, mapping = mask_vars(text)
     params = {"client": "gtx", "sl": sl, "tl": tl, "dt": "t", "q": masked}
-    last_err: Optional[str] = None
+    last_err: str | None = None
     for attempt in range(retries):
         try:
             r = requests.get(GOOGLE_URL, params=params, timeout=10)
@@ -285,7 +284,7 @@ def _choose_action(diff: dict, default_source: str, auto: bool) -> str:
     for lang in diff["present"]:
         sys.stdout.write(f"    {lang}: {diff['values'][lang]!r}\n")
     sys.stdout.write("\nchoose action:\n")
-    opts: list[Tuple[str, str]] = []
+    opts: list[tuple[str, str]] = []
     for lang in diff["present"]:
         marker = " (recommended)" if lang == default_source else ""
         opts.append((lang, f"translate from {lang}{marker}"))
@@ -322,7 +321,7 @@ def apply_diff(
     *,
     default_source: str,
     auto: bool,
-) -> Tuple[bool, bool]:
+) -> tuple[bool, bool]:
     """Apply one diff. Returns ``(modified, ok)``."""
     action = _choose_action(diff, default_source, auto)
     page = diff["page"]
@@ -406,7 +405,7 @@ def _build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     if not args.apply:
         args.check = True

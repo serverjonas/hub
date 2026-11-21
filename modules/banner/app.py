@@ -1,8 +1,8 @@
+import logging
 import os
 import sqlite3
 import sys
 import time
-import logging
 
 from flask import Blueprint, abort, redirect, render_template, request
 
@@ -10,10 +10,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 from toolbox.user import (
     DB_PATH,
+    get_cooldown_remaining,
     get_current_user,
     get_infos,
     has_active_cooldown,
-    get_cooldown_remaining,
     record_mod_cooldown,
     require_admin_or_mod,
 )

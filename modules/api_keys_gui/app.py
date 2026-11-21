@@ -12,13 +12,10 @@ Routes (registered under ``/account/api-keys``):
 * ``POST /<int:key_id>/delete`` – delete one of YOUR keys
 """
 
-import json
-import sqlite3
 import time
 
 from flask import (
     Blueprint,
-    abort,
     flash,
     redirect,
     render_template,
@@ -31,14 +28,13 @@ from flask import (
 # the single consumer that drives this subsystem; Routes import from the
 # same module to verify keys.
 from modules.api.v1.auth import (
+    _hash_secret,  # canonical hash helper
+    delete_api_key,
     generate_api_key,
     insert_api_key,
-    delete_api_key,
     list_api_keys,
 )
-from modules.api.v1.auth import _hash_secret   # canonical hash helper
 from toolbox.user import get_current_user
-
 
 bp = Blueprint("api_keys_gui", __name__, template_folder="../../templates")
 
